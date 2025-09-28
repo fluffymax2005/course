@@ -1,34 +1,85 @@
-1. Check .NET version and SDK's. Install SDK and GIT from official resources.
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Project Setup Guide</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            max-width: 800px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        .command-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
 
-dotnet --version
+<div class="note">
+    <strong>NOTE:</strong> all commands are entered in powershell.
+</div>
+
+<h1>1. Check .NET version and SDK's. Install SDK and GIT from official resources.</h1>
+
+<div class="command-section">
+dotnet --version<br>
 dotnet --list-sdks
+</div>
 
-NOTE: all commands are entered in powershell.
+<h1>2. Create folder for your project. Go to your project folder.</h1>
 
-2. Create folder for your project. Go to your project folder.
+<h1>3. Create ASP.NET WEB API project</h1>
 
-3. Create ASP.NET WEB API project
-
-dotnet new webapi -o DbAPI -f net8.0
+<div class="command-section">
+dotnet new webapi -o DbAPI -f net8.0<br>
 cd DbAPI
+</div>
 
-4. Install required packages.
+<h1>4. Install required packages.</h1>
 
-dotnet add package Microsoft.EntityFrameworkCore --version 8.0.0
-dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 8.0.0
-dotnet add package Microsoft.EntityFrameworkCore.Tools --version 8.0.0
-dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.0
+<div class="command-section">
+dotnet add package Microsoft.EntityFrameworkCore --version 8.0.0<br>
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 8.0.0<br>
+dotnet add package Microsoft.EntityFrameworkCore.Tools --version 8.0.0<br>
+dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.0<br>
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 8.0.20
+</div>
 
-5. Clone repository in any place where "course" directory does not exist (or it is empty)
+<h1>5. Clone repository in any place where "course" directory does not exist (or it is empty)</h1>
 
-git clone https://github.com/petrosyan20051/course.git
+<div class="command-section">
+git clone https://github.com/petrosyan20051/course.git<br>
 cd course
+</div>
 
-6. Switch DBAPI branch
+<h1>6. Switch DBAPI branch</h1>
 
+<div class="command-section">
 git switch DBAPI
+</div>
 
-7. Cut and paste all files (except ".git" folder) from repos to <your_project_folder_name> folder. Accept rewriting case neccessary.
+<h1>7. Cut and paste all files (except ".git" folder) from repos to &lt;your_project_folder_name&gt; folder. Accept rewriting case neccessary.</h1>
 
-8. Enjoy development.
+<h1>8. Enjoy development.</h1>
+
+</body>
+</html>
