@@ -169,12 +169,13 @@ namespace db.Contexts {
                 entity.Property(e => e.RoleId).IsRequired().HasColumnOrder(2);
                 entity.Property(e => e.Username).IsRequired().HasColumnOrder(3);
                 entity.Property(e => e.Password).IsRequired().HasColumnOrder(4);
-                entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(5);
-                entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(6);
-                entity.Property(e => e.Note).HasColumnOrder(7);
-                entity.Property(e => e.WhoChanged).HasColumnOrder(8);
-                entity.Property(e => e.WhenChanged).HasColumnOrder(9);
-                entity.Property(e => e.IsDeleted).HasColumnOrder(10);
+                entity.Property(e => e.Email).IsRequired().HasColumnOrder(5);
+                entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(6);
+                entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(7);
+                entity.Property(e => e.Note).HasColumnOrder(8);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(9);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(10);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(11);
             });
 
             modelBuilder.Entity<Credential>().HasData(credentials);

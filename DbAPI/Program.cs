@@ -10,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Threading.RateLimiting;
 using TypeId = int;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add logging
 builder.Logging.AddFile(Path.Combine(Directory.GetCurrentDirectory(), "logs"));
-
 
 // Disable system debug requests
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None); // SQL requests
@@ -68,6 +68,18 @@ builder.Services.AddSwaggerGen(options => {
     });
 });
 
+builder.Services.AddRateLimiter(options => {
+    options.AddPolicy("RecoveryPolicy", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString(),
+            factory: partition => new FixedWindowRateLimiterOptions {
+                AutoReplenishment = true,
+                PermitLimit = 3,
+                Window = TimeSpan.FromHours(1)
+            }
+    ));
+});
+
 // Register OrderDbContext + reposes
 builder.Services.AddDbContext<OrderDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -106,6 +118,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+
+app.UseStaticFiles(); // Enable using html files
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {

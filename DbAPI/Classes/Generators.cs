@@ -229,6 +229,7 @@ namespace db.Tools {
                     Id = i,
                     Username = i == 1 ? "admin" : "basic",
                     Password = PasswordHasher.HashPassword("JcGDN9ST5KEG!"),
+                    Email = $"user{i}@example.com",
                     RoleId = i,
                     WhoAdded = "system",
                     WhenAdded = new DateTime(2023, 1, 1)
