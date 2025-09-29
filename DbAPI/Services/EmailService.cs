@@ -1,29 +1,57 @@
 ﻿using DbAPI.Interfaces;
+using System.Net;
+using System.Net.Mail;
 
 namespace DbAPI.Services {
     public class EmailService : IEmailService {
         private readonly ILogger<EmailService> _logger;
+        private readonly IConfiguration _configuration;
 
-        public EmailService(ILogger<EmailService> logger) {
+        public EmailService(ILogger<EmailService> logger, IConfiguration configuration) {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task SendRecoveryEmailAsync(string email, string recoveryUrl, string username) {
-            var emailContent = $@"
-                Восстановление пароля
+            _logger.LogInformation($"Восстановление пароля для {username} ({email})");
+            _logger.LogInformation($"Ссылка для сброса: {recoveryUrl}");
 
-                Здравствуйте, {username}!
+            try {
 
-                Для восстановления пароля перейдите по ссылке:
-                {recoveryUrl}
+                // Проверяем входные параметры на null
+                if (string.IsNullOrEmpty(email)) {
+                    throw new ArgumentNullException(nameof(email), "Email должен быть непустой строкой");
+                }
 
-                Ссылка действительна 24 часа.
+                if (string.IsNullOrEmpty(recoveryUrl)) {
+                    throw new ArgumentNullException(nameof(recoveryUrl), "Ссылка для восстановления должна быть непустой строкой");
+                }
 
-                Если вы не запрашивали восстановление, проигнорируйте это письмо.";
+                using var smtpClient = new SmtpClient(_configuration["Email:Host"]) {
+                    Port = int.Parse(_configuration["Email:Port"]),
+                    Credentials = new NetworkCredential(_configuration["Email:Username"], _configuration["Email:Password"]),
+                    EnableSsl = true,
+                };
 
-            _logger.LogInformation($"Восстановление пароля пользователя \"{username}\"");
+                var mailMessage = new MailMessage {
+                    From = new MailAddress(_configuration["Email:From"]),
+                    Subject = "Восстановление пароля",
+                    Body = $"Здравствуйте, {username}!<br><br>Для восстановления пароля перейдите по ссылке: <a href='{recoveryUrl}'>Восстановить пароль</a><br><br>Ссылка действительна 1 час.",
+                    IsBodyHtml = true,
+                };
+                mailMessage.To.Add(email);
 
-            await Task.CompletedTask;
+                await smtpClient.SendMailAsync(mailMessage);
+
+
+                // Для демонстрации - имитируем отправку
+                await Task.Delay(100);
+
+                _logger.LogInformation($"Email отправлен для {email}");
+            } catch (Exception ex) {
+                _logger.LogError($"Ошибка отправки email: {ex.Message}");
+                throw;
+            }
         }
     }
 }
