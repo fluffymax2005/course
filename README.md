@@ -33,7 +33,7 @@ cd course
 
 git switch DBAPI
 
-<h1>7. Cut and paste all filesfrom repos to &lt;your_project_folder_name&gt; folder. Accept rewriting case neccessary.</h1>
+<h1>7. Cut and paste all files from repos to &lt;your_project_folder_name&gt; folder. Accept rewriting case neccessary.</h1>
 
 <h1>8. Enjoy development.</h1>
 
