@@ -1,5 +1,5 @@
-﻿using DbAPI.Contexts;
-using DbAPI.Classes;
+﻿using DbAPI.Classes;
+using DbAPI.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 

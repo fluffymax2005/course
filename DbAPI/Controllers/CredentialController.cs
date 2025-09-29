@@ -1,14 +1,13 @@
 ﻿using DbAPI.Classes;
+using DbAPI.DTO;
 using DbAPI.Interfaces;
 using DbAPI.Models;
 using DbAPI.Repositories;
-using DbAPI.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using static DbAPI.Interfaces.IInformation;
-
 using TypeId = int;
 
 namespace DbAPI.Controllers {
@@ -87,7 +86,7 @@ namespace DbAPI.Controllers {
             }
         }
 
-
+        // POST: api/register
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterPrompt request) {
             string logRights = request.RegisterRights switch {
@@ -160,9 +159,6 @@ namespace DbAPI.Controllers {
 
             return Ok(response);
         }
-
-        // 
-
 
         // GET: api/{entity}/
         [HttpGet]

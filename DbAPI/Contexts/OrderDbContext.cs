@@ -1,5 +1,5 @@
-﻿using DbAPI.Models;
-using DbAPI.Classes;
+﻿using DbAPI.Classes;
+using DbAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DbAPI.Contexts {
