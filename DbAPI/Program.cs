@@ -75,7 +75,7 @@ builder.Services.AddRateLimiter(options => {
                 PermitLimit = 3,
                 Window = TimeSpan.FromHours(1)
             }
-    ));
+        ));
 });
 
 // Register OrderDbContext + reposes
@@ -88,11 +88,15 @@ builder.Services.AddScoped<IRepository<Rate, TypeId>, RateRepository>();
 builder.Services.AddScoped<IRepository<DbAPI.Models.Route, TypeId>, RouteRepository>();
 builder.Services.AddScoped<IRepository<TransportVehicle, TypeId>, TransportVehicleRepository>();
 
-
 builder.Services.AddScoped<IRepository<Role, TypeId>, RoleRepository>();
 builder.Services.AddScoped<IRepository<Credential, TypeId>, CredentialRepository>();
 builder.Services.AddScoped<RoleRepository>();
 builder.Services.AddScoped<CredentialRepository>();
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IPasswordRecoveryService, PasswordRecoveryService>();
 
 // JWT
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
