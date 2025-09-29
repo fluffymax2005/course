@@ -1,12 +1,12 @@
-﻿using db.Contexts;
-using db.Interfaces;
-using db.Models;
+﻿using DbAPI.Contexts;
+using DbAPI.Interfaces;
+using DbAPI.Models;
 using Microsoft.EntityFrameworkCore;
-using static db.Interfaces.IInformation;
+using static DbAPI.Interfaces.IInformation;
 
 using TypeId = int;
 
-namespace db.Repositories {
+namespace DbAPI.Repositories {
     public class RoleRepository : IRepository<Role, TypeId> {
         private readonly OrderDbContext _context;
 

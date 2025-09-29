@@ -1,8 +1,8 @@
-﻿using db.Models;
-using db.Tools;
+﻿using DbAPI.Models;
+using DbAPI.Classes;
 using Microsoft.EntityFrameworkCore;
 
-namespace db.Contexts {
+namespace DbAPI.Contexts {
 
     public class OrderDbContext : DbContext {
         public DbSet<Order> Orders { get; set; }

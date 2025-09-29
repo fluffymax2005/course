@@ -1,13 +1,13 @@
-﻿using db.Classes;
-using db.Contexts;
-using db.Interfaces;
-using db.Models;
+﻿using DbAPI.Classes;
+using DbAPI.Contexts;
+using DbAPI.Interfaces;
+using DbAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using static db.Interfaces.IInformation;
+using static DbAPI.Interfaces.IInformation;
 using TypeId = int;
 
-namespace db.Repositories {
+namespace DbAPI.Repositories {
     public class CredentialRepository : IRepository<Credential, TypeId> {
         private readonly OrderDbContext _context;
 

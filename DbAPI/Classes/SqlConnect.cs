@@ -1,4 +1,4 @@
-﻿namespace db.Custom_Classes {
+﻿namespace DbAPI.Classes {
     public static class SqlConnect {
         public enum ConnectMode { WindowsSecure, SqlServerSecure };
 

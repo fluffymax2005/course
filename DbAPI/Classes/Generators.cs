@@ -1,8 +1,8 @@
-﻿using db.Classes;
-using db.Models;
-using static db.Interfaces.IInformation;
+﻿using DbAPI.Classes;
+using DbAPI.Models;
+using static DbAPI.Interfaces.IInformation;
 
-namespace db.Tools {
+namespace DbAPI.Classes {
     public static class Generators {
         private static readonly Random _random = new Random(1000);
         public static List<Customer> GenerateCustomers(int count) {

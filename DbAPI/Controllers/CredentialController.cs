@@ -1,17 +1,17 @@
-﻿using db.Classes;
-using db.Interfaces;
-using db.Models;
-using db.Repositories;
+﻿using DbAPI.Classes;
+using DbAPI.Interfaces;
+using DbAPI.Models;
+using DbAPI.Repositories;
 using DbAPI.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
-using static db.Interfaces.IInformation;
+using static DbAPI.Interfaces.IInformation;
 
 using TypeId = int;
 
-namespace db.Controllers {
+namespace DbAPI.Controllers {
 
     [ApiController]
     [Route("api/[controller]")]
@@ -47,8 +47,8 @@ namespace db.Controllers {
                 // Whether credential with such username exists
                 var credential = await _credentialRepository.GetByUserNameAsync(request.Login);
                 if (credential == null || credential.IsDeleted != null) {
-                    _logger.LogError($"Пользователем с именем \"{request.Login}\" не существует");
-                    return Unauthorized(new { message = $"Пользователем с именем \"{request.Login}\" не существует" });
+                    _logger.LogError($"Пользователя с именем \"{request.Login}\" не существует");
+                    return Unauthorized(new { message = $"Пользователя с именем \"{request.Login}\" не существует" });
                 }
 
 
@@ -87,7 +87,7 @@ namespace db.Controllers {
             }
         }
 
-        // TODO: make registration
+
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterPrompt request) {
             string logRights = request.RegisterRights switch {
@@ -160,6 +160,8 @@ namespace db.Controllers {
 
             return Ok(response);
         }
+
+        // 
 
 
         // GET: api/{entity}/

@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static db.Interfaces.IInformation;
+using static DbAPI.Interfaces.IInformation;
 using TypeId = int;
 
-namespace db.Models {
+namespace DbAPI.Models {
     public class Role {
         [Key]
         [Display(Order = 1)]

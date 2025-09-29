@@ -1,10 +1,8 @@
-﻿using db.Classes;
-using db.Contexts;
-using db.Interfaces;
-using db.Models;
-using db.Repositories;
-using db.Repositories.db.Repositories;
-using DbAPI.Classes;
+﻿using DbAPI.Contexts;
+using DbAPI.Interfaces;
+using DbAPI.Models;
+using DbAPI.Repositories;
+using DbAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -87,7 +85,7 @@ builder.Services.AddScoped<IRepository<Order, TypeId>, OrderRepository>();
 builder.Services.AddScoped<IRepository<Customer, TypeId>, CustomerRepository>();
 builder.Services.AddScoped<IRepository<Driver, TypeId>, DriverRepository>();
 builder.Services.AddScoped<IRepository<Rate, TypeId>, RateRepository>();
-builder.Services.AddScoped<IRepository<db.Models.Route, TypeId>, RouteRepository>();
+builder.Services.AddScoped<IRepository<DbAPI.Models.Route, TypeId>, RouteRepository>();
 builder.Services.AddScoped<IRepository<TransportVehicle, TypeId>, TransportVehicleRepository>();
 
 

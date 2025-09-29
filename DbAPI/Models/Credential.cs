@@ -2,7 +2,7 @@
 
 using TypeId = int;
 
-namespace db.Models {
+namespace DbAPI.Models {
     public class Credential {
 
         [Key]

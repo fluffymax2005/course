@@ -1,5 +1,5 @@
-﻿using db.Interfaces;
-using db.Models;
+﻿using DbAPI.Interfaces;
+using DbAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

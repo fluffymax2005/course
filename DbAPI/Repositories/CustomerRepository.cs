@@ -1,11 +1,11 @@
-﻿using db.Contexts;
-using db.Interfaces;
-using db.Models;
+﻿using DbAPI.Contexts;
+using DbAPI.Interfaces;
+using DbAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TypeId = int;
 
-namespace db.Repositories {
+namespace DbAPI.Repositories {
     public class CustomerRepository : IRepository<Customer, TypeId> {
         private readonly OrderDbContext _context;
 

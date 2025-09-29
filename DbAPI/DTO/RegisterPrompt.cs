@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static db.Interfaces.IInformation;
+using static DbAPI.Interfaces.IInformation;
 
 namespace DbAPI.DTO {
     public class RegisterPrompt {

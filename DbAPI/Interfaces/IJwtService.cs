@@ -1,7 +1,7 @@
-﻿using db.Models;
+﻿using DbAPI.Models;
 using System.Security.Claims;
 
-namespace db.Interfaces {
+namespace DbAPI.Interfaces {
     public interface IJwtService {
         string GenerateToken(Credential credential, Role role);
         ClaimsPrincipal ValidateToken(string token);

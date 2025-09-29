@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace db.Classes {
+namespace DbAPI.Classes {
     public static class PasswordHasher {
         // Salt size (bytes)
         private const int SaltSize = 16;

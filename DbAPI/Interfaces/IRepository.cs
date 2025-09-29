@@ -1,4 +1,4 @@
-﻿namespace db.Interfaces {
+﻿namespace DbAPI.Interfaces {
     public interface IRepository<TEntity, TKey> {
 
         // Async versions

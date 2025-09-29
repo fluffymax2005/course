@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 using TypeId = int;
 
-namespace db.Models {
+namespace DbAPI.Models {
 
     public class Driver {
         [Key]

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace db.Models {
+namespace DbAPI.Models {
 
     using TypeId = int;
 

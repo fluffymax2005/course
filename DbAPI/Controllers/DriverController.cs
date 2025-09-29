@@ -1,11 +1,12 @@
-﻿using db.Interfaces;
-using db.Models;
+﻿using DbAPI.Interfaces;
+using DbAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using TypeId = int;
 
-namespace db.Controllers {
+namespace DbAPI
+    .Controllers {
     [ApiController]
     [Route("api/[controller]")]
     public class DriverController : BaseCrudController<Driver, TypeId> {

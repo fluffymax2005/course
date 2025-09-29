@@ -1,12 +1,12 @@
-﻿using db.Interfaces;
-using db.Models;
+﻿using DbAPI.Interfaces;
+using DbAPI.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace db.Classes {
+namespace DbAPI.Services {
     public class JwtService : IJwtService {
         private readonly JwtSettings _jwtSettings;
 

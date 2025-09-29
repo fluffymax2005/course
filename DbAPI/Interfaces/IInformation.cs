@@ -1,4 +1,4 @@
-﻿namespace db.Interfaces {
+﻿namespace DbAPI.Interfaces {
     public interface IInformation {
         public enum UserRights { Basic, Editor, Admin } // rights access for user
 

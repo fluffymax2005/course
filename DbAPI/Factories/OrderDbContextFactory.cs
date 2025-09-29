@@ -1,10 +1,10 @@
-﻿using db.Contexts;
-using db.Custom_Classes;
+﻿using DbAPI.Contexts;
+using DbAPI.Classes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 
-namespace db.Factories {
+namespace DbAPI.Factories {
 
     public class OrderDbContextFactory : IDesignTimeDbContextFactory<OrderDbContext> {
 
