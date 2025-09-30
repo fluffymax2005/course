@@ -1,0 +1,22 @@
+.Container1 {
+    font-size: 16pt;
+    background-color: aqua;
+    fill-opacity: 0.5;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.Red-text {
+    color: red;
+}
+
+.White-text {
+    color: white;
+}
+
+.Button {
+    background-color:chocolate;
+    border-radius: 2px;
+    fill-opacity: 0.3;
+} 
+
