@@ -4,6 +4,8 @@
     fill-opacity: 0.5;
     padding: 20px;
     border-radius: 5px;
+    height: 100px;
+    width: auto;
 }
 
 .Red-text {
@@ -20,3 +22,7 @@
     fill-opacity: 0.3;
 } 
 
+.image {
+    width: 90;
+    height: 90px;
+}
