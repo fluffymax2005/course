@@ -1,0 +1,404 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Восстановление пароля</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .recovery-container {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .recovery-form {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .recovery-form h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .recovery-description {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+            .form-input:focus {
+                outline: none;
+                border-color: #667eea;
+                background-color: white;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .form-input::placeholder {
+                color: #999;
+            }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            min-height: 18px;
+        }
+
+        .recovery-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .recovery-btn:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            }
+
+            .recovery-btn:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        .btn-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+            .back-link a {
+                color: #667eea;
+                text-decoration: none;
+                font-size: 14px;
+                transition: color 0.3s ease;
+            }
+
+                .back-link a:hover {
+                    color: #764ba2;
+                    text-decoration: underline;
+                }
+
+        @media (max-width: 480px) {
+            .recovery-form {
+                padding: 30px 20px;
+            }
+
+                .recovery-form h1 {
+                    font-size: 24px;
+                }
+        }
+    </style>
+</head>
+<body>
+    <div class="recovery-container">
+        <div class="recovery-form">
+            <h1>Восстановление пароля</h1>
+            <p class="recovery-description">
+                Введите адрес электронной почты, привязанный к вашему аккаунту.
+                Мы отправим вам инструкции для восстановления пароля.
+            </p>
+
+            <form id="recoveryForm">
+                <div class="form-group">
+                    <label for="email" class="form-label">Электронная почта</label>
+                    <input type="email"
+                           id="email"
+                           name="email"
+                           class="form-input"
+                           placeholder="Введите ваш email"
+                           required>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+
+                <button type="submit" class="recovery-btn" id="recoveryButton">
+                    <span class="btn-text">Восстановить</span>
+                    <div class="btn-loader" style="display: none;">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </form>
+
+            <div class="success-message" id="successMessage" style="display: none;">
+                <p>✅ Инструкции по восстановлению пароля отправлены на вашу почту!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class PasswordRecovery {
+            constructor() {
+                this.form = document.getElementById('recoveryForm');
+                this.emailInput = document.getElementById('email');
+                this.emailError = document.getElementById('emailError');
+                this.recoveryButton = document.getElementById('recoveryButton');
+                this.successMessage = document.getElementById('successMessage');
+                this.btnText = this.recoveryButton.querySelector('.btn-text');
+                this.btnLoader = this.recoveryButton.querySelector('.btn-loader');
+
+                this.init();
+            }
+
+            init() {
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+                this.emailInput.addEventListener('input', () => this.validateEmail());
+
+                // Очистка ошибок при фокусе
+                this.emailInput.addEventListener('focus', () => this.clearError(this.emailError));
+            }
+
+            handleSubmit(e) {
+                e.preventDefault();
+
+                if (this.validateForm()) {
+                    this.sendRecoveryRequest();
+                }
+            }
+
+            validateForm() {
+                const isEmailValid = this.validateEmail();
+                return isEmailValid;
+            }
+
+            validateEmail() {
+                const email = this.emailInput.value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (!email) {
+                    this.showError(this.emailError, 'Поле email обязательно для заполнения');
+                    return false;
+                }
+
+                if (!emailRegex.test(email)) {
+                    this.showError(this.emailError, 'Введите корректный email адрес');
+                    return false;
+                }
+
+                this.clearError(this.emailError);
+                return true;
+            }
+
+            showError(errorElement, message) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+
+            clearError(errorElement) {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+
+            async sendRecoveryRequest() {
+                const email = this.emailInput.value.trim();
+                this.setLoadingState(true);
+
+                try {
+                    console.log('Отправка запроса на:', '/api/Recover/recover/request');
+                    console.log('Данные:', { email: email });
+
+                    const response = await fetch('/api/Recover/recover/request', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ email: email })
+                    });
+
+                    console.log('Статус ответа:', response.status);
+                    console.log('Content-Type:', response.headers.get('content-type'));
+
+                    // Сначала получим текст ответа для диагностики
+                    const responseText = await response.text();
+                    console.log('Текст ответа:', responseText);
+
+                    // Пытаемся распарсить как JSON только если это JSON
+                    if (response.headers.get('content-type')?.includes('application/json')) {
+                        const data = JSON.parse(responseText);
+                        if (response.ok) {
+                            this.showSuccess();
+                            this.form.reset();
+                        } else {
+                            this.handleError(data);
+                        }
+                    } else {
+                        // Если это не JSON, показываем общую ошибку
+                        console.error('Сервер вернул не JSON:', responseText);
+                        this.showError(this.emailError, 'Ошибка сервера: неверный формат ответа');
+                    }
+
+                } catch (error) {
+                    console.error('Ошибка при отправке запроса:', error);
+                    this.showError(this.emailError, 'Произошла ошибка при отправке запроса. Попробуйте позже.');
+                } finally {
+                    this.setLoadingState(false);
+                }
+            }
+
+            setLoadingState(isLoading) {
+                if (isLoading) {
+                    this.recoveryButton.disabled = true;
+                    this.btnText.style.display = 'none';
+                    this.btnLoader.style.display = 'block';
+                } else {
+                    this.recoveryButton.disabled = false;
+                    this.btnText.style.display = 'block';
+                    this.btnLoader.style.display = 'none';
+                }
+            }
+
+            showSuccess() {
+                this.successMessage.style.display = 'block';
+
+                // Скрываем сообщение через 5 секунд
+                setTimeout(() => {
+                    this.successMessage.style.display = 'none';
+                }, 5000);
+            }
+
+            handleError(errorData) {
+                if (errorData.errors && errorData.errors.Email) {
+                    this.showError(this.emailError, errorData.errors.Email[0]);
+                } else if (errorData.message) {
+                    this.showError(this.emailError, errorData.message);
+                } else {
+                    this.showError(this.emailError, 'Произошла ошибка. Попробуйте позже.');
+                }
+            }
+        }
+
+        // Инициализация при загрузке DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            new PasswordRecovery();
+        });
+
+        // Дополнительные утилиты для валидации
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    </script>
+</body>
+</html>
