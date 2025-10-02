@@ -1,35 +1,87 @@
-.video-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden; 
+* {
+    box-sizing: border-box;
 }
 
-#bg-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+body {
+    background: content-box linear-gradient(135deg, #caf0f8, #0096c7);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+
 }
 
-.authorize-form {
-    background: rgba(255, 255, 255, 0.65);
+/* Genaral settings for all forms */
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    margin-top: 10px;
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form {
+    background: white;
+    border-radius: 12px;
     padding: 20px;
 }
 
-#form-header {
-    color: rgb();
+/* Authorize form settings*/
+
+#authorizeForm {
+    animation: slideUp 0.5s ease-out;
+}
+
+#authorizeHeader {
     text-align: center;
+    padding-top: 40px;
+    margin-bottom: 15px;
+    color:#333;
+    font-size: 28px;
+    font-weight: 600;
 }
 
 .login-label {
     display: block;
     font-size:large;
+    margin-bottom: 10px;
 }
 
 #login {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#login:focus {
+    outline: none;
+    border: 2px solid blue;
+}
+
+.password-label {
+    display: block;
+    font-size: large;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+#password {
     width: 100%;
     font-size: 16px;
     padding: 12px 16px;
@@ -39,9 +91,112 @@
     transition: all 0.3s ease;
 }
 
-#login:focus {
+#password:focus {
     outline: none;
     border: 2px solid blue;
 }
 
+#enterButton {
+    margin-top: 20px;
+    padding: 14px;
+    width:100%;
+    color:white;
+    background: linear-gradient(45deg, #caf0f8, #0096c7);
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: large;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
 
+#enterButton:hover {
+    transform: translateY(-2px);
+    animation-duration: 1s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.nav-labels {
+    display: flex;
+    list-style: none;
+    padding: 10 10;
+    margin: 0;
+}
+
+.nav-labels li {
+    margin-top: 30px;
+    padding: 0 30px;
+}
+
+.nav-labels li:not(:last-child) {
+    border-radius: 1px solid blue;
+}
+
+.nav-labels a {
+    text-decoration: none;
+    color: #333;
+    padding: 10px 5px;
+}
+
+.nav-labels a:hover {
+    color: #007bff;
+    transform: translateX(10px);
+    animation-duration: 10s;
+}
+
+/* Registration form settings */
+
+#registerHeader {
+    text-align: center;
+    border-bottom: 2px solid rgba(128, 128, 128, 0.2);
+    padding-bottom: 20px;
+}
+
+.input-label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+#registerButton {
+    margin-top: 20px;
+    padding: 14px;
+    width:100%;
+    color:white;
+    background: linear-gradient(45deg, #caf0f8, #0096c7);
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: large;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#registerButton:hover {
+    transform: translateY(-2px);
+    animation-duration: 1s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.back-text {
+    margin-top: 20px;
+    text-align: center;
+    text-decoration: none;
+}
+
+p.back-text:hover {
+    color: #007bff;
+    cursor: pointer;
+}
+
+/* Success message */
+
+.success-message {
+    text-align: center;
+    color: green;
+    padding-top: 10px;
+    border-top: 2px solid rgba(128, 128, 128, 0.2);
+    display: none;
+}

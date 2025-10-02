@@ -1,35 +1,91 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="ru">
     <meta charset = "utf-8">
     <meta name = "viewport" content = "width = device-width">
 
     <title>Авторизация</title>
-    <link rel = "stylesheet" href="assets/css/authorize.css">
-
+    <link rel="stylesheet" href="assets/css/authorize.css">
+    <script src="assets/javascript/authorize.js"></script>
     <body>
-        <div class="video-background">
-            <video id="bg-video" autoplay muted loop>
-                <source src="assets/footages/night.mp4" type="video/mp4">
-            </video>
-        </div>
-
-        <div class="authorize-container">
-            <div class="authorize-form">
-                <h1 id="form-header">Авторизация</h1>
+        
+        <div class="container">
+            <!--<div class="form">
+                <h1 id="authorizeHeader">Авторизация</h1>
                 
                 <form id="authorizeForm">
-                    <div class="form-group">
+                    <div class="login-group">
                         <label for="login" class="login-label">Логин</label>
                         <input type = "text"
                             id="login"
                             name="login"
-                            placeholder="Введите ваш логин"
+                            placeholder="Введите логин или адрес электронной почты"
                             required>
                     </div>
+                    <div class="password-group">
+                        <label for="password" class="password-label">Пароль</label>
+                        <input type = "password"
+                            id="password"
+                            name="password"
+                            placeholder="Введите пароль"
+                            required="">
+                    </div>
+                <button id="enterButton"
+                    onclick="registerFormShow()">Авторизоваться</button>
+                <ul class="nav-labels">
+                        <li><a id="registerLabel" 
+                            href="#">Регистрация</a></li>
+                        <li><a id="forgotPasswordLabel">Забыли пароль?</a></li>
+                    </ul>
                 </form>
             </div>
-        </div>
-        
+        </div>-->
+            <div class="form">
+                <h1 id="registerHeader">Регистрация</h1>
+                
+                <form id="registerForm">
+                    <div class="login-group">
+                        <label for="login" class="input-label">Логин</label>
+                        <input type = "text"
+                            id="login"
+                            name="login"
+                            placeholder="Введите логин"
+                            required>
+                    </div>
+                    <div class="email-group">
+                        <label for="email" class="input-label">Электронная почта</label>
+                        <input type = "text"
+                            id="login"
+                            name="login"
+                            placeholder="Введите адрес электронной почты"
+                            required>
+                    </div>
+                    <div class="password-group">
+                        <label for="password" class="input-label">Пароль</label>
+                        <input type = "password"
+                            id="password"
+                            name="password"
+                            placeholder="Введите пароль"
+                            required>
+                    </div>
+                    <div class="password-confirm-group">
+                        <label for="password" class="input-label">Подтверждение пароля</label>
+                        <input type = "password"
+                            id="password"
+                            name="password"
+                            placeholder="Введите пароль снова"
+                            required>
+                    </div>
+
+                    <div class="register-button">
+                        <button id="registerButton"
+                        onclick="TryRegisterCredential()">Зарегистрироваться</button>
+                    </div>
+                    
+                    <p class="back-text" href="#">Вернуться назад</p>  
+                                      
+                    <p class="success-message">Вы успешно прошли процедуру регистрации аккаунта. Можете вернуться в меню авторизации и войти в систему</p>
+                </form>
+            </div>
     </body>
 </html>
