@@ -3,7 +3,6 @@ using DbAPI.DTO;
 using DbAPI.Interfaces;
 using DbAPI.Models;
 using DbAPI.Repositories;
-using DbAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -240,7 +239,7 @@ namespace DbAPI.Controllers {
             }
         }
 
-        // GET: api/Recover/validate-token
+        // GET: api/{entity}/validate-token
         [HttpGet("validate-token")]
         public async Task<IActionResult> ValidateTokenAsync([FromQuery] string token) {
             try {
