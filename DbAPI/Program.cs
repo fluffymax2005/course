@@ -121,8 +121,6 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-app.UseStaticFiles(); // Enable using html files
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
