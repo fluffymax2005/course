@@ -21,7 +21,7 @@
                     <div class="login-group">
                         <label for="login" class="input-label">Логин</label>
                         <input type = "text"
-                            id="login"
+                            id="loginAuthorize"
                             name="login-box"
                             class="input-box"
                             placeholder="Введите логин или адрес электронной почты"
@@ -30,15 +30,16 @@
                     <div class="password-group">
                         <label for="password" class="input-label">Пароль</label>
                         <input type = "password"
-                            id="password"
+                            id="passwordAuthorize"
                             name="password"
                             class="input-box"
                             placeholder="Введите пароль"
                             required="">
                     </div>
-                <button class="action-button"
-                    id="enterButton">Авторизация</button>
-                <ul class="nav-labels">
+                    <button type="button" class="action-button" id="enterButton" onclick="AuthService.login()">
+                        Авторизация
+                    </button>
+                    <ul class="nav-labels">
                         <li><a id="registerLabel" 
                             onclick="showRegisterForm()">Регистрация</a></li>
                         <li><a id="forgotPasswordLabel"
