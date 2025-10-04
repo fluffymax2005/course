@@ -19,7 +19,7 @@
                 
                 <form id="authorizeForm">
                     <div class="login-group">
-                        <label for="login" class="login-label">Логин</label>
+                        <label for="login" class="input-label">Логин</label>
                         <input type = "text"
                             id="login"
                             name="login-box"
@@ -28,7 +28,7 @@
                             required>
                     </div>
                     <div class="password-group">
-                        <label for="password" class="password-label">Пароль</label>
+                        <label for="password" class="input-label">Пароль</label>
                         <input type = "password"
                             id="password"
                             name="password"
@@ -46,6 +46,9 @@
             </div>
 
             <div class="form register-form">
+                <div class="icon">
+                    <img src="assets/icons/dark/register-icon.svg" id="register-icon">
+                </div>
                 <h1 id="registerHeader">Регистрация</h1>
                 
                 <form id="registerForm">
@@ -54,6 +57,7 @@
                         <input type = "text"
                             id="login"
                             name="login"
+                            class="input-box"
                             placeholder="Введите логин"
                             required>
                     </div>
@@ -62,6 +66,7 @@
                         <input type = "text"
                             id="login"
                             name="login"
+                            class="input-box"
                             placeholder="Введите адрес электронной почты"
                             required>
                     </div>
@@ -70,6 +75,7 @@
                         <input type = "password"
                             id="password"
                             name="password"
+                            class="input-box"
                             placeholder="Введите пароль"
                             required>
                     </div>
@@ -78,16 +84,18 @@
                         <input type = "password"
                             id="password"
                             name="password"
+                            class="input-box"
                             placeholder="Введите пароль снова"
                             required>
                     </div>
 
                     <div class="register-button">
                         <button id="registerButton"
-                        onclick="TryRegisterCredential()">Регистрирация</button>
+                        onclick="TryRegisterCredential()">Регистрация</button>
                     </div>
                     
-                    <p class="back-text" href="#">Вернуться назад</p>  
+                    <p class="back-text" 
+                        onclick="showAuthorizeForm()">Вернуться назад</p>  
                                       
                     <p class="success-message">Вы успешно прошли процедуру регистрации аккаунта. Можете вернуться в меню авторизации и войти в систему</p>
                 </form>
