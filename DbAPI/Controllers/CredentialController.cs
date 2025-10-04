@@ -35,6 +35,11 @@ namespace DbAPI.Controllers {
             return entity.Id;
         }
 
+        [HttpGet("test")]
+        public IActionResult Test() {
+            return Ok("You has connected to server" + DateTime.Now);
+        }
+
         [HttpPost("login")]
         [EnableRateLimiting("LoginPolicy")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginPrompt request) {
@@ -49,7 +54,10 @@ namespace DbAPI.Controllers {
 
             try {
                 // Whether credential with such username exists
-                var credential = await _credentialRepository.GetByUserNameAsync(request.Login);
+                Credential? credential = await _credentialRepository.GetByUserNameAsync(request.Login);
+                if (credential == null) {
+                    credential = await GetByEmailAsync(request.Login);
+                }
                 if (credential == null || credential.IsDeleted != null) {
                     _logger.LogError($"Пользователя с именем \"{request.Login}\" не существует");
                     return Unauthorized(new { message = $"Пользователя с именем \"{request.Login}\" не существует" });
@@ -72,6 +80,7 @@ namespace DbAPI.Controllers {
 
                 var token = _jwtService.GenerateToken(credential, role);
 
+                
                 var response = new LoginResponse {
                     UserId = credential.Id,
                     Username = credential.Username,
