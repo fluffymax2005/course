@@ -15,11 +15,13 @@ body {
 
 /* Genaral settings for all forms */
 
-.container {
+.forms-container {
+    position: absolute;
     width: 100%;
     max-width: 500px;
-    margin-top: 10px;
+    margin-top: 70px;
     animation: slideUp 0.5s ease-out;
+    height: 100%;
 }
 
 @keyframes slideUp {
@@ -35,15 +37,31 @@ body {
 }
 
 .form {
+    position: absolute;    
     background: white;
     border-radius: 12px;
     padding: 20px;
+
+    opacity: 0;
+    transform: translateX(30px);
+    pointer-events: none;
+    transition: all 0.5s ease-in-out;
 }
 
 /* Authorize form settings*/
 
 #authorizeForm {
     animation: slideUp 0.5s ease-out;
+}
+
+.form.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+}
+
+.authorize-form:not(.active) {
+    transform: translateX(-30px);
 }
 
 #authorizeHeader {
@@ -61,8 +79,11 @@ body {
     margin-bottom: 10px;
 }
 
-#login {
+#authorizeForm.input-box {
     width: 100%;
+}
+
+#login {
     font-size: 16px;
     padding: 12px 16px;
     border-radius: 8px;
@@ -120,13 +141,15 @@ body {
 .nav-labels {
     display: flex;
     list-style: none;
-    padding: 10 10;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 10px;
     margin: 0;
 }
 
 .nav-labels li {
     margin-top: 30px;
-    padding: 0 30px;
+    cursor: pointer;
 }
 
 .nav-labels li:not(:last-child) {
@@ -146,6 +169,10 @@ body {
 }
 
 /* Registration form settings */
+
+.register-form:not(.active) {
+    transform: translateX(30px);
+}
 
 #registerHeader {
     text-align: center;

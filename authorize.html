@@ -9,8 +9,8 @@
     <script src="assets/javascript/authorize.js"></script>
     <body>
         
-        <div class="container">
-            <!--<div class="form">
+        <div class="forms-container">
+            <div class="form authorize-form active">
                 <h1 id="authorizeHeader">Авторизация</h1>
                 
                 <form id="authorizeForm">
@@ -18,7 +18,8 @@
                         <label for="login" class="login-label">Логин</label>
                         <input type = "text"
                             id="login"
-                            name="login"
+                            name="login-box"
+                            class="input"
                             placeholder="Введите логин или адрес электронной почты"
                             required>
                     </div>
@@ -27,20 +28,20 @@
                         <input type = "password"
                             id="password"
                             name="password"
+                            class="input-box"
                             placeholder="Введите пароль"
                             required="">
                     </div>
-                <button id="enterButton"
-                    onclick="registerFormShow()">Авторизоваться</button>
+                <button id="enterButton">Авторизация</button>
                 <ul class="nav-labels">
                         <li><a id="registerLabel" 
-                            href="#">Регистрация</a></li>
+                            onclick="showRegisterForm()">Регистрация</a></li>
                         <li><a id="forgotPasswordLabel">Забыли пароль?</a></li>
                     </ul>
                 </form>
             </div>
-        </div>-->
-            <div class="form">
+
+            <div class="form register-form">
                 <h1 id="registerHeader">Регистрация</h1>
                 
                 <form id="registerForm">
@@ -79,13 +80,13 @@
 
                     <div class="register-button">
                         <button id="registerButton"
-                        onclick="TryRegisterCredential()">Зарегистрироваться</button>
+                        onclick="TryRegisterCredential()">Регистрирация</button>
                     </div>
                     
                     <p class="back-text" href="#">Вернуться назад</p>  
                                       
                     <p class="success-message">Вы успешно прошли процедуру регистрации аккаунта. Можете вернуться в меню авторизации и войти в систему</p>
                 </form>
-            </div>
+        </div>
     </body>
 </html>
