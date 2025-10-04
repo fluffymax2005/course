@@ -1,13 +1,22 @@
+function showAuthorizeForm() {
+    // Скрываем все формы
+    document.querySelectorAll('.form').forEach(form => {
+        form.classList.remove('active');
+    });
+    // Показываем авторизацию
+    document.querySelector('.authorize-form').classList.add('active');
+}
+
 function showRegisterForm() {
-    // Убираем активность с авторизации
-    document.querySelector('.authorize-form').classList.remove('active');
-    // Добавляем активность регистрации
+    document.querySelectorAll('.form').forEach(form => {
+        form.classList.remove('active');
+    });
     document.querySelector('.register-form').classList.add('active');
 }
 
-function showAuthorizeForm() {
-    // Убираем активность с регистрации
-    document.querySelector('.register-form').classList.remove('active');
-    // Добавляем активность авторизации
-    document.querySelector('.authorize-form').classList.add('active');
+function showForgotPasswordForm() {
+    document.querySelectorAll('.form').forEach(form => {
+        form.classList.remove('active');
+    });
+    document.querySelector('.recovery-form').classList.add('active');
 }

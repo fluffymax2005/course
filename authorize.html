@@ -36,11 +36,13 @@
                             placeholder="Введите пароль"
                             required="">
                     </div>
-                <button id="enterButton">Авторизация</button>
+                <button class="action-button"
+                    id="enterButton">Авторизация</button>
                 <ul class="nav-labels">
                         <li><a id="registerLabel" 
                             onclick="showRegisterForm()">Регистрация</a></li>
-                        <li><a id="forgotPasswordLabel">Забыли пароль?</a></li>
+                        <li><a id="forgotPasswordLabel"
+                            onclick="showForgotPasswordForm()">Забыли пароль?</a></li>
                     </ul>
                 </form>
             </div>
@@ -90,15 +92,52 @@
                     </div>
 
                     <div class="register-button">
-                        <button id="registerButton"
+                        <button class="action-button"
+                            id="registerButton"
                         onclick="TryRegisterCredential()">Регистрация</button>
                     </div>
                     
                     <p class="back-text" 
-                        onclick="showAuthorizeForm()">Вернуться назад</p>  
+                        onclick="showAuthorizeForm()">Вернуться назад
+                    </p>  
                                       
                     <p class="success-message">Вы успешно прошли процедуру регистрации аккаунта. Можете вернуться в меню авторизации и войти в систему</p>
                 </form>
+            </div>
+
+            <div class="form recovery-form">
+                <h1 id="forgotPasswordHeader">Восстановление пароля</h1>
+                <p class="recovery-description">
+                    Введите адрес электронной почты, привязанный к вашему аккаунту.
+                    Мы отправим вам инструкции для восстановления пароля.
+                </p>
+
+                <form id="recoveryForm">
+                    <div class="recovery-group">
+                        <label for="email" class="form-label">Электронная почта</label>
+                        <input type="email"
+                            id="email"
+                            name="email"
+                            class="input-box"
+                            placeholder="Введите ваш email"
+                            required>
+                        <div class="error-message" id="emailError"></div>
+                    </div>
+
+                    <button type="submit" 
+                        class="action-button" 
+                        id="recoveryButton">Восстановить
+                    </button>
+                </form>
+
+                <div class="success-message" id="successMessage" style="display: none;">
+                    <p>✅ Инструкции по восстановлению пароля отправлены на указанную почту почту!</p>
+                </div>
+
+                <p class="back-text" 
+                        onclick="showAuthorizeForm()">Вернуться назад
+                </p>  
+            </div>
         </div>
     </body>
 </html>

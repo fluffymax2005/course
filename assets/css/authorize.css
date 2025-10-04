@@ -15,12 +15,11 @@ body {
 /* Genaral settings for all forms */
 
 .forms-container {
-    position: absolute;
+    position: relative;
     width: 100%;
-    max-width: 450px;
-    margin-top: 70px;
+    max-width: 500px;
     animation: slideUp 0.5s ease-out;
-    height: 100%;
+    height: 700px;
     overflow: hidden;
 }
 
@@ -40,13 +39,25 @@ body {
     position: absolute;    
     background: white;
     border-radius: 12px;
-    padding: 0 20px 20px 20px;
+    padding: 40px;
 
-    opacity: 0;
-    transform: translateX(30px);
-    pointer-events: none;
     transition: all 0.7s ease-in-out;
+    width: 100%;
+    top: 0;
+    left: 0;
 }
+
+.form.active {
+    opacity: 1;
+    pointer-events: all;
+    z-index: 2;
+}
+
+.form:not(.active) {
+    opacity: 0;
+    pointer-events: none;
+}
+
 
 .icon {
     display: flex;
@@ -57,8 +68,10 @@ body {
     width: 100%;
     font-size: 16px;
     padding: 12px 16px;
+    border: 2px solid grey;
     border-radius: 8px;
     transition: all 0.3s ease;
+    background-color: #f8f9fa;
 }
 
 .input-label {
@@ -72,12 +85,31 @@ body {
     margin-top: 10px;
 }
 
+.action-button {
+    margin-top: 20px;
+    padding: 14px;
+    width:100%;
+    color:white;
+    background: linear-gradient(45deg, #caf0f8, #0096c7);
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: large;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    animation-duration: 1s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
 /* Authorize form settings */
 
 #authorizeForm {
     animation: slideUp 0.5s ease-out;
-    top: 0;
-    left: 0;
 }
 
 #authorize-icon {
@@ -86,17 +118,16 @@ body {
     display: block;
 }
 
-.form.active {
-    opacity: 1;
+.authorize-form {
     transform: translateX(0);
-    pointer-events: all;
-    z-index: 2;
+}
+
+.authorize-form.active {
+    transform: translateX(0);
 }
 
 .authorize-form:not(.active) {
     transform: translateX(-100%);
-    opacity: 0;
-    z-index: 1;
 }
 
 #authorizeHeader {
@@ -116,27 +147,6 @@ body {
 #password:focus {
     outline: none;
     border: 2px solid blue;
-}
-
-#enterButton {
-    margin-top: 20px;
-    padding: 14px;
-    width:100%;
-    color:white;
-    background: linear-gradient(45deg, #caf0f8, #0096c7);
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-size: large;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-#enterButton:hover {
-    transform: translateY(-2px);
-    animation-duration: 1s;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .nav-labels {
@@ -169,15 +179,15 @@ body {
 /* Registration form settings */
 
 #registerForm {
-    width: 400px;
-    top: 0;
-    left: 0;
+    width: 100%;
+}
+
+.register-form {
+    transform: translateX(100%);
 }
 
 .register-form.active {
     transform: translateX(0);
-    opacity: 1;
-    z-index: 2;
 }
 
 .register-form:not(.active) {
@@ -204,27 +214,6 @@ body {
     border: 2px solid blue;
 }
 
-#registerButton {
-    margin-top: 20px;
-    padding: 14px;
-    width:100%;
-    color:white;
-    background: linear-gradient(45deg, #caf0f8, #0096c7);
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-size: large;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-#registerButton:hover {
-    transform: translateY(-2px);
-    animation-duration: 1s;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
 .back-text {
     margin-top: 20px;
     text-align: center;
@@ -244,4 +233,33 @@ p.back-text:hover {
     padding-top: 10px;
     border-top: 2px solid rgba(128, 128, 128, 0.2);
     display: none;
+}
+
+/* Forgot password settings */
+
+.forgot-password-form {
+    transform: translateX(100%);
+}
+
+.forgot-password-form.active {
+    transform: translateX(0);
+}
+
+#forgotPasswordHeader {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(128, 128, 128, 0.2);
+}
+
+.recovery-description {
+    text-align: center;
+    font-size: medium;
+    color: #666666;
+    margin-bottom: 30px;
+}
+
+.recovery-group label {
+    display: block;
+    font-size: large;
+    margin-bottom: 10px;
 }
