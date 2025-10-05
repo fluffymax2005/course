@@ -12,15 +12,14 @@ body {
 
 }
 
-/* Genaral settings for all forms */
-
-.forms-container {
-    position: relative;
-    width: 100%;
-    max-width: 500px;
-    animation: slideUp 0.5s ease-out;
-    height: 700px;
-    overflow: hidden;
+@keyframes slideDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    } to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
 }
 
 @keyframes slideUp {
@@ -33,6 +32,18 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+
+/* General settings for all forms */
+
+.forms-container {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    animation: slideUp 0.5s ease-out;
+    height: 700px;
+    overflow: hidden;
 }
 
 .form {
@@ -104,6 +115,14 @@ body {
     transform: translateY(-2px);
     animation-duration: 1s;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.output-message {
+    margin-bottom: 0;
+    text-align: center;
+    font-size: medium;
+    display: none;
+    animation: slideUp 0.5s ease-in-out;
 }
 
 /* Authorize form settings */
