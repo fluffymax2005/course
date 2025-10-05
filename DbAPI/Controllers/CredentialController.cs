@@ -67,7 +67,7 @@ namespace DbAPI.Controllers {
                 // Password verification
                 if (!PasswordHasher.VerifyPassword(request.Password, credential.Password)) {
                     _logger.LogError($"Введен неверный логин или пароль пользователя \"{request.Login}\"");
-                    return Unauthorized(new { messsage = "Введен неверный логин или пароль" });
+                    return Unauthorized(new { message = "Введен неверный логин или пароль" });
                 }
 
 
@@ -100,7 +100,7 @@ namespace DbAPI.Controllers {
             }
         }
 
-        // POST: api/register
+        // POST: api/{entity}/register
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterPrompt request) {
             string logRights = request.RegisterRights switch {
@@ -135,8 +135,10 @@ namespace DbAPI.Controllers {
             // Whether user with such name exists
             var credential = await _credentialRepository.GetByUserNameAsync(request.UserName);
             if (credential != null) {
-                _logger.LogError($"Пользователь с именем \"{request.UserName}\" уже существует");
-                return BadRequest(new { message = $"Пользователь с именем \"{request.UserName}\" уже существует" });
+                _logger.LogError($"Пользователь с именем \"{request.UserName}\" и адресом электронной почты " +
+                    $"\"{request.Email}\" уже существует");
+                return BadRequest(new { message = $"Пользователь с именем \"{request.UserName}\" и адресом электронной почты " +
+                    $"\"{request.Email}\" уже существует" });
             }
 
             // Check whether password is strong
@@ -165,6 +167,7 @@ namespace DbAPI.Controllers {
                 RoleId = role.Id,
                 Username = request.UserName,
                 Password = PasswordHasher.HashPassword(request.Password),
+                Email = request.Email,
                 WhoAdded = request.WhoRegister.IsNullOrEmpty() ? request.UserName : request.WhoRegister,
                 WhenAdded = DateTime.Now,
             });

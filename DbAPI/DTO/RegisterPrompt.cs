@@ -6,6 +6,9 @@ namespace DbAPI.DTO {
         [Required(ErrorMessage = "Имя пользователя обязательно")]
         public required string UserName { get; set; }
 
+        [Required(ErrorMessage = "Адрес электронной почты обязателен")]
+        public required string Email { get; set; }
+
         [Required(ErrorMessage = "Пароль пользователя обязателен")]
         public required string Password { get; set; }
 
