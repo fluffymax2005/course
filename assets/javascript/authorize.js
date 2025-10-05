@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Убираем надписи при нажатии на "Вернуться назад"
-    const backLabel = document.getElementById('backLabel');
+    const backLabel = document.getElementById('registerBackLabel');
     const loginInput = document.getElementById('loginRegister');
     const emailInput = document.getElementById('emailRegister');
     const passwordInput = document.getElementById('passwordRegister');
@@ -75,6 +75,23 @@ document.addEventListener('DOMContentLoaded', function() {
             emailInput.value = '';
             passwordInput.value = '';
             confirmPasswordInput.value = '';
+        }, 500);     
+    });
+});
+
+/* Установка событий для формы регистрации */
+document.addEventListener('DOMContentLoaded', function() {
+    // Убираем содержимое input и message по возвращении назад
+    const regInputs = document.getElementById('recoverEmail');
+    const regOutputMessage = document.querySelector('.recovery-form .output-message');
+
+    // Убираем надписи при нажатии на "Вернуться назад"
+    const backLabel = document.getElementById('recoverBackLabel');
+
+    backLabel.addEventListener('click', function() {
+        setTimeout(() => {
+            regInputs.value = '';
+            AuthService.hideErrorMessage(regOutputMessage);
         }, 500);     
     });
 });
@@ -199,7 +216,7 @@ class AuthService {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error('Ошибка авторизации: ', response.status, errorData);
+                console.error('Ошибка регистрации: ', response.status, errorData);
 
                 let errorMessage = errorData.message;
                 this.setTextMessage(outputText, true, errorMessage);
@@ -215,6 +232,51 @@ class AuthService {
         }
 
         console.log('Регистрация прошла успешно');
+    }
+
+    static async recover() {
+        const emailInput = document.getElementById('recoverEmail');
+
+        const email = emailInput.value.toString();
+
+        console.log(email);
+
+        var outputText = document.getElementById('recoverMessage');
+        console.log("Отправка запроса:", `${this.API_BASE_URL}/recover`);
+
+        try {
+            const response = await fetch(`${this.API_BASE_URL}/recover`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+
+                body: JSON.stringify( {
+                    email: email,
+                })
+            });
+
+            console.log('Код ответа', response.status);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Ошибка восстановления: ', response.status, errorData);
+
+                let errorMessage = errorData.message;
+                this.setTextMessage(outputText, true, errorMessage);
+                return;
+            }
+
+            const data = await response.json();
+            this.setTextMessage(outputText, false, '✅ Инструкции по восстановлению пароля отправлены на указанную почту почту!');
+
+        } catch (error) {
+            console.error('Ошибка регистрации', error);
+            this.setTextMessage(outputText, true, 'Внутренняя ошибка. Попробуйте позже');
+        }
+
+        console.log('Восстановление прошло успешно');
     }
 
     static setTextMessage(label, isError, message, displayStyle = 'block') {

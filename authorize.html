@@ -92,7 +92,7 @@
                     <!--</div>-->
                     
                     <p class="back-text"
-                        id="backLabel"
+                        id="registerBackLabel"
                         onclick="showAuthorizeForm()">Вернуться назад
                     </p>  
                                       
@@ -109,29 +109,25 @@
 
                 <form id="recoveryForm">
                     <div class="recovery-group">
-                        <label for="email" class="form-label">Электронная почта</label>
+                        <label for="email" class="input-label">Электронная почта</label>
                         <input type="email"
-                            id="email"
-                            name="email"
+                            id="recoverEmail"
                             class="input-box"
-                            placeholder="Введите ваш email"
                             required>
-                        <div class="error-message" id="emailError"></div>
                     </div>
 
-                    <button type="submit" 
+                    <button type="button" 
                         class="action-button" 
-                        id="recoveryButton">Восстановить
+                        id="recoveryButton"
+                        onclick="AuthService.recover()">Восстановить
                     </button>
                 </form>
 
-                <div class="success-message" id="successMessage" style="display: none;">
-                    <p>✅ Инструкции по восстановлению пароля отправлены на указанную почту почту!</p>
-                </div>
-
-                <p class="back-text" 
+                <p class="back-text"
+                    id="recoverBackLabel"
                         onclick="showAuthorizeForm()">Вернуться назад
-                </p>  
+                </p>
+                <p class="output-message" id="recoverMessage">✅ Инструкции по восстановлению пароля отправлены на указанную почту почту!</p>
             </div>
         </div>
     </body>
