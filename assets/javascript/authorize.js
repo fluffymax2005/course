@@ -23,18 +23,59 @@ function showForgotPasswordForm() {
     document.querySelector('.recovery-form').classList.add('active');
 }
 
+/* Установка событий для формы авторизации */
 document.addEventListener('DOMContentLoaded', function() {
     const authInputs = document.querySelectorAll('.authorize-form input');
     const authOutputMessage = document.querySelector('.authorize-form .output-message');
 
+    // Убираем сообщения при наведении на компонент
     function hideAuthErrorMessage() {
         AuthService.hideErrorMessage(authOutputMessage);
     }
     
     authInputs.forEach(input => {
-        //input.addEventListener('mouseenter', hideAuthErrorMessage);
         input.addEventListener('focus', hideAuthErrorMessage);
-       // input.addEventListener('input', hideAuthErrorMessage);
+    });
+
+    // Убираем надпись при нажатии на "Регистрация" или "Забыли пароль?"
+    const registerLabel = document.getElementById('registerLabel');
+    const forgotPasswordLabel = document.getElementById('forgotPasswordLabel');
+
+    registerLabel.addEventListener('click', hideAuthErrorMessage);
+    forgotPasswordLabel.addEventListener('click', hideAuthErrorMessage);
+});
+
+
+/* Установка событий для формы регистрации */
+document.addEventListener('DOMContentLoaded', function() {
+    const regInputs = document.querySelectorAll('.register-form input');
+    const regOutputMessage = document.querySelector('.register-form .output-message');
+
+    // Убираем сообщения при наведении на компонент
+    function hideRegErrorMessage() {
+        setTimeout(() => {
+            AuthService.hideErrorMessage(regOutputMessage);
+        }, 500);       
+    }
+    
+    regInputs.forEach(input => {
+        input.addEventListener('focus', hideRegErrorMessage);
+    });
+
+    // Убираем надписи при нажатии на "Вернуться назад"
+    const backLabel = document.getElementById('backLabel');
+    const loginInput = document.getElementById('loginRegister');
+    const emailInput = document.getElementById('emailRegister');
+    const passwordInput = document.getElementById('passwordRegister');
+    const confirmPasswordInput = document.getElementById('confirmPasswordRegister');
+
+    backLabel.addEventListener('click', function() {
+        setTimeout(() => {
+            loginInput.value = '';
+            emailInput.value = '';
+            passwordInput.value = '';
+            confirmPasswordInput.value = '';
+        }, 500);     
     });
 });
 
@@ -51,7 +92,7 @@ class AuthService {
         const password = passwordInput.value.toString();
 
         
-        var outputText = document.querySelector('.output-message');
+        var outputText = document.getElementById('authorizeMessage');
         if (login.trim().length === 0) {
             this.setTextMessage(outputText, true, 'Введите логин');
             return;
@@ -60,7 +101,7 @@ class AuthService {
             return;
         }
 
-        console.log("Sending request to:", `${this.API_BASE_URL}/login`);
+        console.log("Отправка запроса:", `${this.API_BASE_URL}/login`);
 
         try {
             const response = await fetch(`${this.API_BASE_URL}/login`, {
@@ -75,7 +116,7 @@ class AuthService {
                 })
             });
 
-            console.log("Response status:", response.status);
+            console.log("Код ответа:", response.status);
             
             if (!response.ok) {
                 try {
@@ -100,6 +141,80 @@ class AuthService {
             console.error("Ошибка авторизации:", error);
             this.setTextMessage(outputText, true, 'Внутреняя ошибка. Попробуйте позже');
         }
+    }
+
+    static async register() {
+        const loginInput = document.getElementById('loginRegister');
+        const emailInput = document.getElementById('emailRegister');
+        const passwordInput = document.getElementById('passwordRegister');
+        const confirmPasswordInput = document.getElementById('confirmPasswordRegister');
+
+        const login = loginInput.value.toString();
+        const email = emailInput.value.toString();
+        const password = passwordInput.value.toString();
+        const confirmPassword = confirmPasswordInput.value.toString();
+
+        console.log(login);
+        console.log(email);
+        console.log(password);
+        console.log(confirmPassword);
+
+        var outputText = document.getElementById('registerMessage');
+        if (login.trim().length === 0) {
+            this.setTextMessage(outputText, true, 'Введите логин');
+            return;
+        } else if (email.trim().length === 0) {
+            this.setTextMessage(outputText, true, 'Введите адрес электронной почты');
+            return;
+        } else if (password.trim().length === 0) {
+            this.setTextMessage(outputText, true, 'Введите пароль');
+            return;
+        } else if (confirmPassword.trim().length === 0) {
+            this.setTextMessage(outputText, true, 'Подтвердите пароль');
+            return;
+        } else if (password !== confirmPassword) {
+            this.setTextMessage(outputText, true, 'Пароли не совпадают')
+            return;
+        }
+
+        console.log("Отправка запроса:", `${this.API_BASE_URL}/register`);
+
+        try {
+            const response = await fetch(`${this.API_BASE_URL}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+
+                body: JSON.stringify( {
+                    username: login,
+                    email: email,
+                    password: password,
+                    registerRights: 0
+                })
+            });
+
+            console.log('Код ответа', response.status);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Ошибка авторизации: ', response.status, errorData);
+
+                let errorMessage = errorData.message;
+                this.setTextMessage(outputText, true, errorMessage);
+                return;
+            }
+
+            const data = await response.json();
+            this.setTextMessage(outputText, false, 'Регистрация прошла успешно. Можете вернуться и войти в аккаунт');
+
+        } catch (error) {
+            console.error('Ошибка регистрации', error);
+            this.setTextMessage(outputText, true, 'Внутренняя ошибка. Попробуйте позже');
+        }
+
+        console.log('Регистрация прошла успешно');
     }
 
     static setTextMessage(label, isError, message, displayStyle = 'block') {

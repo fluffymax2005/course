@@ -42,7 +42,7 @@ body {
     width: 100%;
     max-width: 500px;
     animation: slideUp 0.5s ease-out;
-    height: 700px;
+    height: 750px;
     overflow: hidden;
 }
 
@@ -242,16 +242,6 @@ body {
 p.back-text:hover {
     color: #007bff;
     cursor: pointer;
-}
-
-/* Success message */
-
-.success-message {
-    text-align: center;
-    color: green;
-    padding-top: 10px;
-    border-top: 2px solid rgba(128, 128, 128, 0.2);
-    display: none;
 }
 
 /* Forgot password settings */

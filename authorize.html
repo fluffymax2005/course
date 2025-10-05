@@ -22,23 +22,20 @@
                         <label for="login" class="input-label">Логин</label>
                         <input type = "text"
                             id="loginAuthorize"
-                            name="login-box"
                             class="input-box"
-                            placeholder="Введите логин или адрес электронной почты"
-                            onmouseenter=""
                             required>
                     </div>
                     <div class="password-group">
                         <label for="password" class="input-label">Пароль</label>
                         <input type = "password"
                             id="passwordAuthorize"
-                            name="password"
                             class="input-box"
-                            placeholder="Введите пароль"
-                            required="">
+                            required>
                     </div>
-                    <button type="button" class="action-button" id="enterButton" onclick="AuthService.login()">
-                        Авторизация
+                    <button type="button"
+                        class="action-button" 
+                        id="enterButton" 
+                        onclick="AuthService.login()">Авторизация
                     </button>
                     <ul class="nav-labels">
                         <li><a id="registerLabel" 
@@ -46,7 +43,7 @@
                         <li><a id="forgotPasswordLabel"
                             onclick="showForgotPasswordForm()">Забыли пароль?</a></li>
                     </ul>
-                    <p class="output-message"></p>
+                    <p class="output-message" id="authorizeMessage"></p>
                 </form>
             </div>
 
@@ -60,51 +57,46 @@
                     <div class="login-group">
                         <label for="login" class="input-label">Логин</label>
                         <input type = "text"
-                            id="login"
-                            name="login"
+                            id="loginRegister"
                             class="input-box"
-                            placeholder="Введите логин"
                             required>
                     </div>
                     <div class="email-group">
                         <label for="email" class="input-label">Электронная почта</label>
                         <input type = "text"
-                            id="login"
-                            name="login"
+                            id="emailRegister"
                             class="input-box"
-                            placeholder="Введите адрес электронной почты"
                             required>
                     </div>
                     <div class="password-group">
                         <label for="password" class="input-label">Пароль</label>
                         <input type = "password"
-                            id="password"
-                            name="password"
+                            id="passwordRegister"
                             class="input-box"
-                            placeholder="Введите пароль"
                             required>
                     </div>
                     <div class="password-confirm-group">
                         <label for="password" class="input-label">Подтверждение пароля</label>
                         <input type = "password"
-                            id="password"
-                            name="password"
+                            id="confirmPasswordRegister"
                             class="input-box"
-                            placeholder="Введите пароль снова"
                             required>
                     </div>
 
-                    <div class="register-button">
-                        <button class="action-button"
+                    <!--<div class="register-button">-->
+                        <button type="button"
+                            class="action-button"
                             id="registerButton"
-                        onclick="TryRegisterCredential()">Регистрация</button>
-                    </div>
+                            onclick="AuthService.register()">Регистрация
+                        </button>
+                    <!--</div>-->
                     
-                    <p class="back-text" 
+                    <p class="back-text"
+                        id="backLabel"
                         onclick="showAuthorizeForm()">Вернуться назад
                     </p>  
                                       
-                    <p class="success-message">Вы успешно прошли процедуру регистрации аккаунта. Можете вернуться в меню авторизации и войти в систему</p>
+                    <p class="output-message" id="registerMessage"></p>
                 </form>
             </div>
 
