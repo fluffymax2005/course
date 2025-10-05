@@ -177,8 +177,8 @@ namespace DbAPI.Controllers {
             return Ok(response);
         }
 
-        // PUT: api/{entity}/recover/request
-        [HttpPost("recover/request")]
+        // PUT: api/{entity}/recover
+        [HttpPost("recover")]
         [EnableRateLimiting("RecoverPolicy")]
         public async Task<IActionResult> RecoverAsync([FromBody] PasswordRecoveryRequest request) {
             _logger.LogInformation($"Начало попытки восстановления пароля");
@@ -207,8 +207,8 @@ namespace DbAPI.Controllers {
             }
         }
 
-        // POSTL api/{entity}/reset/request
-        [HttpPost("reset/request")]
+        // POSTL api/{entity}/reset
+        [HttpPost("reset")]
         public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordRequest request) {
             _logger.LogInformation("Запрос на сброс пароля");
 

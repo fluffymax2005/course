@@ -43,10 +43,6 @@ namespace DbAPI.Services {
 
                 await smtpClient.SendMailAsync(mailMessage);
 
-
-                // Для демонстрации - имитируем отправку
-                await Task.Delay(100);
-
                 _logger.LogInformation($"Email отправлен для {email}");
             } catch (Exception ex) {
                 _logger.LogError($"Ошибка отправки email: {ex.Message}");
