@@ -14,3 +14,4 @@ DbAPI/logs/
 
 DbAPI/DbAPI.csproj
 DbAPI/DbAPI.csproj.user
+DbAPI/appsettings.json
