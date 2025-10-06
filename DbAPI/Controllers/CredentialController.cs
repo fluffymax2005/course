@@ -194,7 +194,7 @@ namespace DbAPI.Controllers {
                 var recoveryToken = await _passwordRecoveryService.GenerateRecoveryToken(credential.Id);
 
                 // Create link to recover password
-                var resetLink = $"{Request.Scheme}://{Request.Host}/api/recover/reset/form?token={recoveryToken}";
+                var resetLink = $"{Request.Scheme}://{Request.Host}/api/Credential/reset/form?token={recoveryToken}";
 
                 // Send email
                 await _emailService.SendRecoveryEmailAsync(request.Email, resetLink, credential.Username);
@@ -207,7 +207,17 @@ namespace DbAPI.Controllers {
             }
         }
 
-        // POSTL api/{entity}/reset
+        // GET api/{entity}/reset/form
+        [HttpGet("reset/form")]
+        public IActionResult GetResetHTMLForm(string token) {
+            _logger.LogInformation($"Запрос на сброс пароля создан для токена {token}");
+            return PhysicalFile(
+                Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "reset-password.html"),
+                "text/html");
+        }
+
+
+        // POST api/{entity}/reset
         [HttpPost("reset")]
         public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordRequest request) {
             _logger.LogInformation("Запрос на сброс пароля");

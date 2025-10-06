@@ -138,6 +138,8 @@ if (app.Environment.IsDevelopment()) {
 }
 
 app.UseRouting();
+app.UseStaticFiles(); // Allow using HTML CSS JS
+
 app.UseCors("AllowFrontend"); // CORS policy
 
 app.UseHttpsRedirection();
