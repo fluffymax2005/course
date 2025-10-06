@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-/* Установка событий для формы регистрации */
+/* Установка событий для формы восстановления пароля */
 document.addEventListener('DOMContentLoaded', function() {
     // Убираем содержимое input и message по возвращении назад
     const regInputs = document.getElementById('recoverEmail');
@@ -93,6 +93,13 @@ document.addEventListener('DOMContentLoaded', function() {
             regInputs.value = '';
             AuthService.hideErrorMessage(regOutputMessage);
         }, 500);     
+    });
+
+    regInputs.addEventListener('focus', function() {
+        setTimeout(() => {
+            regInputs.value = '';
+            AuthService.hideErrorMessage(regOutputMessage);
+        });
     });
 });
 
