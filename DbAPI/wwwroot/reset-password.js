@@ -43,12 +43,12 @@ class ResetService {
                 console.error('Ошибка восстановления: ', response.status, errorData);
 
                 let errorMessage = errorData.message;
-                this.setTextMessage(outputText, true, errorMessage);
+                this.setTextMessage(outputMessage, true, errorMessage);
                 return;
             }
 
             const data = await response.json();
-            this.setTextMessage(outputText, false, 'Пароль успешно изменен');
+            this.setTextMessage(outputMessage, false, 'Пароль успешно изменен');
         } catch (error) {
             console.error('Ошибка сброса пароля: ', error);
             this.setTextMessage(outputMessage, true, 'Внутренняя ошибка');
