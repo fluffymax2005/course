@@ -1,13 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="ru">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-
     <title>Главная страница</title>
-
     <link rel="stylesheet" href="assets/css/index.css">
     <script src="assets/javascript/index.js"></script>
 </head>
@@ -15,18 +11,43 @@
 <body>           
     <header class="header">
         <div class="navigation">
-            <a href="">
-                <img class="header-icon" id="menu-nav-image" src="assets/icons/error.svg">
-            </a>
+            <div class="menu-dropdown">
+                <a href="#">
+                    <img class="header-icon" id="menu-nav-image" src="assets/icons/error.svg">
+                </a>
+                <div class="left-dropdown">
+                    <div class="menu-header">
+                        <img class="header-icon" id="menu-nav-header-icon" src="assets/icons/error.svg">
+                        <img class="header-icon" id="menu-nav-cancel-icon" src="assets/icons/error.svg">
+                    </div>
+                    <a href="#" class="menu-nav-item">
+                        <img src="assets/icons/error.svg">
+                        <p class="menu-nav-text">Главная</p>
+                    </a>
+                    <a href="#" class="menu-nav-item">
+                        <img src="assets/icons/error.svg">
+                        <p class="menu-nav-text">База данных</p>
+                    </a>
+                    <a href="#" class="menu-nav-item">
+                        <img src="assets/icons/error.svg">
+                        <p class="menu-nav-text">Статистика</p>
+                    </a>
+                    <a href="#" class="menu-nav-item">
+                        <img src="assets/icons/error.svg">
+                        <p class="menu-nav-text">Панель администратора</p>
+                    </a>
+                </div>
+            </div>
+            
             <a href="">
                 <img class="header-icon" id="page-icon" src="assets/icons/error.svg">
             </a>
+            
             <a class="header-nav" href="">
                 <span>Панель управления</span>
             </a>
         </div>
-        
-        
+            
         <div class="authorize-header">
             <div class="profile-dropdown">
                 <a href="#">
@@ -35,6 +56,7 @@
                 <div class="dropdown-menu">
                     <a href="#" class="dropdown-item">Авторизация</a>
                     <a href="#" class="dropdown-item">Регистрация</a>
+                    <a href="#" class="dropdown-item">Выйти</a>
                 </div>
             </div>
         </div>
@@ -48,7 +70,7 @@
                 <a href="https://github.com/fluffymax2005/course"> fluffymax2005.
                 </a> MIT licence.
             </p>
+        </div>
     </footer>
 </body>
-
 </html>
