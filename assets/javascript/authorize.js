@@ -130,6 +130,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Автоматическое переключение на нужную форму при заходе на страницу (из главной страницы)
+document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash;
+
+    if (hash === '#register') {
+        showRegisterForm();
+    }
+})
+
 /* Сервис авторизации */
 
 class AuthService {
