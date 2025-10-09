@@ -13,15 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
         
-        
-
         if (tokenExpireDateTime < new Date().getDate()) { // Если токен просрочен то автоматически выходим из системы
             quitItem.style.display = 'none';
         } else {
             quitItem.style.display = 'block';
         }
 
-    })
+    });
 });
 
 // Визуальные функции
@@ -50,13 +48,56 @@ function showRegisterForm() {
 }
 
 function quitSystem() {
+    // Создаем элемент уведомления
+    const toast = document.createElement('div');
+    toast.textContent = 'Выход из системы успешно выполнен';
+    toast.style.cssText = `
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        background: #4CAF50; /* зеленый цвет */
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        opacity: 0;
+        transform: translateX(100px);
+        transition: all 0.3s ease-in-out;
+        max-width: 300px;
+        text-align: center;
+    `;
+
+    // Добавляем уведомление на страницу
+    document.body.appendChild(toast);
+
+    // Удаляем уведомление через 3 секунды
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100px)';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
+
+    // Анимация появления
+    setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+    }, 100);
+    
     deleteCookie('token');
     deleteCookie('tokenExpireTime');
 
     setTimeout(() => {
         const quitItem = this.document.getElementById('quitItem');
         quitItem.style.display = 'none';
-    }, 100);    
+    }, 100);
 }
 
 function test() {
@@ -76,28 +117,27 @@ function getCookie(name) {
 }
 
 function setCookie(name, value, options = {}) {
-
-  options = {
+    options = {
     path: '/',
     // при необходимости добавьте другие значения по умолчанию
     ...options
-  };
+    };
 
-  if (options.expires instanceof Date) {
+    if (options.expires instanceof Date) {
     options.expires = options.expires.toUTCString();
-  }
+    }
 
-  let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+    let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
 
-  for (let optionKey in options) {
+    for (let optionKey in options) {
     updatedCookie += "; " + optionKey;
     let optionValue = options[optionKey];
     if (optionValue !== true) {
-      updatedCookie += "=" + optionValue;
+        updatedCookie += "=" + optionValue;
     }
-  }
+    }
 
-  document.cookie = updatedCookie;
+    document.cookie = updatedCookie;
 }
 
 function deleteCookie(name) {

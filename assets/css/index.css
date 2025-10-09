@@ -187,13 +187,32 @@ header {
     transform: translateY(0);
 }
 
-/* Основной контент */
+/* Приветственная страница */
 .main {
     padding: 20px;
     min-height: calc(100vh - 120px);
 }
 
+/* Страница с базами данных */
+
+.database {
+    display: none;
+}
+
+/* Страница с статистикой данных */
+
+.statistics {
+    display: none;
+}
+
+/* Панель администратора */
+
+.admin-panel {
+    display: none;
+}
+
 /* Футер */
+
 footer {
     background-color: rgb(178, 200, 223);
     padding: 20px;
