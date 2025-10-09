@@ -23,6 +23,33 @@ function showForgotPasswordForm() {
     document.querySelector('.recovery-form').classList.add('active');
 }
 
+/* Установка события по нажатии на кнопку Enter для всех форм */
+document.addEventListener('DOMContentLoaded', function() {
+    const authorizeForm = document.querySelector('.authorize-form');
+    authorizeForm.addEventListener('keyup', function(event) {
+        event.preventDefault();
+        if (event.keyCode === 0x0D) { // Enter key is clicked
+            AuthService.login();
+        }
+    });
+
+    const registerForm = document.querySelector('.register-form');
+    registerForm.addEventListener('keyup', function(event) {
+        event.preventDefault();
+        if (event.keyCode === 0x0D) { // Enter key is clicked
+            AuthService.register();
+        }
+    });
+
+    const recoveryForm = document.querySelector('.recovery-form');
+    recoveryForm.addEventListener('keyup', function(event) {
+        event.preventDefault();
+        if (event.keyCode === 0x0D) { // Enter key is clicked
+            AuthService.recover();
+        }
+    });
+});
+
 /* Установка событий для формы авторизации */
 document.addEventListener('DOMContentLoaded', function() {
     const authInputs = document.querySelectorAll('.authorize-form input');
@@ -107,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 class AuthService {
     static API_BASE_URL = 'http://localhost:5091/api/Credential';
+    static hoursTokenExpiresAt = 1;
 
     static async login() {
         const loginInput = document.getElementById('loginAuthorize');
@@ -161,10 +189,22 @@ class AuthService {
             this.setTextMessage(outputText, false, 'Авторизация прошла успешно');
             console.log("Авторизация прошла успешно: ", data);
 
+            // Set cookie token
+            const expire = new Date();
+            expire.setHours(expire.getHours() + AuthService.hoursTokenExpiresAt);
+            const token = data.token;
+            document.cookie = "token=" + token + ";expires=" + expire.toUTCString() + ";path=/";
+
         } catch (error) {
             console.error("Ошибка авторизации:", error);
             this.setTextMessage(outputText, true, 'Внутреняя ошибка. Попробуйте позже');
+            return;
         }
+
+        // Успешный переход в рабочую область
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1000);
     }
 
     static async register() {
@@ -276,7 +316,7 @@ class AuthService {
             }
 
             const data = await response.json();
-            this.setTextMessage(outputText, false, '✅ Инструкции по восстановлению пароля отправлены на указанную почту почту!');
+            this.setTextMessage(outputText, false, '✅ Инструкции по восстановлению пароля отправлены на указанную почту!');
 
         } catch (error) {
             console.error('Ошибка регистрации', error);
