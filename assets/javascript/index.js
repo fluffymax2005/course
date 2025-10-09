@@ -1,3 +1,29 @@
+/* Инициализация формы проверяет авторизацию пользователя */
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('load', function() {
+        // Компоненты, стиль которых меняется в зависимости от свежести токена
+        const quitItem = this.document.getElementById('quitItem');
+        
+        const tokenExpireTime = getCookie('tokenExpireTime'); // время жизни токена из куки
+        if (tokenExpireTime === undefined) {
+            quitItem.style.display = 'none';
+            return;
+        }
+
+        const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
+        
+        
+
+        if (tokenExpireDateTime < new Date().getDate()) { // Если токен просрочен то автоматически выходим из системы
+            quitItem.style.display = 'none';
+        } else {
+            quitItem.style.display = 'block';
+        }
+
+    })
+});
+
 // Визуальные функции
 
 function showNavigationMenu() {
@@ -24,7 +50,60 @@ function showRegisterForm() {
 }
 
 function quitSystem() {
+    deleteCookie('token');
+    deleteCookie('tokenExpireTime');
 
+    setTimeout(() => {
+        const quitItem = this.document.getElementById('quitItem');
+        quitItem.style.display = 'none';
+    }, 100);    
+}
+
+function test() {
+    const token = getCookie('token');
+    const timeExpire = getCookie('tokenExpireTime');
+    console.log(token);
+    console.log(timeExpire);
+}
+
+
+/* Служебные функции */
+function getCookie(name) {
+    let matches = document.cookie.match(new RegExp(
+    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+function setCookie(name, value, options = {}) {
+
+  options = {
+    path: '/',
+    // при необходимости добавьте другие значения по умолчанию
+    ...options
+  };
+
+  if (options.expires instanceof Date) {
+    options.expires = options.expires.toUTCString();
+  }
+
+  let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+  for (let optionKey in options) {
+    updatedCookie += "; " + optionKey;
+    let optionValue = options[optionKey];
+    if (optionValue !== true) {
+      updatedCookie += "=" + optionValue;
+    }
+  }
+
+  document.cookie = updatedCookie;
+}
+
+function deleteCookie(name) {
+    setCookie(name, "", {
+        'max-age': -1
+    })
 }
 
 // Инициализация при загрузке страницы
