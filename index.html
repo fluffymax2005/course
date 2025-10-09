@@ -20,19 +20,19 @@
                         <img class="header-icon" id="menu-nav-header-icon" src="assets/icons/error.svg">
                         <img class="header-icon" id="menu-nav-cancel-icon" src="assets/icons/error.svg">
                     </div>
-                    <a href="#" class="menu-nav-item">
+                    <a onclick="showSection('main')" class="menu-nav-item">
                         <img src="assets/icons/error.svg">
                         <p class="menu-nav-text">Главная</p>
                     </a>
-                    <a href="#" class="menu-nav-item">
+                    <a onclick="showSection('database')" class="menu-nav-item">
                         <img src="assets/icons/error.svg">
                         <p class="menu-nav-text">База данных</p>
                     </a>
-                    <a href="#" class="menu-nav-item">
+                    <a onclick="showSection('statistics')" class="menu-nav-item">
                         <img src="assets/icons/error.svg">
                         <p class="menu-nav-text">Статистика</p>
                     </a>
-                    <a href="#" class="menu-nav-item">
+                    <a onclick="showSection('admin-panel')" class="menu-nav-item">
                         <img src="assets/icons/error.svg">
                         <p class="menu-nav-text">Панель администратора</p>
                     </a>
@@ -62,8 +62,49 @@
         </div>
     </header>
 
-    <div class="main">
+    <!-- Главная страница -->
+    <div class="main active-section">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">Добро пожаловать в систему управления</h1>
+                <p class="hero-subtitle">Платформа для работы с данными, аналитики и администрирования</p>
+                <div class="hero-features">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>База данных</h3>
+                        <p>Управляйте вашими данными</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3>Статистика</h3>
+                        <p>Анализируйте данные с помощью инструментов</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚙️</div>
+                        <h3>Администрирование</h3>
+                        <p>Полный контроль над системой и пользователями</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div class="quick-actions">
+            <h2>Быстрый доступ</h2>
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="showSection('database')">
+                    <span class="btn-icon">🗃️</span>
+                    <span>База данных</span>
+                </button>
+                <button class="action-btn secondary" onclick="showSection('statistics')">
+                    <span class="btn-icon">📈</span>
+                    <span>Статистика</span>
+                </button>
+                <button class="action-btn tertiary" onclick="showSection('admin-panel')">
+                    <span class="btn-icon">👨‍💼</span>
+                    <span>Админ-панель</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="database">
@@ -75,7 +116,7 @@
     </div>
 
     <div class="admin-panel">
-        
+
     </div>
 
     <footer>

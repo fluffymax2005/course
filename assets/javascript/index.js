@@ -36,6 +36,27 @@ function hideNavigationMenu() {
     leftDropDown.classList.remove('open');
 }
 
+// Функция для переключения между разделами
+function showSection(sectionName) {
+    // Скрываем все разделы
+    const sections = document.querySelectorAll('.main, .database, .statistics, .admin-panel');
+    sections.forEach(section => {
+        section.style.display = 'none';
+        section.classList.remove('active-section');
+    });
+    
+    // Показываем выбранный раздел
+    const activeSection = document.querySelector(`.${sectionName}`);
+    if (activeSection) {
+        activeSection.style.display = 'block';
+        activeSection.classList.add('active-section');
+    }
+    
+    // Закрываем меню навигации
+    hideNavigationMenu();
+}
+
+
 // Перемещение для входа в систему
 function showAuthorizeForm() {
     window.location.href = '/authorize-form/authorize.html#authorize';
@@ -149,6 +170,9 @@ function deleteCookie(name) {
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Page loaded');
+
+    // По умолчанию отображаем главную страницу
+    showSection('main');
     
     // Обработчик для кнопки меню
     const menuButton = document.getElementById('menu-nav-image');
