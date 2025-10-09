@@ -12,6 +12,21 @@ function hideNavigationMenu() {
     leftDropDown.classList.remove('open');
 }
 
+// Перемещение для входа в систему
+function showAuthorizeForm() {
+    window.location.href = '/authorize-form/authorize.html#authorize';
+}
+
+function showRegisterForm() {
+    setTimeout(() => {
+        window.location.href = '/authorize-form/authorize.html#register';
+    }, 1000);   
+}
+
+function quitSystem() {
+
+}
+
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Page loaded');
