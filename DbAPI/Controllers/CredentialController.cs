@@ -84,6 +84,7 @@ namespace DbAPI.Controllers {
                 var response = new LoginResponse {
                     UserId = credential.Id,
                     Username = credential.Username,
+                    UserRights = role.Rights,
                     Token = token,
                     TokenExpireTime = DateTime.UtcNow.AddMinutes(_jwtService.GetTokenLifeTime()),
                     CanGet = role.CanGet,
