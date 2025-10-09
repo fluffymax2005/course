@@ -1,27 +1,3 @@
-/* Инициализация формы проверяет авторизацию пользователя */
-
-document.addEventListener('DOMContentLoaded', function() {
-    window.addEventListener('load', function() {
-        // Компоненты, стиль которых меняется в зависимости от свежести токена
-        const quitItem = this.document.getElementById('quitItem');
-        
-        const tokenExpireTime = getCookie('tokenExpireTime'); // время жизни токена из куки
-        if (tokenExpireTime === undefined) {
-            quitItem.style.display = 'none';
-            return;
-        }
-
-        const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
-        
-        if (tokenExpireDateTime < new Date().getDate()) { // Если токен просрочен то автоматически выходим из системы
-            quitItem.style.display = 'none';
-        } else {
-            quitItem.style.display = 'block';
-        }
-
-    });
-});
-
 // Визуальные функции
 
 function showNavigationMenu() {
@@ -38,6 +14,60 @@ function hideNavigationMenu() {
 
 // Функция для переключения между разделами
 function showSection(sectionName) {
+    // Получаем из куки роль пользователя для ограничения доступа
+    const userRights = getCookie('userRights');
+    if (userRights === undefined) {
+        console.error('Не удалось извлечь права пользователя');
+        const messageBox = messageBoxCreate('Внутренняя ошибка', 'red', '20px', '50%', 'translateY(50px)');
+
+        // Добавляем уведомление на страницу
+        document.body.appendChild(messageBox);
+        
+        // Удаляем уведомление через 3 секунды
+        setTimeout(() => {
+            messageBox.style.opacity = '0';
+            messageBox.style.transform = 'translateX(100px)';
+            setTimeout(() => {
+                if (messageBox.parentNode) {
+                    messageBox.parentNode.removeChild(messageBox);
+                }
+            }, 300);
+        }, 3000);
+
+        // Анимация появления
+        setTimeout(() => {
+            messageBox.style.opacity = '1';
+            messageBox.style.transform = 'translateX(0)';
+        }, 100);
+    }
+
+    if (userRights === '0' && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
+        const messageBox = messageBoxCreate('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
+            'red', '20px', '35%', 'translateY(50px)');
+        
+        // Добавляем уведомление на страницу
+        document.body.appendChild(messageBox);
+
+        // Удаляем уведомление через 3 секунды
+        setTimeout(() => {
+            messageBox.style.opacity = '0';
+            messageBox.style.transform = 'translateX(100px)';
+            setTimeout(() => {
+                if (messageBox.parentNode) {
+                    messageBox.parentNode.removeChild(messageBox);
+                }
+            }, 300);
+        }, 3000);
+
+        // Анимация появления
+        setTimeout(() => {
+            messageBox.style.opacity = '1';
+            messageBox.style.transform = 'translateX(0)';
+        }, 100);
+
+        return;
+    }
+
     // Скрываем все разделы
     const sections = document.querySelectorAll('.main, .database, .statistics, .admin-panel');
     sections.forEach(section => {
@@ -70,27 +100,7 @@ function showRegisterForm() {
 
 function quitSystem() {
     // Создаем элемент уведомления
-    const toast = document.createElement('div');
-    toast.textContent = 'Выход из системы успешно выполнен';
-    toast.style.cssText = `
-        position: fixed;
-        top: 60px;
-        right: 20px;
-        background: #4CAF50; /* зеленый цвет */
-        color: white;
-        padding: 16px 24px;
-        border-radius: 12px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 16px;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 10000;
-        opacity: 0;
-        transform: translateX(100px);
-        transition: all 0.3s ease-in-out;
-        max-width: 300px;
-        text-align: center;
-    `;
+    const toast = messageBoxCreate('Выход из системы успешно выполнен', '#4CAF50', '60px', '20px', 'transform(100px)');
 
     // Добавляем уведомление на страницу
     document.body.appendChild(toast);
@@ -119,17 +129,38 @@ function quitSystem() {
         const quitItem = this.document.getElementById('quitItem');
         quitItem.style.display = 'none';
     }, 100);
-}
+} 
+ 
+// Функция создания окна уведомления
+function messageBoxCreate(message, background_color, top_pos, right_pos, transform) {
+    // Создаем окно уведомления
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        top: ${top_pos};
+        right: ${right_pos};
+        background: ${background_color};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        opacity: 0;
+        transform: ${transform};
+        transition: all 0.3s ease-in-out;
+        max-width: 500px;
+        text-align: center;
+    `;
 
-function test() {
-    const token = getCookie('token');
-    const timeExpire = getCookie('tokenExpireTime');
-    console.log(token);
-    console.log(timeExpire);
+    return toast;
 }
-
 
 /* Служебные функции */
+
 function getCookie(name) {
     let matches = document.cookie.match(new RegExp(
     "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
@@ -204,5 +235,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 hideNavigationMenu();
             }
         }
+    });
+});
+
+/* Инициализация формы проверяет авторизацию пользователя */
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('load', function() {
+        // Компоненты, стиль которых меняется в зависимости от свежести токена
+        const quitItem = this.document.getElementById('quitItem');
+        
+        const tokenExpireTime = getCookie('tokenExpireTime'); // время жизни токена из куки
+        if (tokenExpireTime === undefined) {
+            quitItem.style.display = 'none';
+            return;
+        }
+
+        const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
+        
+        if (tokenExpireDateTime < new Date().getDate()) { // Если токен просрочен то автоматически выходим из системы
+            quitItem.style.display = 'none';
+        } else {
+            quitItem.style.display = 'block';
+        }
+
     });
 });
