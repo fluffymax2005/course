@@ -189,11 +189,16 @@ class AuthService {
             this.setTextMessage(outputText, false, 'Авторизация прошла успешно');
             console.log("Авторизация прошла успешно: ", data);
 
-            // Set cookie token
-            const expire = new Date();
-            expire.setHours(expire.getHours() + AuthService.hoursTokenExpiresAt);
+            // Звпись токена в куки
+            const tokenExpireTime = data.tokenExpireTime;
             const token = data.token;
-            document.cookie = "token=" + token + ";expires=" + expire.toUTCString() + ";path=/";
+            document.cookie = "token=" + token + ";expires=" + tokenExpireTime + ";path=/";
+
+            // Запись прав доступа и роль пользователя в куки
+            const userRights = data.userRights;
+            document.cookie = "userRights=" + userRights + ";expires=" + tokenExpireTime + ";path=/";
+
+            console.log(document.cookie);
 
         } catch (error) {
             console.error("Ошибка авторизации:", error);
