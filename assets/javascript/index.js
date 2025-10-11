@@ -18,53 +18,13 @@ function showSection(sectionName) {
     const userRights = getCookie('userRights');
     if (userRights === undefined) {
         console.error('Не удалось извлечь права пользователя');
-        const messageBox = messageBoxCreate('Внутренняя ошибка', 'red', '20px', '50%', 'translateY(50px)');
-
-        // Добавляем уведомление на страницу
-        document.body.appendChild(messageBox);
-        
-        // Удаляем уведомление через 3 секунды
-        setTimeout(() => {
-            messageBox.style.opacity = '0';
-            messageBox.style.transform = 'translateX(100px)';
-            setTimeout(() => {
-                if (messageBox.parentNode) {
-                    messageBox.parentNode.removeChild(messageBox);
-                }
-            }, 300);
-        }, 3000);
-
-        // Анимация появления
-        setTimeout(() => {
-            messageBox.style.opacity = '1';
-            messageBox.style.transform = 'translateX(0)';
-        }, 100);
+        messageBoxCreate('Внутренняя ошибка', 'red', '20px', '50%', 'translateY(50px)');
+        return;
     }
 
     if (userRights === '0' && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
-        const messageBox = messageBoxCreate('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
+        messageBoxShow('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
             'red', '20px', '35%', 'translateY(50px)');
-        
-        // Добавляем уведомление на страницу
-        document.body.appendChild(messageBox);
-
-        // Удаляем уведомление через 3 секунды
-        setTimeout(() => {
-            messageBox.style.opacity = '0';
-            messageBox.style.transform = 'translateX(100px)';
-            setTimeout(() => {
-                if (messageBox.parentNode) {
-                    messageBox.parentNode.removeChild(messageBox);
-                }
-            }, 300);
-        }, 3000);
-
-        // Анимация появления
-        setTimeout(() => {
-            messageBox.style.opacity = '1';
-            messageBox.style.transform = 'translateX(0)';
-        }, 100);
-
         return;
     }
 
@@ -98,30 +58,7 @@ function showRegisterForm() {
     }, 1000);   
 }
 
-function quitSystem() {
-    // Создаем элемент уведомления
-    const toast = messageBoxCreate('Выход из системы успешно выполнен', '#4CAF50', '60px', '20px', 'transform(100px)');
-
-    // Добавляем уведомление на страницу
-    document.body.appendChild(toast);
-
-    // Удаляем уведомление через 3 секунды
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100px)';
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
-        }, 300);
-    }, 3000);
-
-    // Анимация появления
-    setTimeout(() => {
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateX(0)';
-    }, 100);
-    
+function quitSystem() {       
     deleteCookie('token');
     deleteCookie('tokenExpireTime');
 
@@ -133,11 +70,14 @@ function quitSystem() {
         authorizeItem.style.display = 'block';
         registerItem.style.display = 'block';
         quitItem.style.display = 'none';
-    }, 1000);
-} 
+    }, 10);
+
+    // Создаем элемент уведомления
+    messageBoxShow('Выход из системы успешно выполнен', '#4CAF50', '20px', '40%', 'translateY(-50px)');
+}
  
 // Функция создания окна уведомления
-function messageBoxCreate(message, background_color, top_pos, right_pos, transform) {
+function messageBoxShow(message, background_color, top_pos, right_pos, transform, duration = 3000) {
     // Создаем окно уведомления
     const toast = document.createElement('div');
     toast.textContent = message;
@@ -156,12 +96,31 @@ function messageBoxCreate(message, background_color, top_pos, right_pos, transfo
         z-index: 10000;
         opacity: 0;
         transform: ${transform};
-        transition: all 0.3s ease-in-out;
+        transition: all 0.5s ease-in-out;
         max-width: 500px;
         text-align: center;
     `;
 
-    return toast;
+    // Отображение сообщения
+    document.body.appendChild(toast);
+
+    // Появление: сверху вниз
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+        toast.style.top = '20px';
+    });
+
+    // Исчезновение: снизу вверх через указанное время
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, duration);
 }
 
 /* Служебные функции */

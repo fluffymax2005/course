@@ -140,6 +140,8 @@ header {
     position: relative;
 }
 
+/* Выпадающее меню авторизации */
+
 .profile-dropdown {
     position: relative;
     display: flex;
