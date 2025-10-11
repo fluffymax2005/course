@@ -202,6 +202,7 @@ class AuthService {
             const tokenExpireTime = data.tokenExpireTime;
             const token = data.token;
             document.cookie = "token=" + token + ";expires=" + tokenExpireTime + ";path=/";
+            document.cookie = "tokenExpireTime=" + tokenExpireTime + ";expire=" + tokenExpireTime + ";path=/";
 
             // Запись прав доступа и роль пользователя в куки
             const userRights = data.userRights;
@@ -217,7 +218,7 @@ class AuthService {
 
         // Успешный переход в рабочую область
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = '/workspace-form/index.html';
         }, 1000);
     }
 
