@@ -1,6 +1,6 @@
 @db_HostAddress = http://localhost:5091
 
-GET {{db_HostAddress}}/weatherforecast/
+GET {{db_HostAddress}}/api/Credential/
 Accept: application/json
 
 ###

@@ -2,13 +2,13 @@
   "profiles": {
     "http": {
       "commandName": "Project",
-      "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5091"
+      "applicationUrl": "http://localhost:5091",
+      "sqlDebugging": true
     },
     "https": {
       "commandName": "Project",

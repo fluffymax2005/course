@@ -1,4 +1,7 @@
-﻿using DbAPI.Contexts;
+﻿//#define DOCKER
+#define __NO_USE_SWAGGER
+
+using DbAPI.Contexts;
 using DbAPI.Interfaces;
 using DbAPI.Models;
 using DbAPI.Repositories;
@@ -80,7 +83,11 @@ builder.Services.AddRateLimiter(options => {
 
 // Register OrderDbContext + reposes
 builder.Services.AddDbContext<OrderDbContext>(options =>
+#if DOCKER
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnection")));
+#else
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+#endif
 builder.Services.AddScoped<IRepository<Order, TypeId>, OrderRepository>();
 builder.Services.AddScoped<IRepository<Customer, TypeId>, CustomerRepository>();
 builder.Services.AddScoped<IRepository<Driver, TypeId>, DriverRepository>();
@@ -119,7 +126,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // CORS policy
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowFrontend", policy => {
-        policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500")
+        policy.WithOrigins(
+                "http://127.0.0.1:5500", 
+                "http://localhost:5500",
+                "http://localhost:5091",
+                "http://localhost:8081"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -133,8 +145,11 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    #if __NO_USE_SWAGGER
+    #else
+        app.UseSwagger();    
+        app.UseSwaggerUI();
+    #endif
 }
 
 app.UseRouting();
