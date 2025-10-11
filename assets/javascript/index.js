@@ -126,9 +126,14 @@ function quitSystem() {
     deleteCookie('tokenExpireTime');
 
     setTimeout(() => {
+        const authorizeItem = this.document.getElementById('authorizeItem');
+        const registerItem = this.document.getElementById('registerItem');
         const quitItem = this.document.getElementById('quitItem');
+
+        authorizeItem.style.display = 'block';
+        registerItem.style.display = 'block';
         quitItem.style.display = 'none';
-    }, 100);
+    }, 1000);
 } 
  
 // Функция создания окна уведомления
@@ -243,6 +248,8 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('load', function() {
         // Компоненты, стиль которых меняется в зависимости от свежести токена
+        const authorizeItem = this.document.getElementById('authorizeItem');
+        const registerItem = this.document.getElementById('registerItem');
         const quitItem = this.document.getElementById('quitItem');
         
         const tokenExpireTime = getCookie('tokenExpireTime'); // время жизни токена из куки
@@ -254,8 +261,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
         
         if (tokenExpireDateTime < new Date().getDate()) { // Если токен просрочен то автоматически выходим из системы
+            authorizeItem.style.display = 'block';
+            registerItem.style.display = 'block';
             quitItem.style.display = 'none';
         } else {
+            authorizeItem.style.display = 'none';
+            registerItem.style.display = 'none';
             quitItem.style.display = 'block';
         }
 
