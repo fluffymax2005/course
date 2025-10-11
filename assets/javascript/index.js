@@ -12,17 +12,58 @@ function hideNavigationMenu() {
     leftDropDown.classList.remove('open');
 }
 
+function updateSection() {
+    // Скрываем все разделы
+    const sections = document.querySelectorAll('.main, .database, .statistics, .admin-panel');
+    sections.forEach(section => {
+        section.style.display = 'none';
+        section.classList.remove('active-section');
+    });
+    
+    // Показываем выбранный раздел
+    const activeSection = document.querySelector(`.${sectionName === 'Главная' ? '.main' : 
+        sectionName === 'База данных' ? '.database' :
+        sectionName === 'Статистика' ? '.statistics' : '.admin-panel'
+    }`);
+    if (activeSection) {
+        activeSection.style.display = 'block';
+        activeSection.classList.add('active-section');
+    }
+}
+
 // Функция для переключения между разделами
-function showSection(sectionName) {
-    // Получаем из куки роль пользователя для ограничения доступа
+function showSection(sectionName, isLoadListener = false) {
+    if (isLoadListener) {
+        return;
+    }
+
+    // Получаем из куки роль пользователя для ограничения доступа и его срок жизни
     const userRights = getCookie('userRights');
+    const tokenExpireTime = getCookie('tokenExpireTime'); // время жизни токена из куки
+    if (tokenExpireTime === undefined) {
+        console.error('Не удалось извлечь срок жизни токена, либо пользователь вышел из системы самостоятельно');
+        messageBoxShow('Авторизуйтесь в системе', 'red', '20px', '44%', 'translateY(50px)');
+        return;
+    }
+
+    const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
+
+    // Проверяем жизнь токена
     if (userRights === undefined) {
         console.error('Не удалось извлечь права пользователя');
-        messageBoxCreate('Внутренняя ошибка', 'red', '20px', '50%', 'translateY(50px)');
+        messageBoxShow('Внутренняя ошибка', 'red', '20px', '50%', 'translateY(50px)');
+        return;
+    } else if (tokenExpireDateTime < new Date().getDate()) {
+        console.error('Время сессии истекло');
+        messageBoxShow('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', '20px', '50%', 'translateY(50px)');
         return;
     }
 
     if (userRights === '0' && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
+        messageBoxShow('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
+            'red', '20px', '35%', 'translateY(50px)');
+        return;
+    } else if (userRights === '1' && (sectionName === 'admin-panel')) {
         messageBoxShow('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
             'red', '20px', '35%', 'translateY(50px)');
         return;
@@ -40,6 +81,18 @@ function showSection(sectionName) {
     if (activeSection) {
         activeSection.style.display = 'block';
         activeSection.classList.add('active-section');
+
+        // Сменяем название заголовка рядом с панелью навигации
+        const headerText = document.getElementById('header-text');
+        if (sectionName === 'main') {
+            headerText.textContent = 'Главная';
+        } else if (sectionName === 'database') {
+            headerText.textContent = 'База данных';
+        } else if (sectionName === 'statistics') {
+            headerText.textContent = 'Статистика';
+        } else if (sectionName === 'admin-panel') {
+            headerText.textContent = 'Панель администратора';
+        }
     }
     
     // Закрываем меню навигации
@@ -127,30 +180,30 @@ function messageBoxShow(message, background_color, top_pos, right_pos, transform
 
 function getCookie(name) {
     let matches = document.cookie.match(new RegExp(
-    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-    ));
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
     return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
 function setCookie(name, value, options = {}) {
     options = {
-    path: '/',
-    // при необходимости добавьте другие значения по умолчанию
-    ...options
+        path: '/',
+        // при необходимости добавьте другие значения по умолчанию
+        ...options
     };
 
     if (options.expires instanceof Date) {
-    options.expires = options.expires.toUTCString();
+        options.expires = options.expires.toUTCString();
     }
 
     let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
 
     for (let optionKey in options) {
-    updatedCookie += "; " + optionKey;
-    let optionValue = options[optionKey];
-    if (optionValue !== true) {
-        updatedCookie += "=" + optionValue;
-    }
+        updatedCookie += "; " + optionKey;
+        let optionValue = options[optionKey];
+        if (optionValue !== true) {
+            updatedCookie += "=" + optionValue;
+        }
     }
 
     document.cookie = updatedCookie;
@@ -167,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Page loaded');
 
     // По умолчанию отображаем главную страницу
-    showSection('main');
+    showSection('main', true);
     
     // Обработчик для кнопки меню
     const menuButton = document.getElementById('menu-nav-image');
