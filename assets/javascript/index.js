@@ -12,27 +12,8 @@ function hideNavigationMenu() {
     leftDropDown.classList.remove('open');
 }
 
-function updateSection() {
-    // Скрываем все разделы
-    const sections = document.querySelectorAll('.main, .database, .statistics, .admin-panel');
-    sections.forEach(section => {
-        section.style.display = 'none';
-        section.classList.remove('active-section');
-    });
-    
-    // Показываем выбранный раздел
-    const activeSection = document.querySelector(`.${sectionName === 'Главная' ? '.main' : 
-        sectionName === 'База данных' ? '.database' :
-        sectionName === 'Статистика' ? '.statistics' : '.admin-panel'
-    }`);
-    if (activeSection) {
-        activeSection.style.display = 'block';
-        activeSection.classList.add('active-section');
-    }
-}
-
 // Функция для переключения между разделами
-function showSection(sectionName, isLoadListener = false) {
+async function showSection(sectionName = null, isLoadListener = false) {
     if (isLoadListener) {
         return;
     }
@@ -77,6 +58,12 @@ function showSection(sectionName, isLoadListener = false) {
     });
     
     // Показываем выбранный раздел
+    if (sectionName === null) {
+        const headerText = document.getElementById('header-text');
+        sectionName = headerText.textContent === 'Главная' ? 'main' : 
+            headerText.textContent === 'База данных' ? 'database' :
+            headerText.textContent === 'Статистика' ? 'statistics' : 'admin-panel';
+    }
     const activeSection = document.querySelector(`.${sectionName}`);
     if (activeSection) {
         activeSection.style.display = 'block';
@@ -92,7 +79,14 @@ function showSection(sectionName, isLoadListener = false) {
             headerText.textContent = 'Статистика';
         } else if (sectionName === 'admin-panel') {
             headerText.textContent = 'Панель администратора';
-            switchTab('users');
+            // Инициализируем первую вкладку с проверкой авторизации
+            const success = await switchTab('users');
+            if (!success) {
+                // Если не удалось загрузить данные, скрываем панель администратора
+                activeSection.style.display = 'none';
+                activeSection.classList.remove('active-section');
+                return;
+            }
         }
     }
     

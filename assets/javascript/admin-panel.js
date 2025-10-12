@@ -8,7 +8,22 @@ const itemsPerPage = 10;
 const BASE_API_URL = 'http://localhost:5091/api'
 
 // Функции для вкладок
-function switchTab(tabName) {
+async function switchTab(tabName, event = null) {
+    
+    let loadSuccess = false;
+
+    // Загрузить данные для вкладки
+    if (tabName === 'users') {
+        loadSuccess = await loadUsers();
+    } else if (tabName === 'roles') {
+        loadSuccess = await loadRoles();
+    }
+
+    if (!loadSuccess) {
+        return false;
+    }
+
+    // Только после успешной загрузки данных переключаем вкладки
     // Скрыть все вкладки
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
@@ -22,21 +37,42 @@ function switchTab(tabName) {
     // Показать выбранную вкладку
     document.getElementById(`${tabName}-tab`).classList.add('active');
     
-    // Активировать кнопку
-    event.target.classList.add('active');
-    
-    // Загрузить данные для вкладки
-    if (tabName === 'users') {
-        loadUsers();
-    } else if (tabName === 'roles') {
-        loadRoles();
+    // Активировать кнопку (если event передан)
+    if (event) {
+        event.target.classList.add('active');
+    } else {
+        // Ищем кнопку по tabName и активируем её
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            if (btn.textContent.toLowerCase().includes(tabName) || 
+                btn.getAttribute('data-tab') === tabName) {
+                btn.classList.add('active');
+            }
+        });
     }
+
+    return true;
 }
 
 // Функции для пользователей
 async function loadUsers(page = 1) {
     try {
+        // Проверяем токен перед запросом
         const token = getCookie('token');
+        const tokenExpireTime = getCookie('tokenExpireTime');
+        
+        if (!token || !tokenExpireTime) {
+            console.error('Токен не найден');
+            messageBoxShow('Авторизуйтесь в системе', 'red', '20px', '44%', 'translateY(50px)');
+            return false;
+        }
+
+        const tokenExpireDateTime = new Date(tokenExpireTime);
+        if (tokenExpireDateTime < new Date()) {
+            console.error('Время сессии истекло');
+            messageBoxShow('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', '20px', '50%', 'translateY(50px)');
+            return false;
+        }
+        
         const response = await fetch(`${BASE_API_URL}/Credential`, {
             method: 'GET',
             headers: {
@@ -45,15 +81,10 @@ async function loadUsers(page = 1) {
             }
         });
         
-        if (!response.ok) throw new Error('Ошибка загрузки пользователей');
+        if (!response.ok) throw new Error(response.status);
         
         const users = await response.json(); // Получаем массив напрямую
-        
-        // Добавьте отладку
-        console.log('Users API response:', users);
-        console.log('Is array:', Array.isArray(users));
-        console.log('Type:', typeof users);
-        
+               
         if (Array.isArray(users)) {
             displayUsers(users);
             setupUsersPagination(users.length, page);
@@ -64,8 +95,12 @@ async function loadUsers(page = 1) {
         
     } catch (error) {
         console.error('Error loading users:', error);
-        messageBoxShow('Ошибка загрузки пользователей', 'red', '20px', '50%', 'translateY(50px)');
+        
+        const errorMessage = error.message == 401 ? 'Срок вашей сессии истек. Авторизуйтесь повторно' : 'Внутренняя ошибка';        
+        messageBoxShow(errorMessage, 'red', '20px', '40%', 'translateY(50px)');
+        return false;
     }
+    return true;
 }
 
 function displayUsers(users) {
@@ -151,8 +186,10 @@ async function loadRoles(page = 1) {
         
     } catch (error) {
         console.error('Error loading roles:', error);
-        messageBoxShow('Ошибка загрузки ролей', 'red', '20px', '50%', 'translateY(50px)');
+        messageBoxShow('Ошибка загрузки ролей', 'red', '20px', '45%', 'translateY(50px)');
+        return false;
     }
+    return true;
 }
 
 function displayRoles(roles) {

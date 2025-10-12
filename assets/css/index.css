@@ -359,6 +359,7 @@ header {
 .admin-panel {
     min-height: calc(100vh - 120px);
     background: #f8f9fa;
+    display: none;
 }
 
 .admin-container {
