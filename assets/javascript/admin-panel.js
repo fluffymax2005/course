@@ -1,0 +1,520 @@
+// Переменные для управления состоянием
+let currentEditingUser = null;
+let currentEditingRole = null;
+let currentUsersPage = 1;
+let currentRolesPage = 1;
+const itemsPerPage = 10;
+
+const BASE_API_URL = 'http://localhost:5091/api'
+
+// Функции для вкладок
+function switchTab(tabName) {
+    // Скрыть все вкладки
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Убрать активный класс со всех кнопок
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Показать выбранную вкладку
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+    
+    // Активировать кнопку
+    event.target.classList.add('active');
+    
+    // Загрузить данные для вкладки
+    if (tabName === 'users') {
+        loadUsers();
+    } else if (tabName === 'roles') {
+        loadRoles();
+    }
+}
+
+// Функции для пользователей
+async function loadUsers(page = 1) {
+    try {
+        const token = getCookie('token');
+        const response = await fetch(`${BASE_API_URL}/Credential/`, {
+            method: 'GET',
+            eaders: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) throw new Error('Ошибка загрузки пользователей');
+        
+        const users = await response.json(); // Получаем массив напрямую
+        
+        // Добавьте отладку
+        console.log('Users API response:', users);
+        console.log('Is array:', Array.isArray(users));
+        console.log('Type:', typeof users);
+        
+        if (Array.isArray(users)) {
+            displayUsers(users);
+            setupUsersPagination(users.length, page);
+            currentUsersPage = page;
+        } else {
+            throw new Error('API returned non-array response');
+        }
+        
+    } catch (error) {
+        console.error('Error loading users:', error);
+        messageBoxShow('Ошибка загрузки пользователей', 'red', '20px', '50%', 'translateY(50px)');
+    }
+}
+
+function displayUsers(users) {
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '';
+    
+    // Добавьте проверку на массив
+    if (!Array.isArray(users)) {
+        console.error('Users is not an array:', users);
+        return;
+    }
+    
+    users.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${user.Id}</td>
+            <td>${user.Username}</td>
+            <td>${user.Email}</td>
+            <td>${getRoleName(user.RoleId)}</td>
+            <td>${new Date(user.WhenAdded).toLocaleDateString()}</td>
+            <td class="${user.IsDeleted ? 'status-deleted' : 'status-active'}">
+                ${user.IsDeleted ? 'Удален' : 'Активен'}
+            </td>
+            <td>
+                <button class="btn-edit" onclick="editUser(${user.Id})" ${user.IsDeleted ? 'disabled' : ''}>Редактировать</button>
+                <button class="btn-delete" onclick="confirmDeleteUser(${user.Id}, '${user.Username}')">
+                    ${user.IsDeleted ? 'Восстановить' : 'Удалить'}
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function setupUsersPagination(totalCount, currentPage) {
+    const pagination = document.getElementById('usersPagination');
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+    
+    let paginationHTML = '';
+    
+    if (currentPage > 1) {
+        paginationHTML += `<button onclick="loadUsers(${currentPage - 1})">‹</button>`;
+    }
+    
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+            paginationHTML += `<button class="active">${i}</button>`;
+        } else {
+            paginationHTML += `<button onclick="loadUsers(${i})">${i}</button>`;
+        }
+    }
+    
+    if (currentPage < totalPages) {
+        paginationHTML += `<button onclick="loadUsers(${currentPage + 1})">›</button>`;
+    }
+    
+    pagination.innerHTML = paginationHTML;
+}
+
+// Функции для ролей
+async function loadRoles(page = 1) {
+    try {
+        const token = getCookie('token');
+        const response = await fetch(`${BASE_API_URL}/Role/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) throw new Error('Ошибка загрузки ролей');
+        
+        const roles = await response.json(); // Получаем массив напрямую
+        
+        // Исправьте здесь - передаём массив roles напрямую
+        displayRoles(roles);
+        setupRolesPagination(roles.length, page); // Используем длину массива для пагинации
+        currentRolesPage = page;
+        
+    } catch (error) {
+        console.error('Error loading roles:', error);
+        messageBoxShow('Ошибка загрузки ролей', 'red', '20px', '50%', 'translateY(50px)');
+    }
+}
+
+function displayRoles(roles) {
+    const tbody = document.getElementById('rolesTableBody');
+    tbody.innerHTML = '';
+    
+    // Добавьте проверку на массив
+    if (!Array.isArray(roles)) {
+        console.error('Roles is not an array:', roles);
+        return;
+    }
+    
+    roles.forEach(role => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${role.Id}</td>
+            <td>${role.Forename}</td>
+            <td>${getRightsName(role.Rights)}</td>
+            <td>${role.CanGet ? '✓' : '✗'}</td>
+            <td>${role.CanPost ? '✓' : '✗'}</td>
+            <td>${role.CanUpdate ? '✓' : '✗'}</td>
+            <td>${role.CanDelete ? '✓' : '✗'}</td>
+            <td>${new Date(role.WhenAdded).toLocaleDateString()}</td>
+            <td>
+                <button class="btn-edit" onclick="editRole(${role.Id})" ${role.IsDeleted ? 'disabled' : ''}>Редактировать</button>
+                <button class="btn-delete" onclick="confirmDeleteRole(${role.Id}, '${role.Forename}')">
+                    ${role.IsDeleted ? 'Восстановить' : 'Удалить'}
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function setupRolesPagination(totalCount, currentPage) {
+    const pagination = document.getElementById('rolesPagination');
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+    
+    let paginationHTML = '';
+    
+    if (currentPage > 1) {
+        paginationHTML += `<button onclick="loadRoles(${currentPage - 1})">‹</button>`;
+    }
+    
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+            paginationHTML += `<button class="active">${i}</button>`;
+        } else {
+            paginationHTML += `<button onclick="loadRoles(${i})">${i}</button>`;
+        }
+    }
+    
+    if (currentPage < totalPages) {
+        paginationHTML += `<button onclick="loadRoles(${currentPage + 1})">›</button>`;
+    }
+    
+    pagination.innerHTML = paginationHTML;
+}
+
+// Вспомогательные функции
+function getRoleName(roleId) {
+    const roles = {
+        1: 'Администратор',
+        2: 'Модератор',
+        3: 'Пользователь'
+    };
+    return roles[roleId] || 'Неизвестно';
+}
+
+function getRightsName(rights) {
+    const rightsMap = {
+        0: 'Пользователь',
+        1: 'Редактор',
+        2: 'Администратор'
+    };
+    return rightsMap[rights] || 'Неизвестно';
+}
+
+// Модальные окна для пользователей
+function showUserForm() {
+    currentEditingUser = null;
+    document.getElementById('userModalTitle').textContent = 'Добавить пользователя';
+    document.getElementById('userForm').reset();
+    document.getElementById('password').required = true;
+    loadRolesForSelect();
+    document.getElementById('userModal').style.display = 'block';
+}
+
+function editUser(userId) {
+    // Здесь должна быть логика загрузки данных пользователя
+    // Для демонстрации используем заглушку
+    currentEditingUser = userId;
+    document.getElementById('userModalTitle').textContent = 'Редактировать пользователя';
+    document.getElementById('password').required = false;
+    loadRolesForSelect();
+    
+    // Загружаем данные пользователя (заглушка)
+    document.getElementById('username').value = 'example_user';
+    document.getElementById('email').value = 'user@example.com';
+    document.getElementById('roleId').value = '1';
+    document.getElementById('note').value = 'Пример примечания';
+    
+    document.getElementById('userModal').style.display = 'block';
+}
+
+function closeUserModal() {
+    document.getElementById('userModal').style.display = 'none';
+}
+
+async function loadRolesForSelect() {
+    try {
+        const token = getCookie('token');
+        const response = await fetch('/api/roles', { // Уберите /all если endpoint такой же
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (response.ok) {
+            const roles = await response.json(); // Получаем массив напрямую
+            
+            // Добавьте проверку
+            if (!Array.isArray(roles)) {
+                console.error('Expected array of roles but got:', roles);
+                return;
+            }
+            
+            const select = document.getElementById('roleId');
+            select.innerHTML = '';
+            
+            roles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.Id;
+                option.textContent = role.Forename;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading roles for select:', error);
+    }
+}
+
+async function saveUser(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const userData = {
+        Username: formData.get('username'),
+        Email: formData.get('email'),
+        RoleId: parseInt(formData.get('roleId')),
+        Note: formData.get('note')
+    };
+    
+    if (formData.get('password')) {
+        userData.Password = formData.get('password');
+    }
+    
+    try {
+        const token = getCookie('token');
+        const url = currentEditingUser ? `/api/users/${currentEditingUser}` : '/api/users';
+        const method = currentEditingUser ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        });
+        
+        if (!response.ok) throw new Error('Ошибка сохранения пользователя');
+        
+        messageBoxShow('Пользователь успешно сохранен', '#4CAF50', '20px', '50%', 'translateY(50px)');
+        closeUserModal();
+        loadUsers(currentUsersPage);
+        
+    } catch (error) {
+        console.error('Error saving user:', error);
+        messageBoxShow('Ошибка сохранения пользователя', 'red', '20px', '50%', 'translateY(50px)');
+    }
+}
+
+// Модальные окна для ролей
+function showRoleForm() {
+    currentEditingRole = null;
+    document.getElementById('roleModalTitle').textContent = 'Добавить роль';
+    document.getElementById('roleForm').reset();
+    document.getElementById('roleModal').style.display = 'block';
+}
+
+function editRole(roleId) {
+    // Здесь должна быть логика загрузки данных роли
+    // Для демонстрации используем заглушку
+    currentEditingRole = roleId;
+    document.getElementById('roleModalTitle').textContent = 'Редактировать роль';
+    
+    // Загружаем данные роли (заглушка)
+    document.getElementById('forename').value = 'Пример роли';
+    document.getElementById('rights').value = '1';
+    document.getElementById('canGet').checked = true;
+    document.getElementById('canPost').checked = true;
+    document.getElementById('canUpdate').checked = false;
+    document.getElementById('canDelete').checked = false;
+    
+    document.getElementById('roleModal').style.display = 'block';
+}
+
+function closeRoleModal() {
+    document.getElementById('roleModal').style.display = 'none';
+}
+
+async function saveRole(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const roleData = {
+        Forename: formData.get('forename'),
+        Rights: parseInt(formData.get('rights')),
+        CanGet: formData.get('canGet') === 'on',
+        CanPost: formData.get('canPost') === 'on',
+        CanUpdate: formData.get('canUpdate') === 'on',
+        CanDelete: formData.get('canDelete') === 'on'
+    };
+    
+    try {
+        const token = getCookie('token');
+        const url = currentEditingRole ? `/api/roles/${currentEditingRole}` : '/api/roles';
+        const method = currentEditingRole ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(roleData)
+        });
+        
+        if (!response.ok) throw new Error('Ошибка сохранения роли');
+        
+        messageBoxShow('Роль успешно сохранена', '#4CAF50', '20px', '50%', 'translateY(50px)');
+        closeRoleModal();
+        loadRoles(currentRolesPage);
+        
+    } catch (error) {
+        console.error('Error saving role:', error);
+        messageBoxShow('Ошибка сохранения роли', 'red', '20px', '50%', 'translateY(50px)');
+    }
+}
+
+// Функции удаления
+function confirmDeleteUser(userId, username) {
+    const isCurrentlyDeleted = false; // Здесь должна быть логика проверки текущего статуса
+    
+    document.getElementById('confirmMessage').textContent = 
+        `Вы уверены, что хотите ${isCurrentlyDeleted ? 'восстановить' : 'удалить'} пользователя "${username}"?`;
+    
+    document.getElementById('confirmDeleteBtn').onclick = () => deleteUser(userId, isCurrentlyDeleted);
+    document.getElementById('confirmModal').style.display = 'block';
+}
+
+function confirmDeleteRole(roleId, roleName) {
+    const isCurrentlyDeleted = false; // Здесь должна быть логика проверки текущего статуса
+    
+    document.getElementById('confirmMessage').textContent = 
+        `Вы уверены, что хотите ${isCurrentlyDeleted ? 'восстановить' : 'удалить'} роль "${roleName}"?`;
+    
+    document.getElementById('confirmDeleteBtn').onclick = () => deleteRole(roleId, isCurrentlyDeleted);
+    document.getElementById('confirmModal').style.display = 'block';
+}
+
+async function deleteUser(userId, restore = false) {
+    try {
+        const token = getCookie('token');
+        const response = await fetch(`/api/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ restore: restore })
+        });
+        
+        if (!response.ok) throw new Error('Ошибка удаления пользователя');
+        
+        messageBoxShow(`Пользователь успешно ${restore ? 'восстановлен' : 'удален'}`, '#4CAF50', '20px', '50%', 'translateY(50px)');
+        closeConfirmModal();
+        loadUsers(currentUsersPage);
+        
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        messageBoxShow('Ошибка удаления пользователя', 'red', '20px', '50%', 'translateY(50px)');
+    }
+}
+
+async function deleteRole(roleId, restore = false) {
+    try {
+        const token = getCookie('token');
+        const response = await fetch(`/api/roles/${roleId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ restore: restore })
+        });
+        
+        if (!response.ok) throw new Error('Ошибка удаления роли');
+        
+        messageBoxShow(`Роль успешно ${restore ? 'восстановлена' : 'удалена'}`, '#4CAF50', '20px', '50%', 'translateY(50px)');
+        closeConfirmModal();
+        loadRoles(currentRolesPage);
+        
+    } catch (error) {
+        console.error('Error deleting role:', error);
+        messageBoxShow('Ошибка удаления роли', 'red', '20px', '50%', 'translateY(50px)');
+    }
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+}
+
+// Поиск
+function searchUsers() {
+    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+    const rows = document.querySelectorAll('#usersTableBody tr');
+    
+    rows.forEach(row => {
+        const username = row.cells[1].textContent.toLowerCase();
+        const email = row.cells[2].textContent.toLowerCase();
+        
+        if (username.includes(searchTerm) || email.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Инициализация при загрузке страницы администратора
+function initAdminPanel() {
+    loadUsers();
+    loadRoles();
+}
+
+// Обновить функцию showSection для инициализации панели администратора
+// Добавить в существующую функцию showSection:
+function showSection(sectionName, isLoadListener = false) {
+    // ... существующий код ...
+    
+    // Показываем выбранный раздел
+    const activeSection = document.querySelector(`.${sectionName}`);
+    if (activeSection) {
+        activeSection.style.display = 'block';
+        activeSection.classList.add('active-section');
+
+        // Инициализировать панель администратора при переходе на нее
+        if (sectionName === 'admin-panel') {
+            setTimeout(initAdminPanel, 100);
+        }
+
+        // ... остальной существующий код ...
+    }
+    
+    // ... остальной существующий код ...
+}

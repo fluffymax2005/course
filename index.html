@@ -6,6 +6,7 @@
     <title>Главная страница</title>
     <link rel="stylesheet" href="assets/css/index.css">
     <script src="assets/javascript/index.js"></script>
+    <script src="assets/javascript/admin-panel.js"></script>
 </head>
 
 <body>           
@@ -115,7 +116,188 @@
     </div>
 
     <div class="admin-panel">
+        <div class="section-header">
+            <h1>Панель администратора</h1>
+            <p>Управление пользователями и ролями системы</p>
+        </div>
 
+        <div class="admin-container">
+            <!-- Вкладки -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchTab('users')">Учетные записи</button>
+                <button class="tab-btn" onclick="switchTab('roles')">Роли</button>
+            </div>
+
+            <!-- Содержимое вкладки пользователей -->
+            <div id="users-tab" class="tab-content active">
+                <div class="admin-header">
+                    <h2>Управление учетными записями</h2>
+                    <button class="btn-primary" onclick="showUserForm()">Добавить пользователя</button>
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" id="userSearch" placeholder="Поиск по имени пользователя или email..." onkeyup="searchUsers()">
+                </div>
+
+                <div class="table-container">
+                    <table class="admin-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Имя пользователя</th>
+                                <th>Email</th>
+                                <th>Роль</th>
+                                <th>Дата добавления</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Данные будут загружены через JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="usersPagination">
+                    <!-- Пагинация будет добавлена через JavaScript -->
+                </div>
+            </div>
+
+            <!-- Содержимое вкладки ролей -->
+            <div id="roles-tab" class="tab-content">
+                <div class="admin-header">
+                    <h2>Управление ролями</h2>
+                    <button class="btn-primary" onclick="showRoleForm()">Добавить роль</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="admin-table" id="rolesTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Название</th>
+                                <th>Права</th>
+                                <th>GET</th>
+                                <th>POST</th>
+                                <th>UPDATE</th>
+                                <th>DELETE</th>
+                                <th>Дата добавления</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rolesTableBody">
+                            <!-- Данные будут загружены через JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="rolesPagination">
+                    <!-- Пагинация будет добавлена через JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для пользователей -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="userModalTitle">Добавить пользователя</h3>
+                <span class="close" onclick="closeUserModal()">&times;</span>
+            </div>
+            <form id="userForm" onsubmit="saveUser(event)">
+                <div class="form-group">
+                    <label for="username">Имя пользователя:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password">
+                    <small>Оставьте пустым, если не хотите менять пароль</small>
+                </div>
+                <div class="form-group">
+                    <label for="roleId">Роль:</label>
+                    <select id="roleId" name="roleId" required>
+                        <!-- Опции будут заполнены через JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="note">Примечание:</label>
+                    <textarea id="note" name="note" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeUserModal()">Отмена</button>
+                    <button type="submit" class="btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно для ролей -->
+    <div id="roleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="roleModalTitle">Добавить роль</h3>
+                <span class="close" onclick="closeRoleModal()">&times;</span>
+            </div>
+            <form id="roleForm" onsubmit="saveRole(event)">
+                <div class="form-group">
+                    <label for="forename">Название роли:</label>
+                    <input type="text" id="forename" name="forename" required>
+                </div>
+                <div class="form-group">
+                    <label for="rights">Права доступа:</label>
+                    <select id="rights" name="rights" required>
+                        <option value="0">Пользователь</option>
+                        <option value="1">Модератор</option>
+                        <option value="2">Администратор</option>
+                    </select>
+                </div>
+                <div class="permissions-grid">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="canGet" name="canGet">
+                        <span>GET доступ</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="canPost" name="canPost">
+                        <span>POST доступ</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="canUpdate" name="canUpdate">
+                        <span>UPDATE доступ</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="canDelete" name="canDelete">
+                        <span>DELETE доступ</span>
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeRoleModal()">Отмена</button>
+                    <button type="submit" class="btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения удаления -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content confirm-modal">
+            <div class="modal-header">
+                <h3>Подтверждение удаления</h3>
+                <span class="close" onclick="closeConfirmModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Вы уверены, что хотите удалить этот элемент?</p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="closeConfirmModal()">Отмена</button>
+                <button type="button" class="btn-danger" id="confirmDeleteBtn">Удалить</button>
+            </div>
+        </div>
     </div>
 
     <footer>
