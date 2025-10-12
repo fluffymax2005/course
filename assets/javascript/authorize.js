@@ -198,7 +198,11 @@ class AuthService {
             this.setTextMessage(outputText, false, 'Авторизация прошла успешно');
             console.log("Авторизация прошла успешно: ", data);
 
-            // Звпись токена в куки
+            // Удаление старых куки
+            this.deleteCookie('token');
+            this.deleteCookie('tokenExpireTime');
+            
+            // Запись токена в куки
             const tokenExpireTime = data.tokenExpireTime;
             const token = data.token;
             document.cookie = "token=" + token + ";expires=" + tokenExpireTime + ";path=/";
@@ -285,7 +289,6 @@ class AuthService {
                 return;
             }
 
-            const data = await response.json();
             this.setTextMessage(outputText, false, 'Регистрация прошла успешно. Можете вернуться и войти в аккаунт');
 
         } catch (error) {
@@ -330,7 +333,6 @@ class AuthService {
                 return;
             }
 
-            const data = await response.json();
             this.setTextMessage(outputText, false, '✅ Инструкции по восстановлению пароля отправлены на указанную почту!');
 
         } catch (error) {
@@ -363,4 +365,34 @@ class AuthService {
             }, 450);
         }
     }
+
+    static setCookie(name, value, options = {}) {
+    options = {
+        path: '/',
+        // при необходимости добавьте другие значения по умолчанию
+        ...options
+    };
+
+    if (options.expires instanceof Date) {
+        options.expires = options.expires.toUTCString();
+    }
+
+    let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+    for (let optionKey in options) {
+        updatedCookie += "; " + optionKey;
+        let optionValue = options[optionKey];
+        if (optionValue !== true) {
+            updatedCookie += "=" + optionValue;
+        }
+    }
+
+    document.cookie = updatedCookie;
+}
+    
+    static deleteCookie(name) {
+    this.setCookie(name, "", {
+        'max-age': -1
+    })
+}
 }
