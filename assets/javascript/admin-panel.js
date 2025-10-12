@@ -304,11 +304,14 @@ function closeUserModal() {
 }
 
 async function loadRolesForSelect() {
+    console.log(`Sending requst: ${BASE_API_URL}/Role`);
     try {
         const token = getCookie('token');
-        const response = await fetch('/api/roles', { // Уберите /all если endpoint такой же
+        const response = await fetch(`${BASE_API_URL}/Role`, {
+            method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Content': 'application/json'
             }
         });
         
@@ -326,8 +329,8 @@ async function loadRolesForSelect() {
             
             roles.forEach(role => {
                 const option = document.createElement('option');
-                option.value = role.Id;
-                option.textContent = role.Forename;
+                option.value = role.id;
+                option.textContent = role.forename;
                 select.appendChild(option);
             });
         }
@@ -336,44 +339,43 @@ async function loadRolesForSelect() {
     }
 }
 
-async function saveUser(event) {
+async function addUser(event) {
     event.preventDefault();
     
     const formData = new FormData(event.target);
+    if (formData.get('password') != formData.get('confirm-password')) {
+        messageBoxShow('Пароли не совпадают', 'red', '20px', '45%', 'translateY(50px)');
+        return;
+    }
+
+    const roleInput = formData.get('roleId');
     const userData = {
-        Username: formData.get('username'),
-        Email: formData.get('email'),
-        RoleId: parseInt(formData.get('roleId')),
-        Note: formData.get('note')
+        userName: formData.get('username'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        whoRegister: getCookie('userName'),
+        registerRights: roleInput === '0' ? 0 : roleInput === '1' ? 1 : 2
     };
     
-    if (formData.get('password')) {
-        userData.Password = formData.get('password');
-    }
-    
-    try {
-        const token = getCookie('token');
-        const url = currentEditingUser ? `/api/users/${currentEditingUser}` : '/api/users';
-        const method = currentEditingUser ? 'PUT' : 'POST';
-        
-        const response = await fetch(url, {
-            method: method,
+
+    try {      
+        const response = await fetch(`${BASE_API_URL}/Credential/register`, {
+            method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(userData)
         });
         
-        if (!response.ok) throw new Error('Ошибка сохранения пользователя');
+        if (!response.ok) throw new Error(response);
         
-        messageBoxShow('Пользователь успешно сохранен', '#4CAF50', '20px', '50%', 'translateY(50px)');
+        messageBoxShow('Пользователь успешно сохранен', '#4CAF50', '20px', '45%', 'translateY(50px)');
         closeUserModal();
         loadUsers(currentUsersPage);
         
     } catch (error) {
         console.error('Error saving user:', error);
-        messageBoxShow('Ошибка сохранения пользователя', 'red', '20px', '50%', 'translateY(50px)');
+        messageBoxShow('Ошибка регистрации пользователя', 'red', '20px', '50%', 'translateY(50px)');
     }
 }
 
