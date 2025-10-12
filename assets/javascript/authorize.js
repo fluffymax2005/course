@@ -212,6 +212,11 @@ class AuthService {
             const userRights = data.userRights;
             document.cookie = "userRights=" + userRights + ";expires=" + tokenExpireTime + ";path=/";
 
+            // Запись имени пользователя в куки
+            const username = data.username;
+            document.cookie = "userName=" + username + ";expires=" + tokenExpireTime + ";path=/";
+
+
             console.log(document.cookie);
 
         } catch (error) {
