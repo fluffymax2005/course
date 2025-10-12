@@ -37,9 +37,9 @@ function switchTab(tabName) {
 async function loadUsers(page = 1) {
     try {
         const token = getCookie('token');
-        const response = await fetch(`${BASE_API_URL}/Credential/`, {
+        const response = await fetch(`${BASE_API_URL}/Credential`, {
             method: 'GET',
-            eaders: {
+            headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
@@ -81,14 +81,17 @@ function displayUsers(users) {
     users.forEach(user => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${user.Id}</td>
-            <td>${user.Username}</td>
-            <td>${user.Email}</td>
-            <td>${getRoleName(user.RoleId)}</td>
-            <td>${new Date(user.WhenAdded).toLocaleDateString()}</td>
-            <td class="${user.IsDeleted ? 'status-deleted' : 'status-active'}">
-                ${user.IsDeleted ? 'Удален' : 'Активен'}
-            </td>
+            <td>${user.id}</td>
+            <td>${user.roleId}</td>
+            <td>${user.username}</td>
+            <td>${user.password}</td>
+            <td>${user.email}</td>
+            <td>${user.whoAdded}</td>
+            <td>${new Date(user.whenAdded).toLocaleDateString()}</td>
+            <td>${user.whoChanged === null ? 'null' : user.whoChanged}</td>
+            <td>${user.whenChanged === null ? 'null' : new Date(user.whenChanged).toLocaleDateString()}</td>
+            <td>${user.note === null ? 'null' : user.note}</td>
+            <td>${user.isDeleted === null ? 'null' : new Date(user.isDeleted).toLocaleDateString()}</td>
             <td>
                 <button class="btn-edit" onclick="editUser(${user.Id})" ${user.IsDeleted ? 'disabled' : ''}>Редактировать</button>
                 <button class="btn-delete" onclick="confirmDeleteUser(${user.Id}, '${user.Username}')">
@@ -129,7 +132,7 @@ function setupUsersPagination(totalCount, currentPage) {
 async function loadRoles(page = 1) {
     try {
         const token = getCookie('token');
-        const response = await fetch(`${BASE_API_URL}/Role/`, {
+        const response = await fetch(`${BASE_API_URL}/Role`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -143,7 +146,7 @@ async function loadRoles(page = 1) {
         
         // Исправьте здесь - передаём массив roles напрямую
         displayRoles(roles);
-        setupRolesPagination(roles.length, page); // Используем длину массива для пагинации
+        //setupRolesPagination(roles.length, page); // Используем длину массива для пагинации
         currentRolesPage = page;
         
     } catch (error) {
@@ -165,18 +168,22 @@ function displayRoles(roles) {
     roles.forEach(role => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${role.Id}</td>
-            <td>${role.Forename}</td>
-            <td>${getRightsName(role.Rights)}</td>
-            <td>${role.CanGet ? '✓' : '✗'}</td>
-            <td>${role.CanPost ? '✓' : '✗'}</td>
-            <td>${role.CanUpdate ? '✓' : '✗'}</td>
-            <td>${role.CanDelete ? '✓' : '✗'}</td>
-            <td>${new Date(role.WhenAdded).toLocaleDateString()}</td>
+            <td>${role.id}</td>
+            <td>${role.forename}</td>
+            <td>${getRightsName(role.rights)}</td>
+            <td>${role.canGet ? '✓' : '✗'}</td>
+            <td>${role.canPost ? '✓' : '✗'}</td>
+            <td>${role.canUpdate ? '✓' : '✗'}</td>
+            <td>${role.canDelete ? '✓' : '✗'}</td>
+            <td>${role.whoAdded}</td>
+            <td>${new Date(role.whenAdded).toLocaleDateString()}</td>
+            <td>${role.whoChanged}</td>
+            <td>${new Date(role.whenChanged).toLocaleDateString()}</td>
+            <td>${role.isDeleted === null ? 'null' : new Date(role.isDeleted).toLocaleDateString()}</td>
             <td>
-                <button class="btn-edit" onclick="editRole(${role.Id})" ${role.IsDeleted ? 'disabled' : ''}>Редактировать</button>
-                <button class="btn-delete" onclick="confirmDeleteRole(${role.Id}, '${role.Forename}')">
-                    ${role.IsDeleted ? 'Восстановить' : 'Удалить'}
+                <button class="btn-edit" onclick="editRole(${role.id})" ${role.isDeleted ? 'disabled' : ''}>Редактировать</button>
+                <button class="btn-delete" onclick="confirmDeleteRole(${role.id}, '${role.forename}')">
+                    ${role.isDeleted ? 'Восстановить' : 'Удалить'}
                 </button>
             </td>
         `;
@@ -480,8 +487,8 @@ function searchUsers() {
     const rows = document.querySelectorAll('#usersTableBody tr');
     
     rows.forEach(row => {
-        const username = row.cells[1].textContent.toLowerCase();
-        const email = row.cells[2].textContent.toLowerCase();
+        const username = row.cells[2].textContent.toLowerCase();
+        const email = row.cells[4].textContent.toLowerCase();
         
         if (username.includes(searchTerm) || email.includes(searchTerm)) {
             row.style.display = '';
@@ -499,7 +506,7 @@ function initAdminPanel() {
 
 // Обновить функцию showSection для инициализации панели администратора
 // Добавить в существующую функцию showSection:
-function showSection(sectionName, isLoadListener = false) {
+/*function showSection(sectionName, isLoadListener = false) {
     // ... существующий код ...
     
     // Показываем выбранный раздел
@@ -517,4 +524,4 @@ function showSection(sectionName, isLoadListener = false) {
     }
     
     // ... остальной существующий код ...
-}
+}*/

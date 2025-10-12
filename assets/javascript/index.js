@@ -92,6 +92,7 @@ function showSection(sectionName, isLoadListener = false) {
             headerText.textContent = 'Статистика';
         } else if (sectionName === 'admin-panel') {
             headerText.textContent = 'Панель администратора';
+            switchTab('users');
         }
     }
     

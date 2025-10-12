@@ -524,6 +524,7 @@ header {
     background: #f8f9fa;
     font-weight: 600;
     color: #333;
+    text-align: center;
 }
 
 .admin-table tr:hover {
@@ -625,6 +626,8 @@ header {
 /* Формы */
 .form-group {
     margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .form-group label {
@@ -673,6 +676,10 @@ header {
     gap: 10px;
     padding: 20px;
     border-top: 1px solid #eee;
+}
+
+#userNameGroup {
+    margin-top: 10px;
 }
 
 /* Футер */

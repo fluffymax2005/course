@@ -144,11 +144,16 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>ID роли</th>
                                 <th>Имя пользователя</th>
+                                <th>Пароль</th>
                                 <th>Email</th>
-                                <th>Роль</th>
-                                <th>Дата добавления</th>
-                                <th>Статус</th>
+                                <th>Кто добавил</th>
+                                <th>Когда добавил</th>
+                                <th>Кто изменил</th>
+                                <th>Когда изменил</th>
+                                <th>Заметка</th>
+                                <th>Удален</th>
                                 <th>Действия</th>
                             </tr>
                         </thead>
@@ -181,7 +186,11 @@
                                 <th>POST</th>
                                 <th>UPDATE</th>
                                 <th>DELETE</th>
-                                <th>Дата добавления</th>
+                                <th>Кто добавил</th>
+                                <th>Когда добавил</th>
+                                <th>Кто изменил</th>
+                                <th>Когда изменил</th>
+                                <th>Удален</th>
                                 <th>Действия</th>
                             </tr>
                         </thead>
@@ -206,18 +215,21 @@
                 <span class="close" onclick="closeUserModal()">&times;</span>
             </div>
             <form id="userForm" onsubmit="saveUser(event)">
-                <div class="form-group">
-                    <label for="username">Имя пользователя:</label>
+                <div class="form-group" id="userNameGroup">
+                    <label for="username">Имя пользователя</label>
                     <input type="text" id="username" name="username" required>
                 </div>
                 <div class="form-group">
-                    <label for="email">Email:</label>
+                    <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Пароль:</label>
+                    <label for="password">Пароль</label>
                     <input type="password" id="password" name="password">
-                    <small>Оставьте пустым, если не хотите менять пароль</small>
+                </div>
+                <div class="form-group">
+                    <label for="password">Подтверждение пароля</label>
+                    <input type="password" id="confirmPassword" name="password">
                 </div>
                 <div class="form-group">
                     <label for="roleId">Роль:</label>
@@ -231,7 +243,7 @@
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="closeUserModal()">Отмена</button>
-                    <button type="submit" class="btn-primary">Сохранить</button>
+                    <button type="submit" class="btn-primary">Добавить</button>
                 </div>
             </form>
         </div>
