@@ -32,11 +32,11 @@ async function showSection(sectionName = null, isLoadListener = false) {
     // Проверяем жизнь токена
     if (userRights === undefined) {
         console.error('Не удалось извлечь права пользователя');
-        messageBoxShow('Внутренняя ошибка', 'red', '20px', '50%', 'translateY(50px)');
+        messageBoxShow('Внутренняя ошибка', 'red', '20px', '45%', 'translateY(50px)');
         return;
-    } else if (tokenExpireDateTime < new Date().getDate()) {
+    } else if (tokenExpireDateTime < new Date()) {
         console.error('Время сессии истекло');
-        messageBoxShow('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', '20px', '50%', 'translateY(50px)');
+        messageBoxShow('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', '20px', '37%', 'translateY(50px)');
         return;
     }
 
@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
         
-        if (tokenExpireDateTime < new Date().getDate()) { // Если токен просрочен то автоматически выходим из системы
+        if (tokenExpireDateTime < new Date()) { // Если токен просрочен то автоматически выходим из системы
             authorizeItem.style.display = 'block';
             registerItem.style.display = 'block';
             quitItem.style.display = 'none';

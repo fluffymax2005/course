@@ -542,25 +542,3 @@ function initAdminPanel() {
     loadUsers();
     loadRoles();
 }
-
-// Обновить функцию showSection для инициализации панели администратора
-// Добавить в существующую функцию showSection:
-/*function showSection(sectionName, isLoadListener = false) {
-    // ... существующий код ...
-    
-    // Показываем выбранный раздел
-    const activeSection = document.querySelector(`.${sectionName}`);
-    if (activeSection) {
-        activeSection.style.display = 'block';
-        activeSection.classList.add('active-section');
-
-        // Инициализировать панель администратора при переходе на нее
-        if (sectionName === 'admin-panel') {
-            setTimeout(initAdminPanel, 100);
-        }
-
-        // ... остальной существующий код ...
-    }
-    
-    // ... остальной существующий код ...
-}*/
