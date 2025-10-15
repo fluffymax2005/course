@@ -1,0 +1,223 @@
+/* Стили для страницы базы данных */
+.database {
+    min-height: calc(100vh - 120px);
+    background: #f8f9fa;
+    display: none;
+}
+
+.database-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Выбор таблицы */
+.table-selector {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-selector label {
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+}
+
+.table-selector select {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 200px;
+}
+
+/* Информация о таблице */
+.table-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-info h3 {
+    margin: 0;
+    color: #333;
+}
+
+.table-info p {
+    margin: 0;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Таблица данных */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+    background: #667eea;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+}
+
+.data-table tr:hover {
+    background: #f8f9fa;
+}
+
+.data-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Сообщение об отсутствии данных */
+.no-data {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.no-data p {
+    font-size: 18px;
+    color: #6c757d;
+    margin: 0;
+}
+
+/* Кнопки действий в таблице */
+.table-actions {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.btn-edit-small {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-delete-small {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-edit-small:hover {
+    background: #218838;
+}
+
+.btn-delete-small:hover {
+    background: #c82333;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .table-selector {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .table-selector select {
+        min-width: auto;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .table-info {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .data-table {
+        font-size: 14px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 8px 10px;
+    }
+}
+
+/* Стили для полей формы */
+.form-fields {
+    padding: 0 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-field {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.form-field.full-width {
+    flex: 0 0 100%;
+}
+
+/* Стили для разных типов данных в таблице */
+.status-active {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.status-inactive {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.amount-positive {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.amount-negative {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.date-cell {
+    font-family: monospace;
+    font-size: 13px;
+}
