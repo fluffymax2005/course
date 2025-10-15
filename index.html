@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="assets/css/admin-panel.css">
 
     <script src="assets/javascript/index.js"></script>
+    <script src="assets/javascript/database.js"></script>
     <script src="assets/javascript/admin-panel.js"></script>
 </head>
 
@@ -110,8 +111,7 @@
         </div>
     </div>
 
-    <!-- Добавьте этот блок в body после раздела statistics и перед admin-panel -->
-
+    <!-- Блок database -->
     <div class="database">
         <div class="section-header">
             <h1>База данных</h1>
@@ -119,18 +119,35 @@
         </div>
 
         <div class="database-container">
-            <!-- Выбор таблицы -->
-            <div class="table-selector">
-                <label for="tableSelect">Выберите таблицу:</label>
-                <select id="tableSelect" onchange="loadTableData()">
-                    <option value="">-- Выберите таблицу --</option>
-                    <option value="users">Пользователи</option>
-                    <option value="products">Товары</option>
-                    <option value="orders">Заказы</option>
-                    <option value="categories">Категории</option>
-                    <option value="suppliers">Поставщики</option>
-                    <option value="transactions">Транзакции</option>
-                </select>
+            <!-- Выбор таблицы и поиск -->
+            <div class="database-controls">
+                <div class="table-selector">
+                    <label for="tableSelect">Выберите таблицу:</label>
+                    <select id="tableSelect" onchange="loadTableData()">
+                        <option value="">-- Выберите таблицу --</option>
+                        <option value="orders">Заказы</option>
+                        <option value="customers">Заказчики</option>
+                        <option value="routes">Маршруты</option>
+                        <option value="rates">Тарифы</option>
+                        <option value="drivers">Шоферы</option>
+                        <option value="transport-vehicles">Транспортные средства</option>
+                    </select>
+                </div>
+
+                <div class="search-controls">
+                    <div class="search-by-id">
+                        <label for="searchById">Поиск по ID:</label>
+                        <input type="number" id="searchById" placeholder="Введите ID" min="1">
+                        <button class="btn-secondary" onclick="searchById()" id="searchByIdBtn">
+                            <span class="btn-icon">🔍</span>
+                            Найти
+                        </button>
+                        <button class="btn-tertiary" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">
+                            <span class="btn-icon">❌</span>
+                            Очистить
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Кнопки действий (отображаются в зависимости от прав) -->
                 <div class="action-buttons" id="dbActionButtons" style="display: none;">
@@ -145,10 +162,15 @@
                 </div>
             </div>
 
-            <!-- Информация о таблице -->
+            <!-- Информация о таблице и результатах поиска -->
             <div class="table-info" id="tableInfo" style="display: none;">
-                <h3 id="tableName">Название таблицы</h3>
-                <p id="recordCount">Записей: 0</p>
+                <div class="table-info-left">
+                    <h3 id="tableName">Название таблицы</h3>
+                    <p id="recordCount">Записей: 0</p>
+                </div>
+                <div class="search-results-info" id="searchResultsInfo" style="display: none;">
+                    <span class="search-badge" id="searchResultsText"></span>
+                </div>
             </div>
 
             <!-- Таблица с данными -->
@@ -166,6 +188,12 @@
                 <div class="no-data" id="noDataMessage" style="display: none;">
                     <p>Нет данных для отображения</p>
                 </div>
+
+                <!-- Сообщение когда ничего не найдено -->
+                <div class="no-data" id="noSearchResultsMessage" style="display: none;">
+                    <p>Запись с указанным ID не найдена</p>
+                    <button class="btn-secondary" onclick="clearSearch()">Показать все записи</button>
+                </div>
             </div>
 
             <!-- Пагинация -->
@@ -175,41 +203,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно для добавления/редактирования записи -->
-    <div id="recordModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="recordModalTitle">Добавить запись</h3>
-                <span class="close" onclick="closeRecordModal()">&times;</span>
-            </div>
-            <form id="recordForm" onsubmit="saveRecord(event)">
-                <div class="form-fields" id="recordFormFields">
-                    <!-- Поля формы будут динамически создаваться через JavaScript -->
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeRecordModal()">Отмена</button>
-                    <button type="submit" class="btn-primary" id="recordSubmitBtn">Добавить</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Модальное окно подтверждения удаления записи -->
-    <div id="deleteRecordModal" class="modal">
-        <div class="modal-content confirm-modal">
-            <div class="modal-header">
-                <h3>Подтверждение удаления</h3>
-                <span class="close" onclick="closeDeleteRecordModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p id="deleteRecordMessage">Вы уверены, что хотите удалить эту запись?</p>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn-secondary" onclick="closeDeleteRecordModal()">Отмена</button>
-                <button type="button" class="btn-danger" id="confirmDeleteRecordBtn">Удалить</button>
-            </div>
-        </div>
-    </div>
+<!-- Остальные модальные окна остаются без изменений -->
 
     <div class="statistics">
 
