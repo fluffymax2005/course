@@ -84,6 +84,11 @@ namespace DbAPI.Repositories {
         }
 
         public async Task UpdateAsync(Rate entity) {
+            if (await _context.Drivers.Where(d => d.Id == entity.DriverId).AnyAsync() == false) {
+                throw new InvalidDataException($"Водитель с ID = {entity.DriverId} не существует");
+            } else if (await _context.TransportVehicles.Where(d => d.Id == entity.VehicleId).AnyAsync() == false) {
+                throw new InvalidDataException($"Транспортное средство с ID = {entity.VehicleId} не существует");
+            }
             _context.Rates.Update(entity);
             await _context.SaveChangesAsync();
         }

@@ -64,7 +64,12 @@ namespace DbAPI.Controllers {
                 return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
             }
 
-            await _repository.UpdateAsync(entity);
+            try {
+                await _repository.UpdateAsync(entity);
+            } catch (InvalidDataException ex) {
+                _logger.LogError($"Order:UpdateAsync({id}): {ex.Message}");
+                return BadRequest($"Ошибка сохранения: {ex.Message}");
+            }
             _logger.LogInformation($"Запрос \"Order.Update({id})\" пользователя \"{User.Identity.Name}\" успешен");
             return NoContent();
         }

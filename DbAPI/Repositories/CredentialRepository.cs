@@ -86,6 +86,10 @@ namespace DbAPI.Repositories {
         }
 
         public async Task UpdateAsync(Credential entity) {
+            if (await _context.Roles.Where(d => d.Id == entity.RoleId).AnyAsync() == false) {
+                throw new InvalidDataException($"Роль с ID = {entity.RoleId} не существует");
+            }
+
             _context.Credentials.Update(entity);
             await _context.SaveChangesAsync();
         }

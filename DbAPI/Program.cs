@@ -1,5 +1,5 @@
 ﻿//#define DOCKER
-#define __NO_USE_SWAGGER
+#define USE_SWAGGER
 
 using DbAPI.Contexts;
 using DbAPI.Interfaces;
@@ -145,8 +145,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
-    #if __NO_USE_SWAGGER
-    #else
+    #if USE_SWAGGER
         app.UseSwagger();    
         app.UseSwaggerUI();
     #endif

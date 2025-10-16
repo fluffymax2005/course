@@ -36,8 +36,8 @@ namespace DbAPI.Controllers {
         }
 
         [HttpGet("test")]
-        public IActionResult Test() {
-            return Ok("You has connected to server" + DateTime.Now);
+        public async Task<IActionResult> Test() {
+            return Ok(await _repository.GetAllAsync());
         }
 
         [HttpPost("login")]
@@ -284,7 +284,7 @@ namespace DbAPI.Controllers {
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public override async Task<ActionResult<IEnumerable<Credential>>> GetAllAsync() {
-            _logger.LogWarning($"Администратор {User.Identity.Name} сделал запрос ко всем учетным записям");
+            _logger.LogWarning($"Администратор \"{User.Identity.Name}\" сделал запрос ко всем учетным записям");
             return Ok(await _repository.GetAllAsync());
         }
 
@@ -322,6 +322,13 @@ namespace DbAPI.Controllers {
                 _logger.LogError($"Администратору {User.Identity.Name} не удалось обновить данные учетной записи с ID = {entity.Id}. " +
                     $"Причина: сущность не найдена");
                 return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
+            }
+
+            try {
+                await _repository.UpdateAsync(entity);
+            } catch (InvalidDataException ex) {
+                _logger.LogError($"Credential:UpdateAsync({id}): {ex.Message}");
+                return BadRequest($"Ошибка сохранения: {ex.Message}");
             }
 
             _logger.LogInformation($"Администратор {User.Identity.Name} обновил учетную запись с ID = {entity.Id}");

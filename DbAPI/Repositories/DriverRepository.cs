@@ -59,8 +59,8 @@ namespace DbAPI.Repositories {
         }
 
         private async Task EntityValidate(string forename, string surname, string phoneNumber,
-            string driverLicenceSeries, string driverLicenceNumber, string whoAdded,
-            DateTime whenAdded, TypeId? id = null, string? whoChanged = null, DateTime? whenChanged = null,
+            string driverLicenceSeries, string driverLicenceNumber, string? whoAdded = null,
+            DateTime? whenAdded = null, TypeId? id = null, string? whoChanged = null, DateTime? whenChanged = null,
             string? note = null, DateTime? isDeleted = null) {
 
             if (forename.IsNullOrEmpty()) {

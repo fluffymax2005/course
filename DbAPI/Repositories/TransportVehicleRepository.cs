@@ -94,6 +94,9 @@ namespace DbAPI.Repositories {
         }
 
         public async Task UpdateAsync(TransportVehicle entity) {
+            if (await _context.Drivers.Where(d => d.Id == entity.DriverId).AnyAsync() == false) {
+                throw new InvalidDataException($"Водитель с ID = {entity.DriverId} не существует");
+            }
             _context.TransportVehicles.Update(entity);
             await _context.SaveChangesAsync();
         }

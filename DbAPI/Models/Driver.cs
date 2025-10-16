@@ -11,18 +11,18 @@ namespace DbAPI.Models {
         public TypeId Id { get; set; }
 
         [Display(Order = 2)]
-        public required string Forename { get; set; }
+        public string Forename { get; set; }
         [Display(Order = 3)]
-        public required string Surname { get; set; }
+        public string Surname { get; set; }
         [Display(Order = 4)]
-        public required string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
         [Display(Order = 5)]
-        public required string DriverLicenceSeries { get; set; }
+        public string DriverLicenceSeries { get; set; }
         [Display(Order = 6)]
-        public required string DriverLicenceNumber { get; set; }
+        public string DriverLicenceNumber { get; set; }
 
         [Display(Order = 7)]
-        public required string WhoAdded { get; set; }
+        public string WhoAdded { get; set; }
         [Display(Order = 8)]
         public DateTime WhenAdded { get; set; }
         [Display(Order = 9)]
