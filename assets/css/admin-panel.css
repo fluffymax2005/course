@@ -99,6 +99,10 @@
     background: #545b62;
 }
 
+#showAllSets {
+    background-color: #28a745;
+}
+
 .btn-danger {
     background: #dc3545;
     color: white;

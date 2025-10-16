@@ -27,7 +27,7 @@
 }
 
 #dbSectionHeader {
-    background: linear-gradient(135deg, #667eea, #764ba2);;
+    background: linear-gradient(135deg, #667eea, #764ba2);
 }
 
 .table-selector {
@@ -113,11 +113,60 @@
 .action-buttons {
     display: flex;
     gap: 12px;
-    align-items: center;
+    align-items: stretch;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* Primary Button with New Gradient */
+.btn-primary-db {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary-db:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+    background: linear-gradient(135deg, #3a9cf8 0%, #00d9e6 100%);
+}
+
+.btn-primary-db:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(79, 172, 254, 0.3);
+}
+
+.btn-secondary-db {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Search Button with Matching Gradient */
+#searchByIdBtn {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -132,16 +181,22 @@
     white-space: nowrap;
 }
 
-.btn-primary:hover {
+#searchByIdBtn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+    background: linear-gradient(135deg, #3a9cf8 0%, #00d9e6 100%);
 }
 
-.btn-secondary {
-    background: white;
-    color: #4a5568;
-    border: 2px solid #e2e8f0;
-    padding: 10px 18px;
+.btn-secondary-db:hover {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(79, 172, 254, 0.3);
+}
+
+.btn-tertiary-db {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
@@ -151,37 +206,20 @@
     align-items: center;
     gap: 8px;
     white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
 }
 
-#searchByIdBtn {
-    background-color: #6a71d8;
+.btn-tertiary-db:hover {
+     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+    background: linear-gradient(135deg, #3a9cf8 0%, #00d9e6 100%);
 }
 
-.btn-secondary:hover {
-    background: #f7fafc;
-    border-color: #667eea;
-    transform: translateY(-3px);
-}
-
-.btn-tertiary {
-    background: #718096;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 13px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-}
-
-.btn-tertiary:hover {
-    background: #4a5568;
-    transform: translateY(-1px);
+.btn-tertiary-db:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(79, 172, 254, 0.3);
 }
 
 .btn-icon {
@@ -297,8 +335,9 @@
     justify-content: center;
 }
 
+/* Small Edit Button */
 .btn-edit-small {
-    background: #48bb78;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     color: white;
     border: none;
     padding: 6px 12px;
@@ -312,8 +351,9 @@
 }
 
 .btn-edit-small:hover {
-    background: #38a169;
+    background: linear-gradient(135deg, #3a9cf8 0%, #00d9e6 100%);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
 }
 
 .btn-delete-small {
@@ -348,7 +388,7 @@
     margin-bottom: 20px;
 }
 
-.no-data .btn-secondary {
+.no-data .btn-secondary-db {
     margin: 0 auto;
 }
 
@@ -412,7 +452,10 @@
     color: #718096;
 }
 
-/* Modal Styles */
+/* ==================== */
+/* MODAL STYLES - FIXED */
+/* ==================== */
+
 .modal {
     display: none;
     position: fixed;
@@ -423,17 +466,38 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
+    overflow-y: auto !important;
 }
 
 .modal-content {
     background-color: white;
     margin: 5% auto;
-    padding: 0;
     border-radius: 16px;
     width: 90%;
     max-width: 500px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh !important;
+    animation: modalAppear 0.3s ease-out;
+    position: relative;
+}
+
+/* Для формы редактирования делаем окно шире */
+#editRecordModal .modal-content {
+    max-width: 600px;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 .confirm-modal {
@@ -447,6 +511,10 @@
     padding: 24px;
     border-bottom: 1px solid #e2e8f0;
     background: #f7fafc;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .modal-header h3 {
@@ -469,13 +537,23 @@
     color: #4a5568;
 }
 
+/* Основной контейнер для контента с прокруткой */
 .modal-body {
-    padding: 24px;
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: visible !important;
 }
 
 /* Form Styles */
 .form-fields {
-    padding: 0 24px;
+    padding: 24px;
+    flex: 1;
+    overflow-y: visible !important;
+    min-height: 0;
+    max-height: none !important;
 }
 
 .form-row {
@@ -489,6 +567,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    margin-bottom: 20px;
 }
 
 .form-field.full-width {
@@ -510,6 +589,8 @@
     font-size: 14px;
     background: white;
     transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .form-field input:focus,
@@ -530,9 +611,13 @@
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    padding: 24px;
+    padding: 20px 24px;
     border-top: 1px solid #e2e8f0;
     background: #f7fafc;
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
 }
 
 .btn-danger {
@@ -551,6 +636,160 @@
     background: #e53e3e;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(245, 101, 101, 0.3);
+}
+
+/* Стили для поля телефона */
+.phone-input-container {
+    position: relative;
+}
+
+.phone-hint {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 4px;
+}
+
+/* Стили для чекбоксов */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.checkbox-container label {
+    margin: 0;
+    font-weight: normal;
+}
+
+/* Стили для скроллбара */
+.modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 4px;
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Firefox scrollbar */
+.modal {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f1f1f1;
+}
+
+/* Подсказки для полей */
+.field-hint {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* Responsive Design для модальных окон */
+@media (max-width: 768px) {
+    .modal {
+        padding: 10px;
+    }
+    
+    .modal-content {
+        margin: 5% auto;
+        width: 95%;
+        max-height: 95vh !important;
+    }
+    
+    #editRecordModal .modal-content {
+        max-width: 95%;
+    }
+    
+    .form-fields {
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+        padding: 16px 20px;
+    }
+    
+    .form-actions button {
+        width: 100%;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal {
+        padding: 5px;
+    }
+    
+    .modal-content {
+        margin: 2% auto;
+        max-height: 96vh !important;
+        border-radius: 12px;
+    }
+    
+    .modal-header {
+        padding: 20px;
+    }
+    
+    .form-fields {
+        padding: 16px;
+    }
+    
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        padding: 10px 14px;
+    }
+}
+
+/* Гарантируем, что body не скроллится когда открыто модальное окно */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Дополнительные стили для лучшего UX */
+.form-field:last-child {
+    margin-bottom: 0;
+}
+
+/* Стили для обязательных полей */
+.form-field.required label::after {
+    content: " *";
+    color: #f56565;
+}
+
+/* Плавная прокрутка */
+.modal {
+    scroll-behavior: smooth;
+}
+
+/* Принудительная прокрутка для всех модальных окон */
+.modal.active {
+    overflow-y: auto !important;
+}
+
+.modal-content.scrollable {
+    overflow-y: auto !important;
 }
 
 /* Responsive Design */
@@ -613,11 +852,6 @@
         flex-direction: column;
         gap: 6px;
     }
-    
-    .modal-content {
-        margin: 10% auto;
-        width: 95%;
-    }
 }
 
 @media (max-width: 480px) {
@@ -637,31 +871,6 @@
     .data-table td {
         padding: 10px 12px;
     }
-    
-    .form-actions {
-        flex-direction: column;
-    }
-    
-    .btn-primary,
-    .btn-secondary,
-    .btn-danger {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-/* Animation for search results */
-@keyframes highlightFade {
-    0% {
-        background-color: #fffaf0;
-    }
-    100% {
-        background-color: #fffaf0;
-    }
-}
-
-.search-highlight {
-    animation: highlightFade 2s ease-in-out;
 }
 
 /* Loading state */
@@ -785,28 +994,19 @@
     }
 }
 
-/* Анимация загрузки */
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-    position: relative;
+/* Принудительные стили для гарантии прокрутки */
+.modal {
+    overflow-y: scroll !important;
 }
 
-.loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 20px;
-    height: 20px;
-    border: 2px solid #e2e8f0;
-    border-top: 2px solid #667eea;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+.modal-content {
+    overflow-y: visible !important;
 }
 
-@keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
+.modal-body {
+    overflow-y: visible !important;
+}
+
+.form-fields {
+    overflow-y: visible !important;
 }

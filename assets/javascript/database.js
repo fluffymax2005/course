@@ -3,7 +3,7 @@ let currentSearchId = null;
 let currentEditingRecord = null;
 let allTableData = [];
 let currentDataPage = 1;
-const dataPerPage = 50;
+const dataPerPage = 20;
 
 // Словарь для доступа к API
 var tableMap = new Map();
@@ -596,8 +596,354 @@ function exportTableData() {
     messageBoxShow('Функция экспорта в разработке', 'blue');
 }
 
+// Функция редактирования записи
 function editRecord(record) {
-    messageBoxShow(`Редактирование записи ID: ${record.id} в разработке`, 'blue');
+    currentEditingRecord = record;
+    
+    // Получаем название таблицы
+    const tableSelect = document.getElementById('tableSelect');
+    const tableName = tableSelect.options[tableSelect.selectedIndex].text;
+    
+    // Устанавливаем заголовок модального окна
+    document.getElementById('editRecordModalTitle').textContent = 
+        `Редактировать запись (ID: ${record.id}) - ${tableName}`;
+    
+    // Заполняем поля формы
+    populateEditForm(record, tableName);
+    
+    // Показываем модальное окно
+    document.getElementById('editRecordModal').style.display = 'block';
+    
+    // Блокируем скролл body
+    document.body.classList.add('modal-open');
+    
+    // Прокручиваем к началу формы
+    const formFields = document.getElementById('editRecordFields');
+    if (formFields) {
+        formFields.scrollTop = 0;
+    }
+}
+
+// Заполнение формы редактирования
+function populateEditForm(record, tableName) {
+    const formFields = document.getElementById('editRecordFields');
+    formFields.innerHTML = '';
+    
+    // Поля, которые нельзя редактировать
+    const nonEditableFields = ['id', 'whoAdded', 'whenAdded', 'whoChanged', 'whenChanged', 'isDeleted'];
+    
+    // Создаем поля для каждого свойства записи
+    Object.keys(record).forEach(key => {
+        if (nonEditableFields.includes(key)) return;
+        
+        const formGroup = document.createElement('div');
+        formGroup.className = 'form-field';
+        
+        const label = document.createElement('label');
+        label.textContent = fieldNameMapping[key] || key;
+        label.htmlFor = `edit_${key}`;
+        
+        const input = createFormField(key, record[key], tableName);
+        
+        formGroup.appendChild(label);
+        formGroup.appendChild(input);
+        formFields.appendChild(formGroup);
+    });
+}
+
+// Создание поля формы в зависимости от типа данных
+function createFormField(fieldName, value, tableName) {
+    const fieldType = detectFieldType(fieldName, value);
+    
+    switch (fieldType) {
+        case 'boolean':
+            return createCheckboxField(fieldName, value);
+        case 'number':
+            return createNumberField(fieldName, value);
+        case 'date':
+            return createDateField(fieldName, value);
+        case 'email':
+            return createEmailField(fieldName, value);
+        case 'phone':
+            return createPhoneField(fieldName, value);
+        default:
+            return createTextField(fieldName, value, tableName);
+    }
+}
+
+// Создание различных типов полей
+function createTextField(fieldName, value, tableName) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.id = `edit_${fieldName}`;
+    input.name = fieldName;
+    input.value = value || '';
+    input.required = isFieldRequired(fieldName, tableName);
+    
+    // Добавляем валидацию для специальных полей
+    if (fieldName === 'email') {
+        input.pattern = '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$';
+        input.title = 'Введите корректный email адрес';
+    }
+    
+    return input;
+}
+
+function createNumberField(fieldName, value) {
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.id = `edit_${fieldName}`;
+    input.name = fieldName;
+    input.value = value || '';
+    input.min = getMinValue(fieldName);
+    input.max = getMaxValue(fieldName);
+    input.required = true;
+    return input;
+}
+
+function createCheckboxField(fieldName, value) {
+    const container = document.createElement('div');
+    container.className = 'checkbox-container';
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `edit_${fieldName}`;
+    checkbox.name = fieldName;
+    checkbox.checked = Boolean(value);
+    
+    const label = document.createElement('label');
+    label.htmlFor = `edit_${fieldName}`;
+    label.textContent = fieldNameMapping[fieldName] || fieldName;
+    
+    container.appendChild(checkbox);
+    container.appendChild(label);
+    
+    return container;
+}
+
+function createDateField(fieldName, value) {
+    const input = document.createElement('input');
+    input.type = 'datetime-local';
+    input.id = `edit_${fieldName}`;
+    input.name = fieldName;
+    
+    if (value) {
+        const date = new Date(value);
+        input.value = date.toISOString().slice(0, 16);
+    }
+    
+    return input;
+}
+
+function createEmailField(fieldName, value) {
+    const input = document.createElement('input');
+    input.type = 'email';
+    input.id = `edit_${fieldName}`;
+    input.name = fieldName;
+    input.value = value || '';
+    input.pattern = '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$';
+    input.title = 'Введите корректный email адрес';
+    input.required = true;
+    return input;
+}
+
+function createPhoneField(fieldName, value) {
+    const container = document.createElement('div');
+    container.className = 'phone-input-container';
+    
+    const input = document.createElement('input');
+    input.type = 'tel';
+    input.id = `edit_${fieldName}`;
+    input.name = fieldName;
+    input.value = value || '';
+    input.placeholder = '+7XXXXXXXXXX';
+    input.title = 'Введите номер телефона в формате +7XXXXXXXXXX';
+    input.required = true;
+    
+    // Добавляем подсказку под полем
+    const hint = document.createElement('div');
+    hint.className = 'phone-hint';
+    hint.textContent = 'Формат: +7XXXXXXXXXX (12 символов)';
+    hint.style.cssText = 'font-size: 12px; color: #718096; margin-top: 4px;';
+    container.appendChild(hint);
+    
+    container.appendChild(input);
+    
+    return container;
+}
+
+// Функция для форматирования номера телефона перед валидацией
+function formatPhoneForValidation(phoneValue) {
+    if (!phoneValue) return '';
+    
+    // Удаляем все нецифровые символы
+    let numbers = phoneValue.replace(/\D/g, '');
+    
+    // Если номер начинается с 7 или 8, или без кода страны
+    if (numbers.startsWith('7') || numbers.startsWith('8')) {
+        numbers = '7' + numbers.substring(1);
+    } else if (numbers.length === 10) {
+        // Если ввели 10 цифр без кода страны
+        numbers = '7' + numbers;
+    }
+    
+    // Ограничиваем длину (11 цифр - код страны + номер)
+    numbers = numbers.substring(0, 11);
+    
+    return numbers ? '+7' + numbers.substring(1) : '';
+}
+
+// Валидация номера телефона при подтверждении
+function validatePhoneFormat(phoneValue) {
+    if (!phoneValue) return false;
+    
+    // Форматируем номер для проверки
+    const formattedPhone = formatPhoneForValidation(phoneValue);
+    
+    // Проверяем формат +7XXXXXXXXXX (ровно 12 символов)
+    return formattedPhone.match(/^\+7[0-9]{10}$/);
+}
+
+// Функция для получения отформатированного номера телефона
+function getFormattedPhoneValue(phoneValue) {
+    return formatPhoneForValidation(phoneValue);
+}
+
+// Вспомогательные функции для валидации
+function isFieldRequired(fieldName, tableName) {
+    const optionalFields = ['note', 'whoChanged', 'whenChanged'];
+    return !optionalFields.includes(fieldName);
+}
+
+function getMinValue(fieldName) {
+    const minValues = {
+        'distance': 1,
+        'movePrice': 0,
+        'idlePrice': 0,
+        'registrationCode': 1,
+        'releaseYear': 1886
+    };
+    return minValues[fieldName] || '';
+}
+
+function getMaxValue(fieldName) {
+    const maxValues = {
+        'registrationCode': 999,
+        'releaseYear': new Date().getFullYear()
+    };
+    return maxValues[fieldName] || '';
+}
+
+// Закрытие модального окна
+function closeEditRecordModal() {
+    document.getElementById('editRecordModal').style.display = 'none';
+    currentEditingRecord = null;
+    
+    // Разблокируем скролл body
+    document.body.classList.remove('modal-open');
+    
+    // Очищаем форму
+    document.getElementById('editRecordFields').innerHTML = '';
+}
+
+
+// Обновление записи
+async function updateRecord(event) {
+    event.preventDefault();
+    
+    if (!currentEditingRecord) {
+        messageBoxShow('Ошибка: запись для редактирования не найдена', 'red');
+        return;
+    }
+    
+    const formData = new FormData(event.target);
+    const updatedData = {};
+    
+    // Копируем ВСЕ поля из исходной записи
+    Object.keys(currentEditingRecord).forEach(key => {
+        updatedData[key] = currentEditingRecord[key];
+    });
+    
+    // Обновляем данные из формы
+    for (let [key, value] of formData.entries()) {
+        // Обработка чекбоксов
+        if (value === 'on') {
+            updatedData[key] = true;
+            continue;
+        }
+        
+        // Пропускаем пустые чекбоксы (оставляем исходное значение)
+        if (document.getElementById(`edit_${key}`)?.type === 'checkbox' && !document.getElementById(`edit_${key}`)?.checked) {
+            updatedData[key] = false;
+            continue;
+        }
+        
+        // Валидация для телефона только при подтверждении
+        if (key === 'phoneNumber' && value) {
+            if (!validatePhoneFormat(value)) {
+                messageBoxShow('Некорректный формат номера телефона. Используйте формат: +7XXXXXXXXXX', 'red');
+                return;
+            }
+            // Форматируем номер перед сохранением
+            value = getFormattedPhoneValue(value);
+        }
+        
+        // Преобразуем типы данных и обновляем значение
+        const fieldType = detectFieldType(key, currentEditingRecord[key]);
+        updatedData[key] = convertValueType(value, fieldType);
+    }
+    
+    // Обновляем служебные поля
+    updatedData.whoChanged = getCookie('userName');
+    updatedData.whenChanged = new Date().toISOString();
+    
+    try {
+        const token = getCookie('token');
+        const tableSelect = document.getElementById('tableSelect');
+        const apiTableName = tableMap.get(tableSelect.options[tableSelect.selectedIndex].text);
+        
+        console.log('Sending update data:', updatedData); // Для отладки
+        
+        const response = await fetch(`${BASE_API_URL}/${apiTableName}/${currentEditingRecord.id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedData)
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`${errorText}`);
+        }
+        
+        messageBoxShow('Запись успешно обновлена', '#4CAF50');
+        closeEditRecordModal();
+        
+        // Обновляем данные таблицы
+        await fetchTableData();
+        
+    } catch (error) {
+        console.error('Error updating record:', error);
+        messageBoxShow(error.message, 'red');
+    }
+}
+
+// Преобразование типов данных
+function convertValueType(value, fieldType) {
+    if (value === '' || value === null) return null;
+    
+    switch (fieldType) {
+        case 'number':
+            return Number(value);
+        case 'boolean':
+            return Boolean(value);
+        case 'date':
+            return new Date(value).toISOString();
+        default:
+            return String(value);
+    }
 }
 
 function confirmDeleteRecord(record) {
@@ -610,5 +956,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchById');
     if (searchInput) {
         searchInput.addEventListener('keypress', handleSearchKeypress);
+    }
+});
+
+// Закрытие по клику вне модального окна
+window.addEventListener('click', function(event) {
+    const editModal = document.getElementById('editRecordModal');
+    if (event.target === editModal) {
+        closeEditRecordModal();
+    }
+});
+
+// Предотвращаем закрытие при клике на само модальное окно
+document.addEventListener('click', function(event) {
+    const modalContent = document.querySelector('#editRecordModal .modal-content');
+    if (modalContent && modalContent.contains(event.target)) {
+        event.stopPropagation();
     }
 });

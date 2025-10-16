@@ -113,6 +113,25 @@
 
     <!-- Блок database -->
     <div class="database">
+        <!-- Модальное окно для редактирования записи -->
+        <div id="editRecordModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="editRecordModalTitle">Редактировать запись</h3>
+                    <span class="close" onclick="closeEditRecordModal()">&times;</span>
+                </div>
+                <form id="editRecordForm" onsubmit="updateRecord(event)">
+                    <div class="form-fields" id="editRecordFields">
+                        <!-- Поля формы будут заполнены динамически -->
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary-db" onclick="closeEditRecordModal()">Отмена</button>
+                        <button type="submit" class="btn-primary-db">Сохранить изменения</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
         <div class="section-header">
             <h1>База данных</h1>
             <p>Управление данными системы</p>
@@ -138,11 +157,11 @@
                     <div class="search-by-id">
                         <label for="searchById">Поиск по ID:</label>
                         <input type="number" id="searchById" placeholder="Введите ID" min="1">
-                        <button class="btn-secondary" onclick="searchById()" id="searchByIdBtn">
+                        <button class="btn-secondary-db" onclick="searchById()" id="searchByIdBtn">
                             <span class="btn-icon">🔍</span>
                             Найти
                         </button>
-                        <button class="btn-tertiary" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">
+                        <button class="btn-tertiary-db" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">
                             <span class="btn-icon">❌</span>
                             Очистить
                         </button>
@@ -151,11 +170,11 @@
                 
                 <!-- Кнопки действий (отображаются в зависимости от прав) -->
                 <div class="action-buttons" id="dbActionButtons" style="display: none;">
-                    <button class="btn-primary" onclick="showAddRecordForm()" id="addRecordBtn">
+                    <button class="btn-secondary-db" onclick="showAddRecordForm()" id="addRecordBtn">
                         <span class="btn-icon">+</span>
                         Добавить запись
                     </button>
-                    <button class="btn-secondary" onclick="exportTableData()" id="exportBtn">
+                    <button class="btn-secondary-db" onclick="exportTableData()" id="exportBtn">
                         <span class="btn-icon">📥</span>
                         Экспорт
                     </button>
@@ -192,7 +211,7 @@
                 <!-- Сообщение когда ничего не найдено -->
                 <div class="no-data" id="noSearchResultsMessage" style="display: none;">
                     <p>Запись с указанным ID не найдена</p>
-                    <button class="btn-secondary" onclick="clearSearch()">Показать все записи</button>
+                    <button class="btn-secondary-db" onclick="clearSearch()" id="showAllSets">Показать все записи</button>
                 </div>
             </div>
 
