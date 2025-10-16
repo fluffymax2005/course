@@ -1,12 +1,9 @@
-// database.js
 let currentTable = '';
 let currentSearchId = null;
 let currentEditingRecord = null;
 let allTableData = [];
 let currentDataPage = 1;
 const dataPerPage = 50;
-
-const BASE_API_URL = 'http://localhost:5091/api'
 
 // Словарь для доступа к API
 var tableMap = new Map();

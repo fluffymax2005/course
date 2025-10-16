@@ -5,7 +5,7 @@ let currentUsersPage = 1;
 let currentRolesPage = 1;
 const itemsPerPage = 10;
 
-const BASE_API_URL = 'http://localhost:5091/api'
+const BASE_API_URL = 'http://localhost:5091/api';
 
 // Функции для вкладок
 async function switchTab(tabName, event = null) {

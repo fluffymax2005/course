@@ -75,6 +75,12 @@ async function showSection(sectionName = null, isLoadListener = false) {
             headerText.textContent = 'Главная';
         } else if (sectionName === 'database') {
             headerText.textContent = 'База данных';
+
+            // Выпадающий список
+            const tableSelect = document.getElementById('tableSelect');
+            tableSelect.value = "";
+            clearSearch();
+            hideTableInterface();
         } else if (sectionName === 'statistics') {
             headerText.textContent = 'Статистика';
         } else if (sectionName === 'admin-panel') {
@@ -93,7 +99,6 @@ async function showSection(sectionName = null, isLoadListener = false) {
     // Закрываем меню навигации
     hideNavigationMenu();
 }
-
 
 // Перемещение для входа в систему
 function showAuthorizeForm() {
