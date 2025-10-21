@@ -912,7 +912,6 @@ async function updateRecord(event) {
             },
             body: JSON.stringify(updatedData)
         });
-        
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`${errorText}`);
