@@ -117,6 +117,7 @@ header {
 .menu-nav-text {
     margin: 0;
     font-weight: 500;
+    font-size: 14pt;
 }
 
 .menu-nav-item img {
@@ -347,10 +348,31 @@ header {
     display: none;
 }
 
+#databaseHeader {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
 /* Страница с статистикой данных */
 
 .statistics {
     display: none;
+}
+
+#menu-nav-image {
+    padding: 6px;
+}
+
+#menu-nav-header-icon {
+    width: 50px;
+    height: 50px;
+}
+
+#headerNavText {
+    font-size: 22pt;
+    font-weight: 600;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
 }
 
 /* Футер */

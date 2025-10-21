@@ -18,34 +18,34 @@
         <div class="navigation">
             <div class="menu-dropdown">
                 <a href="#">
-                    <img class="header-icon" id="menu-nav-image" src="assets/icons/error.svg">
+                    <img class="header-icon" id="menu-nav-image" src="assets/icons/nav-menu.svg">
                 </a>
                 <div class="left-dropdown">
                     <div class="menu-header">
-                        <img class="header-icon" id="menu-nav-header-icon" src="assets/icons/error.svg">
+                        <p class="header-nav-text" id="headerNavText">Навигация</p>
                         <img class="header-icon" id="menu-nav-cancel-icon" src="assets/icons/error.svg">
                     </div>
                     <a onclick="showSection('main')" class="menu-nav-item">
-                        <img src="assets/icons/error.svg">
+                        <img src="assets/icons/main-page.svg">
                         <p class="menu-nav-text">Главная</p>
                     </a>
                     <a onclick="showSection('database')" class="menu-nav-item">
-                        <img src="assets/icons/error.svg">
+                        <img src="assets/icons/database-page.svg">
                         <p class="menu-nav-text">База данных</p>
                     </a>
                     <a onclick="showSection('statistics')" class="menu-nav-item">
-                        <img src="assets/icons/error.svg">
+                        <img src="assets/icons/statistics-page.svg">
                         <p class="menu-nav-text">Статистика</p>
                     </a>
                     <a onclick="showSection('admin-panel')" class="menu-nav-item">
-                        <img src="assets/icons/error.svg">
+                        <img src="assets/icons/admin-panel.svg">
                         <p class="menu-nav-text">Панель администратора</p>
                     </a>
                 </div>
             </div>
             
             <a onclick="showSection()" href="#">
-                <img class="header-icon" id="page-icon" src="assets/icons/error.svg">
+                <img class="header-icon" id="page-icon" src="assets/icons/main-page.svg">
             </a>
             
             <a class="header-nav" onclick="showSection()" href="#">
@@ -56,7 +56,7 @@
        
         <div class="authorize-header">
             <div class="profile-dropdown">
-                <img class="header-icon" id="profile-image" src="assets/icons/error.svg">
+                <img class="header-icon" id="profile-image" src="assets/icons/credential.svg">
                 <div class="dropdown-menu">
                     <a href="#" class="dropdown-item" id="authorizeItem" onclick="showAuthorizeForm()">Авторизация</a>
                     <a href="#" class="dropdown-item" id="registerItem"onclick="showRegisterForm()">Регистрация</a>
@@ -132,7 +132,7 @@
             </div>
         </div>
         
-        <div class="section-header">
+        <div class="section-header" id="databaseHeader">
             <h1>База данных</h1>
             <p>Управление данными системы</p>
         </div>
