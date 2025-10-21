@@ -4,13 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Главная страница</title>
-    <link rel="stylesheet" href="assets/css/index.css">
-    <link rel="stylesheet" href="assets/css/database.css">
-    <link rel="stylesheet" href="assets/css/admin-panel.css">
+    <link rel="stylesheet" href="source/css/index.css">
+    <link rel="stylesheet" href="source/css/database.css">
+    <link rel="stylesheet" href="source/css/admin-panel.css">
 
-    <script src="assets/javascript/admin-panel.js"></script>
-    <script src="assets/javascript/index.js"></script>
-    <script src="assets/javascript/database.js"></script>
+    <script type="module" src="source/javascript/index.js"></script>
+    <script type="module" src="source/javascript/workspace-visuals.js"></script>
+    <script type="module" src="source/javascript/database.js"></script>
+    <script type="module" src="source/javascript/admin-panel.js"></script>
 </head>
 
 <body>           
@@ -125,8 +126,8 @@
                         <!-- Поля формы будут заполнены динамически -->
                     </div>
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary-db" onclick="closeEditRecordModal()">Отмена</button>
-                        <button type="submit" class="btn-primary-db">Сохранить изменения</button>
+                        <button type="button" class="btn-secondary-db" id="closeModalForm" onclick="closeEditRecordModal()">Отмена</button>
+                        <button type="submit" class="btn-primary-db" id="applyModalForm">Сохранить изменения</button>
                     </div>
                 </form>
             </div>
@@ -173,10 +174,6 @@
                     <button class="btn-secondary-db" onclick="showAddRecordForm()" id="addRecordBtn">
                         <span class="btn-icon">+</span>
                         Добавить запись
-                    </button>
-                    <button class="btn-secondary-db" onclick="exportTableData()" id="exportBtn">
-                        <span class="btn-icon">📥</span>
-                        Экспорт
                     </button>
                 </div>
             </div>
@@ -245,7 +242,7 @@
             <div id="users-tab" class="tab-content active">
                 <div class="admin-header">
                     <h2>Управление учетными записями</h2>
-                    <button class="btn-primary" onclick="showUserForm()">Добавить пользователя</button>
+                    <button class="btn-primary" onclick="showUserForm()" id="addCredentialBtn">Добавить пользователя</button>
                 </div>
                 
                 <div class="search-bar">
@@ -285,7 +282,7 @@
             <div id="roles-tab" class="tab-content">
                 <div class="admin-header">
                     <h2>Управление ролями</h2>
-                    <button class="btn-primary" onclick="showRoleForm()">Добавить роль</button>
+                    <button class="btn-primary" onclick="showRoleForm()" id="addRoleBtn">Добавить роль</button>
                 </div>
 
                 <div class="table-container">

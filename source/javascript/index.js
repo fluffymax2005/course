@@ -1,124 +1,19 @@
-// Визуальные функции
+import { deleteCookie } from "./cookie.js";
 
-function showNavigationMenu() {
-    const leftDropDown = document.querySelector('.left-dropdown');
-    console.log('Opening menu');
-    leftDropDown.classList.add('open');
-}
+export {messageBoxShow};
 
-function hideNavigationMenu() {
-    const leftDropDown = document.querySelector('.left-dropdown');
-    console.log('Closing menu');
-    leftDropDown.classList.remove('open');
-}
+let MESSAGE_BOX_HEIGHT_OFFSET = 20; // начальный отступ
+const TOAST_MARGIN = 10; // отступ между тостами
+const activeToasts = new Map(); // храним активные тосты
 
-// Функция для переключения между разделами
-async function showSection(sectionName = null, isLoadListener = false) {
-    if (isLoadListener) {
-        return;
-    }
-
-    // Получаем из куки роль пользователя для ограничения доступа и его срок жизни
-    const userRights = getCookie('userRights');
-    const tokenExpireTime = getCookie('tokenExpireTime'); // время жизни токена из куки
-    if (tokenExpireTime === undefined) {
-        console.error('Не удалось извлечь срок жизни токена, либо пользователь вышел из системы самостоятельно');
-        messageBoxShow('Авторизуйтесь в системе', 'red', '20px', '44%', 'translateY(50px)');
-        return;
-    }
-
-    const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
-
-    // Проверяем жизнь токена
-    if (userRights === undefined) {
-        console.error('Не удалось извлечь права пользователя');
-        messageBoxShow('Внутренняя ошибка', 'red', '20px', '45%', 'translateY(50px)');
-        return;
-    } else if (tokenExpireDateTime < new Date()) {
-        console.error('Время сессии истекло');
-        messageBoxShow('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', '20px', '37%', 'translateY(50px)');
-        return;
-    }
-
-    if (userRights === '0' && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
-        messageBoxShow('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
-            'red', '20px', '35%', 'translateY(50px)');
-        return;
-    } else if (userRights === '1' && (sectionName === 'admin-panel')) {
-        messageBoxShow('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
-            'red', '20px', '35%', 'translateY(50px)');
-        return;
-    }
-
-    // Скрываем все разделы
-    const sections = document.querySelectorAll('.main, .database, .statistics, .admin-panel');
-    sections.forEach(section => {
-        section.style.display = 'none';
-        section.classList.remove('active-section');
-    });
-    
-    // Показываем выбранный раздел
-    if (sectionName === null) {
-        const headerText = document.getElementById('header-text');
-        sectionName = headerText.textContent === 'Главная' ? 'main' : 
-            headerText.textContent === 'База данных' ? 'database' :
-            headerText.textContent === 'Статистика' ? 'statistics' : 'admin-panel';
-    }
-    const activeSection = document.querySelector(`.${sectionName}`);
-    if (activeSection) {
-        activeSection.style.display = 'block';
-        activeSection.classList.add('active-section');
-
-        // Сменяем название заголовка рядом с панелью навигации
-        const headerText = document.getElementById('header-text');
-        if (sectionName === 'main') {
-            headerText.textContent = 'Главная';
-        } else if (sectionName === 'database') {
-            headerText.textContent = 'База данных';
-
-            // Выпадающий список
-            const tableSelect = document.getElementById('tableSelect');
-            tableSelect.value = "";
-            clearSearch();
-            hideTableInterface();
-        } else if (sectionName === 'statistics') {
-            headerText.textContent = 'Статистика';
-        } else if (sectionName === 'admin-panel') {
-            headerText.textContent = 'Панель администратора';
-            // Инициализируем первую вкладку с проверкой авторизации
-            const success = await switchTab('users');
-            if (!success) {
-                // Если не удалось загрузить данные, скрываем панель администратора
-                activeSection.style.display = 'none';
-                activeSection.classList.remove('active-section');
-                return;
-            }
-        }
-    }
-    
-    // Закрываем меню навигации
-    hideNavigationMenu();
-}
-
-// Перемещение для входа в систему
-function showAuthorizeForm() {
-    window.location.href = '/authorize-form/authorize.html#authorize';
-}
-
-function showRegisterForm() {
-    setTimeout(() => {
-        window.location.href = '/authorize-form/authorize.html#register';
-    }, 1000);   
-}
-
-function quitSystem() {       
+window.quitSystem = function quitSystem() {       
     deleteCookie('token');
     deleteCookie('tokenExpireTime');
 
     setTimeout(() => {
-        const authorizeItem = this.document.getElementById('authorizeItem');
-        const registerItem = this.document.getElementById('registerItem');
-        const quitItem = this.document.getElementById('quitItem');
+        const authorizeItem = document.getElementById('authorizeItem');
+        const registerItem = document.getElementById('registerItem');
+        const quitItem = document.getElementById('quitItem');
 
         authorizeItem.style.display = 'block';
         registerItem.style.display = 'block';
@@ -126,17 +21,17 @@ function quitSystem() {
     }, 10);
 
     // Создаем элемент уведомления
-    messageBoxShow('Выход из системы успешно выполнен', '#4CAF50', '20px', '40%', 'translateY(-50px)');
+    messageBoxShow('Выход из системы успешно выполнен', '#4CAF50', '40%', 'translateY(-50px)');
 }
  
-// Функция создания окна уведомления
-function messageBoxShow(message, background_color, top_pos, right_pos, transform, duration = 3000) {
-    // Создаем окно уведомления
+async function messageBoxShow(message, background_color, right_pos, transform, duration = 3000) {
     const toast = document.createElement('div');
     toast.textContent = message;
+    const toastId = Date.now() + Math.random(); // уникальный ID
+    
     toast.style.cssText = `
         position: fixed;
-        top: ${top_pos};
+        top: ${MESSAGE_BOX_HEIGHT_OFFSET}px;
         right: ${right_pos};
         background: ${background_color};
         color: white;
@@ -154,133 +49,76 @@ function messageBoxShow(message, background_color, top_pos, right_pos, transform
         text-align: center;
     `;
 
-    // Отображение сообщения
     document.body.appendChild(toast);
 
-    // Появление: сверху вниз
+    // Ждем пока элемент отрендерится
+    await new Promise(resolve => setTimeout(resolve, 0));
+    
+    const height = toast.offsetHeight;
+    
+    // Сохраняем информацию о тосте
+    activeToasts.set(toastId, {
+        element: toast,
+        height: height,
+        top: MESSAGE_BOX_HEIGHT_OFFSET
+    });
+
+    // Увеличиваем отступ для следующего тоста
+    MESSAGE_BOX_HEIGHT_OFFSET += height + TOAST_MARGIN;
+
+    // Анимация появления
     requestAnimationFrame(() => {
         toast.style.opacity = '1';
         toast.style.transform = 'translateY(0)';
-        toast.style.top = '20px';
     });
 
-    // Исчезновение: снизу вверх через указанное время
+    // Автоматическое скрытие
     setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
-        }, 300);
+        removeToast(toastId);
     }, duration);
+
+    return toastId;
 }
 
-/* Служебные функции */
+function removeToast(toastId) {
+    const toastInfo = activeToasts.get(toastId);
+    if (!toastInfo) return;
 
-function getCookie(name) {
-    let matches = document.cookie.match(new RegExp(
-        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-        ));
-    return matches ? decodeURIComponent(matches[1]) : undefined;
-}
-
-function setCookie(name, value, options = {}) {
-    options = {
-        path: '/',
-        // при необходимости добавьте другие значения по умолчанию
-        ...options
-    };
-
-    if (options.expires instanceof Date) {
-        options.expires = options.expires.toUTCString();
-    }
-
-    let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
-
-    for (let optionKey in options) {
-        updatedCookie += "; " + optionKey;
-        let optionValue = options[optionKey];
-        if (optionValue !== true) {
-            updatedCookie += "=" + optionValue;
-        }
-    }
-
-    document.cookie = updatedCookie;
-}
-
-function deleteCookie(name) {
-    setCookie(name, "", {
-        'max-age': -1
-    })
-}
-
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Page loaded');
-
-    // По умолчанию отображаем главную страницу
-    showSection('main', true);
+    const { element, height } = toastInfo;
     
-    // Обработчик для кнопки меню
-    const menuButton = document.getElementById('menu-nav-image');
-    menuButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log('Menu button clicked');
-        showNavigationMenu();
+    // Анимация исчезновения
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(-20px)';
+    
+    setTimeout(() => {
+        if (element.parentNode) {
+            element.parentNode.removeChild(element);
+        }
+        
+        // Удаляем из Map и пересчитываем позиции
+        activeToasts.delete(toastId);
+        recalculateToastPositions();
+    }, 300);
+}
+
+function recalculateToastPositions() {
+    let currentOffset = 20;
+    
+    // Обновляем позиции всех активных тостов
+    activeToasts.forEach((toastInfo, toastId) => {
+        const { element, height } = toastInfo;
+        
+        // Плавно перемещаем тост на новую позицию
+        element.style.transition = 'top 0.3s ease-in-out';
+        element.style.top = `${currentOffset}px`;
+        
+        // Обновляем информацию о позиции
+        toastInfo.top = currentOffset;
+        
+        // Увеличиваем отступ для следующего тоста
+        currentOffset += height + TOAST_MARGIN;
     });
     
-    // Обработчик для кнопки закрытия
-    const closeButton = document.getElementById('menu-nav-cancel-icon');
-    closeButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log('Close button clicked');
-        hideNavigationMenu();
-    });
-    
-    // Закрытие меню при клике вне его
-    document.addEventListener('click', function(event) {
-        const leftDropDown = document.querySelector('.left-dropdown');
-        const menuButton = document.getElementById('menu-nav-image');
-        const closeButton = document.getElementById('menu-nav-cancel-icon');
-        
-        if (leftDropDown && leftDropDown.classList.contains('open')) {
-            if (!leftDropDown.contains(event.target) && 
-                !menuButton.contains(event.target) && 
-                !closeButton.contains(event.target)) {
-                console.log('Closing menu by outside click');
-                hideNavigationMenu();
-            }
-        }
-    });
-});
-
-/* Инициализация формы проверяет авторизацию пользователя */
-
-document.addEventListener('DOMContentLoaded', function() {
-    window.addEventListener('load', function() {
-        // Компоненты, стиль которых меняется в зависимости от свежести токена
-        const authorizeItem = this.document.getElementById('authorizeItem');
-        const registerItem = this.document.getElementById('registerItem');
-        const quitItem = this.document.getElementById('quitItem');
-        
-        const tokenExpireTime = getCookie('tokenExpireTime'); // время жизни токена из куки
-        if (tokenExpireTime === undefined) {
-            quitItem.style.display = 'none';
-            return;
-        }
-
-        const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
-        
-        if (tokenExpireDateTime < new Date()) { // Если токен просрочен то автоматически выходим из системы
-            authorizeItem.style.display = 'block';
-            registerItem.style.display = 'block';
-            quitItem.style.display = 'none';
-        } else {
-            authorizeItem.style.display = 'none';
-            registerItem.style.display = 'none';
-            quitItem.style.display = 'block';
-        }
-
-    });
-});
+    // Обновляем глобальный offset
+    MESSAGE_BOX_HEIGHT_OFFSET = currentOffset;
+}

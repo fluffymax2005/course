@@ -1,3 +1,6 @@
+import { BASE_API_URL } from "./api.js";
+import { getCookie } from "./cookie.js";
+
 // Переменные для управления состоянием
 let currentEditingUser = null;
 let currentEditingRole = null;
@@ -5,11 +8,8 @@ let currentUsersPage = 1;
 let currentRolesPage = 1;
 const itemsPerPage = 10;
 
-const BASE_API_URL = 'http://localhost:5091/api';
-
 // Функции для вкладок
-async function switchTab(tabName, event = null) {
-    
+window.switchTab = async function switchTab(tabName, event = null) {
     let loadSuccess = false;
 
     // Загрузить данные для вкладки

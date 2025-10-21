@@ -103,6 +103,15 @@
     background-color: #28a745;
 }
 
+#addCredentialBtn {
+    background: rgb(50, 183, 108);;
+}
+
+#addRoleBtn {
+    background: rgb(50, 183, 108);;
+}
+
+
 .btn-danger {
     background: #dc3545;
     color: white;
@@ -119,7 +128,7 @@
 }
 
 .btn-edit {
-    background: #28a745;
+    background: rgb(247, 155, 92);
     color: white;
     border: none;
     padding: 6px 12px;

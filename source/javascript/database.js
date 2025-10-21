@@ -1,3 +1,9 @@
+import { getCookie } from "./cookie.js";
+import {BASE_API_URL} from './api.js';
+import { messageBoxShow } from "./index.js";
+
+export {hideTableInterface};
+
 let currentTable = '';
 let currentSearchId = null;
 let currentEditingRecord = null;
@@ -65,7 +71,7 @@ const fieldNameMapping = {
     'vehicleModel': 'Модель транспорта'
 };
 
-function loadTableData() {
+window.loadTableData = function loadTableData() {
     const tableSelect = document.getElementById('tableSelect');
     currentTable = tableSelect.value;
     
@@ -343,7 +349,7 @@ function setupPagination() {
 }
 
 // Смена страницы
-function changePage(page) {
+window.changePage = function changePage(page) {
     currentDataPage = page;
     displayTableData(getCurrentPageData());
     
@@ -358,7 +364,7 @@ function changePage(page) {
 }
 
 // ПОИСК ПО ID
-function searchById() {
+window.searchById = function searchById() {
     const searchInput = document.getElementById('searchById');
     const searchId = parseInt(searchInput.value);
     
@@ -501,7 +507,7 @@ function showNoSearchResults() {
 }
 
 // Очистка поиска
-function clearSearch() {
+window.clearSearch = function clearSearch() {
     currentSearchId = null;
     
     // Сбрасываем поле поиска
@@ -588,7 +594,7 @@ function getCellClassName(type, value) {
 }
 
 // Заглушки для остальных функций
-function showAddRecordForm() {
+window.showAddRecordForm = function showAddRecordForm() {
     messageBoxShow('Функция добавления записи в разработке', 'blue');
 }
 
@@ -835,7 +841,7 @@ function getMaxValue(fieldName) {
 }
 
 // Закрытие модального окна
-function closeEditRecordModal() {
+window.closeEditRecordModal = function closeEditRecordModal() {
     document.getElementById('editRecordModal').style.display = 'none';
     currentEditingRecord = null;
     
@@ -848,11 +854,11 @@ function closeEditRecordModal() {
 
 
 // Обновление записи
-async function updateRecord(event) {
+window.updateRecord = async function updateRecord(event) {
     event.preventDefault();
     
     if (!currentEditingRecord) {
-        messageBoxShow('Ошибка: запись для редактирования не найдена', 'red');
+        messageBoxShow('Ошибка: запись для редактирования не найдена', 'red', 0, 'translateY(50px)');
         return;
     }
     
@@ -881,7 +887,7 @@ async function updateRecord(event) {
         // Валидация для телефона только при подтверждении
         if (key === 'phoneNumber' && value) {
             if (!validatePhoneFormat(value)) {
-                messageBoxShow('Некорректный формат номера телефона. Используйте формат: +7XXXXXXXXXX', 'red');
+                messageBoxShow('Некорректный формат номера телефона. Используйте формат: +7XXXXXXXXXX', 'red', 0, 'translateY(50px)');
                 return;
             }
             // Форматируем номер перед сохранением
@@ -917,7 +923,7 @@ async function updateRecord(event) {
             throw new Error(`${errorText}`);
         }
         
-        messageBoxShow('Запись успешно обновлена', '#4CAF50');
+        messageBoxShow('Запись успешно обновлена', '#4CAF50', 0, 'translateY(50px)');
         closeEditRecordModal();
         
         // Обновляем данные таблицы
@@ -925,7 +931,7 @@ async function updateRecord(event) {
         
     } catch (error) {
         console.error('Error updating record:', error);
-        messageBoxShow(error.message, 'red');
+        messageBoxShow(error.message, 'red', 0, 'translateY(50px)');
     }
 }
 
@@ -945,7 +951,7 @@ function convertValueType(value, fieldType) {
     }
 }
 
-function confirmDeleteRecord(record) {
+window.confirmDeleteRecord = function confirmDeleteRecord(record) {
     messageBoxShow(`Удаление записи ID: ${record.id} в разработке`, 'blue');
 }
 

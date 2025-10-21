@@ -147,7 +147,7 @@
 }
 
 .btn-secondary-db {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -166,7 +166,7 @@
 
 /* Search Button with Matching Gradient */
 #searchByIdBtn {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -184,7 +184,6 @@
 #searchByIdBtn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
-    background: linear-gradient(135deg, #3a9cf8 0%, #00d9e6 100%);
 }
 
 .btn-secondary-db:hover {
@@ -337,7 +336,7 @@
 
 /* Small Edit Button */
 .btn-edit-small {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: rgb(247, 155, 92);
     color: white;
     border: none;
     padding: 6px 12px;
@@ -351,7 +350,6 @@
 }
 
 .btn-edit-small:hover {
-    background: linear-gradient(135deg, #3a9cf8 0%, #00d9e6 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
 }
@@ -373,6 +371,37 @@
 .btn-delete-small:hover {
     background: #e53e3e;
     transform: translateY(-1px);
+}
+
+#closeModalForm {
+    background:  rgba(255, 0, 0, 70%);
+}
+
+#closeModalForm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+#applyModalForm {
+    background:  linear-gradient(135deg, #667eea, #764ba2);
+}
+
+#applyModalForm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+#clearSearchBtn {
+    background: rgba(255, 0, 0, 50%)
+}
+
+#addRecordBtn {
+    background: rgb(50, 183, 108);
+}
+
+#addRecordBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* No Data Messages */
