@@ -49,16 +49,5 @@ class DatabaseCache {
     onDataChanged(tableName) {      
         // Очищаем кэш измененной таблицы
         this.clear(tableName);
-        
-        // Также можно очистить связанные таблицы
-        this.clearRelatedCaches(tableName);
-    }
-
-    clearRelatedCaches(changedTable) {
-        // Логика очистки связанных таблиц
-        // Например, при изменении заказов очищаем кэш статистики
-        if (changedTable === 'Заказы') {
-            this.clear('statistics_cache');
-        }
     }
 }

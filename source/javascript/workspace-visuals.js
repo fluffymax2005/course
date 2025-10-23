@@ -1,6 +1,6 @@
 import { getCookie } from "./cookie.js";
 import { messageBoxShow } from "./index.js";
-import { hideTableInterface } from "./database.js";
+import { hideTableInterface } from "./database-form-service.js";
 
 // Визуальные функции
 

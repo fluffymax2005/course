@@ -1,13 +1,15 @@
-/* Служебные функции */
+/* Служебные функции для куки */
 
-export function getCookie(name) {
+export {getCookie, setCookie, deleteCookie, getUserRights, getToken, getTokenExpireTime, getUserName};
+
+function getCookie(name) {
     let matches = document.cookie.match(new RegExp(
         "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
         ));
     return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
-export function setCookie(name, value, options = {}) {
+function setCookie(name, value, options = {}) {
     options = {
         path: '/',
         // при необходимости добавьте другие значения по умолчанию
@@ -31,8 +33,25 @@ export function setCookie(name, value, options = {}) {
     document.cookie = updatedCookie;
 }
 
-export function deleteCookie(name) {
+function deleteCookie(name) {
     setCookie(name, "", {
         'max-age': -1
     })
+}
+
+
+function getUserRights() {
+    return getCookie('userRights');
+}
+
+function getToken() {
+    return getCookie('token');
+}
+
+function getTokenExpireTime() {
+    return getCookie('tokenExpireTime');
+}
+
+function getUserName() {
+    return getCookie('userName');
 }
