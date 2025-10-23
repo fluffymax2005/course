@@ -32,7 +32,7 @@ async function messageBoxShow(message, background_color, right_pos, transform, d
     toast.style.cssText = `
         position: fixed;
         top: ${MESSAGE_BOX_HEIGHT_OFFSET}px;
-        right: ${right_pos};
+        right: ${right_pos}px;
         background: ${background_color};
         color: white;
         padding: 16px 24px;

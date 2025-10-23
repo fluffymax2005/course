@@ -1,6 +1,9 @@
 import { getCookie } from "./cookie.js";
 import {BASE_API_URL} from './api.js';
 import { messageBoxShow } from "./index.js";
+import { DatabaseCache } from "./database-cache.js";
+
+const dbCache = new DatabaseCache();
 
 export {hideTableInterface};
 
@@ -71,7 +74,7 @@ const fieldNameMapping = {
     'vehicleModel': 'Модель транспорта'
 };
 
-window.loadTableData = function loadTableData() {
+window.loadTableData = function loadTableData(useCache = true) {
     const tableSelect = document.getElementById('tableSelect');
     currentTable = tableSelect.value;
     
@@ -87,7 +90,7 @@ window.loadTableData = function loadTableData() {
     checkDatabaseAccess();
     
     // Загружаем данные таблицы
-    fetchTableData();
+    fetchTableData(useCache);
 }
 
 function hideTableInterface() {
@@ -110,24 +113,39 @@ function checkDatabaseAccess() {
     }
 }
 
-async function fetchTableData() {
-    const token = getCookie('token');
+async function fetchTableData(useCache = true) {
+    // Текущая сессия актульна
     const tokenExpireTime = getCookie('tokenExpireTime');
     if (tokenExpireTime === undefined) {
         console.error('Не удалось извлечь срок жизни токена, либо пользователь вышел из системы самостоятельно');
-        messageBoxShow('Авторизуйтесь в системе', 'red', '20px', '44%', 'translateY(50px)');
+        messageBoxShow('Авторизуйтесь в системе', 'red', '0', '44%', 'translateY(50px)');
         return;
     }
 
     const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
     if (tokenExpireDateTime < new Date()) {
         console.error('Время сессии истекло');
-        messageBoxShow('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', '20px', '37%', 'translateY(50px)');
+        messageBoxShow('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', '0', '37%', 'translateY(50px)');
         return;
     }
 
     // Выпадающий список
     const tableSelect = document.getElementById('tableSelect');
+    const tableName = tableSelect.options[tableSelect.selectedIndex].text;
+
+    // Пользователь обращается к кэшированной таблице
+    if (useCache) {
+        const cachedData = dbCache.get(tableName);
+        if (cachedData) {
+            allTableData = cachedData;
+            currentDataPage = 1;
+            displayTableData(getCurrentPageData());
+            return;
+        }
+    }
+
+    // Запрос
+    const token = getCookie('token');
 
     try {
         const response = await fetch(`${BASE_API_URL}/${tableMap.get(tableSelect.options[tableSelect.selectedIndex].text)}`, {
@@ -143,9 +161,11 @@ async function fetchTableData() {
         const data = await response.json();
 
         if (Array.isArray(data)) {
+            // Сохраняем в кэш
+            dbCache.set(tableName, data);
+            
             allTableData = data;
-            currentDataPage = 1; // Сбрасываем на первую страницу
-            // ИСПРАВЛЕНИЕ: передаем данные для текущей страницы, а не все данные
+            currentDataPage = 1;
             displayTableData(getCurrentPageData());
         } else {
             throw new Error('API returned non-array response');
@@ -155,7 +175,7 @@ async function fetchTableData() {
         console.error('Error loading users:', error);
         
         const errorMessage = error.message == 401 ? 'Срок вашей сессии истек. Авторизуйтесь повторно' : 'Внутренняя ошибка';        
-        messageBoxShow(errorMessage, 'red', '20px', '40%', 'translateY(50px)');
+        messageBoxShow(errorMessage, 'red', '0', '40%', 'translateY(50px)');
     }
 }
 
@@ -922,6 +942,9 @@ window.updateRecord = async function updateRecord(event) {
             const errorText = await response.text();
             throw new Error(`${errorText}`);
         }
+
+        // Инвалидируем кэш после успешного обновления
+        dbCache.onDataChanged(tableSelect.options[tableSelect.selectedIndex].text, 'update');
         
         messageBoxShow('Запись успешно обновлена', '#4CAF50', 0, 'translateY(50px)');
         closeEditRecordModal();

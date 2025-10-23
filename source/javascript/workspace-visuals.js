@@ -1,4 +1,4 @@
-import { getCookie, setCookie, deleteCookie } from "./cookie.js";
+import { getCookie } from "./cookie.js";
 import { messageBoxShow } from "./index.js";
 import { hideTableInterface } from "./database.js";
 
