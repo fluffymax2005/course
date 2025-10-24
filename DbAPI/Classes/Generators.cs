@@ -1,19 +1,22 @@
-﻿using DbAPI.Models;
+﻿using DbAPI.Interfaces;
+using DbAPI.Models;
 using static DbAPI.Interfaces.IInformation;
 
 namespace DbAPI.Classes {
     public static class Generators {
         private static readonly Random _random = new Random(1000);
+        private static readonly string PERSON_DATA_PATH = @"../Person_Data";
+
         public static List<Customer> GenerateCustomers(int count) {
-            string[] firstNames = { "Иван", "Алексей", "Дмитрий", "Сергей", "Андрей", "Михаил", "Артем", "Николай", "Павел", "Егор" };
-            string[] lastNames = { "Иванов", "Петров", "Сидоров", "Смирнов", "Кузнецов", "Васильев", "Попов", "Соколов", "Михайлов", "Новиков" };
+            string[] firstNames = File.ReadAllLines($"{PERSON_DATA_PATH}/names.txt");
+            string[] lastNames = File.ReadAllLines($"{PERSON_DATA_PATH}/surnames.txt");
             string[] domains = { "gmail.com", "mail.ru", "yandex.ru", "outlook.com", "hotmail.com" };
 
             return Enumerable.Range(1, count).Select(i => new Customer {
                 Id = i,
                 Forename = firstNames[_random.Next(firstNames.Length)],
                 Surname = lastNames[_random.Next(lastNames.Length)],
-                PhoneNumber = $"+79{_random.Next(10000000, 99999999)}",
+                PhoneNumber = $"+79{_random.Next(100000000, 999999999)}",
                 Email = $"user{i}@example.com",
                 WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
                 WhoAdded = "system",
@@ -207,17 +210,24 @@ namespace DbAPI.Classes {
 
         public static List<Role>? GenerateRoles() {
 
+            string[] forenames = ["admin", "basic", "editor", "director"];
+            UserRights[] rights = [UserRights.Admin, UserRights.Basic, UserRights.Editor, UserRights.Director];
+            bool[] canPost = { true, false, true, false };
+            bool[] canUpdate = { true, false, true, false };
+            bool[] canDelete = {true, false, false, false };
+            
             return Enumerable.Range(1, 2).Select(i => {
                 return new Role {
                     Id = i,
-                    Forename = i == 1 ? "admin" : "basic",
-                    Rights = i == 1 ? UserRights.Admin : UserRights.Basic,
+                    Forename = forenames[i - 1],
+                    Rights = rights[i - 1],
                     CanGet = true,
-                    CanPost = i == 1,
-                    CanUpdate = i == 1,
-                    CanDelete = i == 1,
+                    CanPost = canPost[i - 1],
+                    CanUpdate = canUpdate[i - 1],
+                    CanDelete = canDelete[i - 1],
                     WhoAdded = "system",
-                    WhenAdded = new DateTime(2023, 1, 1)
+                    WhenAdded = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, DateTime.Now.Hour, 
+                        DateTime.Now.Minute, DateTime.Now.Second)
                 };
             }).ToList();
         }
@@ -228,7 +238,7 @@ namespace DbAPI.Classes {
                     Id = i,
                     Username = i == 1 ? "admin" : "basic",
                     Password = PasswordHasher.HashPassword("JcGDN9ST5KEG!"),
-                    Email = $"user{i}@example.com",
+                    Email = $"santech_montage@mail.ru",
                     RoleId = i,
                     WhoAdded = "system",
                     WhenAdded = new DateTime(2023, 1, 1)

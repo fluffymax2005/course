@@ -57,6 +57,7 @@ dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 8.0.0<br>
 dotnet add package Microsoft.EntityFrameworkCore.Tools --version 8.0.0<br>
 dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.0<br>
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 8.0.20
+dotnet add package NPetrovich
 
 <h1>6. Clone repository in any place where "course" directory does not exist (or it is empty)</h1>
 
