@@ -273,7 +273,7 @@ function getRightsName(rights) {
 }
 
 // Модальные окна для пользователей
-function showUserForm() {
+window.showUserForm = function showUserForm() {
     currentEditingUser = null;
     document.getElementById('userModalTitle').textContent = 'Добавить пользователя';
     document.getElementById('userForm').reset();
@@ -282,7 +282,7 @@ function showUserForm() {
     document.getElementById('userModal').style.display = 'block';
 }
 
-function editUser(userId) {
+window.editUser = function editUser(userId) {
     // Здесь должна быть логика загрузки данных пользователя
     // Для демонстрации используем заглушку
     currentEditingUser = userId;
@@ -299,7 +299,7 @@ function editUser(userId) {
     document.getElementById('userModal').style.display = 'block';
 }
 
-function closeUserModal() {
+window.closeUserModal = function closeUserModal() {
     document.getElementById('userModal').style.display = 'none';
 }
 
@@ -339,7 +339,7 @@ async function loadRolesForSelect() {
     }
 }
 
-async function addUser(event) {
+window.addUser = async function addUser(event) {
     event.preventDefault();
     
     const formData = new FormData(event.target);
@@ -380,14 +380,14 @@ async function addUser(event) {
 }
 
 // Модальные окна для ролей
-function showRoleForm() {
+window.showRoleForm = function showRoleForm() {
     currentEditingRole = null;
     document.getElementById('roleModalTitle').textContent = 'Добавить роль';
     document.getElementById('roleForm').reset();
     document.getElementById('roleModal').style.display = 'block';
 }
 
-function editRole(roleId) {
+window.editRole = function editRole(roleId) {
     // Здесь должна быть логика загрузки данных роли
     // Для демонстрации используем заглушку
     currentEditingRole = roleId;
@@ -404,11 +404,11 @@ function editRole(roleId) {
     document.getElementById('roleModal').style.display = 'block';
 }
 
-function closeRoleModal() {
+window.closeRoleModal = function closeRoleModal() {
     document.getElementById('roleModal').style.display = 'none';
 }
 
-async function saveRole(event) {
+window.saveRole = async function saveRole(event) {
     event.preventDefault();
     
     const formData = new FormData(event.target);
@@ -448,7 +448,7 @@ async function saveRole(event) {
 }
 
 // Функции удаления
-function confirmDeleteUser(userId, username) {
+window.confirmDeleteUser = function confirmDeleteUser(userId, username) {
     const isCurrentlyDeleted = false; // Здесь должна быть логика проверки текущего статуса
     
     document.getElementById('confirmMessage').textContent = 
@@ -458,7 +458,7 @@ function confirmDeleteUser(userId, username) {
     document.getElementById('confirmModal').style.display = 'block';
 }
 
-function confirmDeleteRole(roleId, roleName) {
+window.confirmDeleteRole = function confirmDeleteRole(roleId, roleName) {
     const isCurrentlyDeleted = false; // Здесь должна быть логика проверки текущего статуса
     
     document.getElementById('confirmMessage').textContent = 
@@ -516,7 +516,7 @@ async function deleteRole(roleId, restore = false) {
     }
 }
 
-function closeConfirmModal() {
+window.closeConfirmModal = function closeConfirmModal() {
     document.getElementById('confirmModal').style.display = 'none';
 }
 

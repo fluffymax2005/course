@@ -2,12 +2,14 @@ import {getToken, getTokenExpireTime} from './cookie.js'
 import {BASE_API_URL} from './api.js';
 import { messageBoxShow } from "./index.js";
 import { DatabaseCache } from "./database-cache.js";
+import { isFieldRequired, getMinValue, getMaxValue } from './database-table-service.js';
 import { hideTableInterface, displayTableData, fieldNameMapping } from "./database-visuals.js";
 import { checkDatabaseAccess, getCurrentPageData } from "./database-general-service.js";
 
-export {hideTableInterface, checkDatabaseAccess, setupPagination, fetchTableData, populateEditForm};
+export {hideTableInterface, checkDatabaseAccess, setupPagination, fetchTableData, populateEditForm, changeCurrentSearchId, 
+    changeCurrentDataPage, detectFieldType, changeCurrentEditingRecord};
 
-export {currentEditingRecord};
+export {currentEditingRecord, currentSearchId, allTableData, currentDataPage, DATA_PER_PAGE, tableMap, dbCache};
 
 const dbCache = new DatabaseCache();
 
@@ -25,6 +27,20 @@ tableMap.set('Маршруты', 'Route');
 tableMap.set('Тарифы', 'Rate');
 tableMap.set('Шоферы', 'Driver');
 tableMap.set('Транспортные средства', 'TransportVehicle');
+
+// Функции для изменения значений переменных
+
+function changeCurrentSearchId(value) {
+    currentSearchId = value;
+}
+
+function changeCurrentDataPage(value) {
+    currentDataPage = value;
+}
+
+function changeCurrentEditingRecord(value) {
+    currentEditingRecord = value;
+}
 
 async function fetchTableData(useCache = true) {
     // Текущая сессия актульна
@@ -80,6 +96,7 @@ async function fetchTableData(useCache = true) {
             allTableData = data;
             currentDataPage = 1;
             displayTableData(getCurrentPageData());
+            setupPagination();
         } else {
             throw new Error('API returned non-array response');
         }

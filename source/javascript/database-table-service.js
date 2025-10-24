@@ -1,7 +1,11 @@
 import { getToken, getUserName } from "./cookie.js";
-import { fetchTableData, populateEditForm, currentEditingRecord } from "./database-form-service.js";
+import { fetchTableData, populateEditForm, currentEditingRecord, changeCurrentSearchId, allTableData, 
+    changeCurrentDataPage, changeCurrentEditingRecord, detectFieldType, tableMap, dbCache } from "./database-form-service.js";
+import { displaySearchResults, showSearchInfo } from "./database-visuals.js";
+import { messageBoxShow } from "./index.js";
+import { BASE_API_URL } from "./api.js";
 
-export {editRecord};
+export {editRecord, isFieldRequired, getMinValue, getMaxValue};
 
 // Заглушки для остальных функций
 window.showAddRecordForm = function showAddRecordForm() {
@@ -95,7 +99,7 @@ window.updateRecord = async function updateRecord(event) {
 
 // Функция редактирования записи
 function editRecord(record) {
-    currentEditingRecord = record;
+    changeCurrentEditingRecord(record);
     
     // Получаем название таблицы
     const tableSelect = document.getElementById('tableSelect');
@@ -135,7 +139,7 @@ window.searchById = function searchById() {
         return;
     }
     
-    currentSearchId = searchId;
+    changeCurrentSearchId(searchId);
     
     // Ищем запись по ID во всех данных
     const foundRecord = allTableData.find(record => record.id === searchId);

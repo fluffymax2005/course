@@ -1,4 +1,5 @@
 import { getUserRights } from "./cookie.js";
+import { allTableData, currentDataPage, DATA_PER_PAGE } from "./database-form-service.js";
 
 export {getUserRights, checkDatabaseAccess, getCurrentPageData, formatValue, getCellClassName};
 

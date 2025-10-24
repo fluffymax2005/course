@@ -1,6 +1,7 @@
-import { fetchTableData } from "./database-form-service.js";
-import { checkDatabaseAccess, setupPagination } from "./database-form-service.js";
-import { getUserRights, formatValue, getCellClassName } from "./database-general-service.js";
+import { fetchTableData, checkDatabaseAccess, setupPagination, currentSearchId, changeCurrentSearchId, 
+    changeCurrentDataPage, allTableData, currentDataPage, DATA_PER_PAGE, detectFieldType, currentEditingRecord,  
+    changeCurrentEditingRecord} from "./database-form-service.js";
+import { getUserRights, formatValue, getCellClassName, getCurrentPageData } from "./database-general-service.js";
 import { editRecord } from "./database-table-service.js";
 
 export {hideTableInterface, displayTableData, displaySearchResults, showNoSearchResults, showSearchInfo, getUserRights};
@@ -335,7 +336,7 @@ function showNoSearchResults() {
 
 // Очистка поиска
 window.clearSearch = function clearSearch() {
-    currentSearchId = null;
+    changeCurrentSearchId(null);
     
     // Сбрасываем поле поиска
     document.getElementById('searchById').value = '';
@@ -345,7 +346,7 @@ window.clearSearch = function clearSearch() {
     document.getElementById('searchResultsInfo').style.display = 'none';
     
     // Сбрасываем на первую страницу и показываем все данные
-    currentDataPage = 1;
+    changeCurrentDataPage(1);
     if (allTableData && allTableData.length > 0) {
         displayTableData(getCurrentPageData());
     }
@@ -353,7 +354,7 @@ window.clearSearch = function clearSearch() {
 
 // Смена страницы
 window.changePage = function changePage(page) {
-    currentDataPage = page;
+    changeCurrentDataPage(page);
     displayTableData(getCurrentPageData());
     
     // Прокрутка к верху таблицы
@@ -400,7 +401,7 @@ document.addEventListener('click', function(event) {
 // Закрытие модального окна
 window.closeEditRecordModal = function closeEditRecordModal() {
     document.getElementById('editRecordModal').style.display = 'none';
-    currentEditingRecord = null;
+    changeCurrentEditingRecord(null);
     
     // Разблокируем скролл body
     document.body.classList.remove('modal-open');
