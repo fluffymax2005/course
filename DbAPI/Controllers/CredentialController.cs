@@ -37,6 +37,7 @@ namespace DbAPI.Controllers {
 
         [HttpGet("test")]
         public async Task<IActionResult> Test() {
+            _logger.LogInformation("CredentialController:Test()");
             return Ok(await _repository.GetAllAsync());
         }
 
