@@ -33,7 +33,8 @@ namespace DbAPI.Classes {
                 do {
                     phoneNumber = $"+79{_random.Next(100000000, 999999999)}";
                 } while (phone_numbers.Any(p => p.Equals(phoneNumber)));
-                
+
+                phone_numbers.Concat(new string[] { phoneNumber }.ToArray());
 
                 return new Customer {
                     Id = i,
@@ -68,8 +69,7 @@ namespace DbAPI.Classes {
                         ? $"{districts[_random.Next(districts.Length)]} р-н, {landmarks[_random.Next(landmarks.Length)]}"
                         : $"{districts[_random.Next(districts.Length)]} р-н, {streetTypes[_random.Next(streetTypes.Length)]} " +
                           $"{streetNames[_random.Next(streetNames.Length)]}, {_random.Next(1, 150)}";
-                }
-                while (dropOff == boarding);
+                } while (dropOff == boarding);
 
                 return new Models.Route {
                     Id = i,
@@ -88,8 +88,6 @@ namespace DbAPI.Classes {
 
             string[] female_names = File.ReadAllLines($"{PERSON_DATA_PATH}/female_names.txt");
             string[] female_surnames = File.ReadAllLines($"{PERSON_DATA_PATH}/female_surnames.txt");
-
-            string[] phone_numbers = new string[] { };
 
             var licenseSeries = Enumerable.Range('A', 26)
                 .Select(c => ((char)c).ToString() + (char)_random.Next('A', 'Z' + 1))
@@ -112,6 +110,8 @@ namespace DbAPI.Classes {
                 do {
                     phoneNumber = $"+79{_random.Next(100000000, 999999999)}";
                 } while (phone_numbers.Any(p => p.Equals(phoneNumber)));
+
+                phone_numbers.Concat(new string[] { phoneNumber }.ToArray());
 
                 return new Driver {
                     Id = i,
@@ -185,7 +185,7 @@ namespace DbAPI.Classes {
             }).ToList();
         }
 
-        public static List<Rate>? GenerateRates(List<Driver> drivers, List<TransportVehicle> vehicles, int count) {
+        public static List<Rate>? GenerateRates(List<Driver> drivers, List<TransportVehicle> vehicles, int count = 5) {
             // Проверка наличия связанных данных
             if (drivers == null || drivers.Count == 0)
                 return null;
@@ -197,6 +197,7 @@ namespace DbAPI.Classes {
 
             int[] move_prices = { 15, 25, 10, 30, 20 };
             int[] idle_prices = { 5, 8, 3, 10, 7 };
+            var rateTypeIndexes = new HashSet<int>();
 
             return Enumerable.Range(1, count).Select(i => {
                 // Выбираем случайного водителя и его транспортное средство
@@ -207,7 +208,14 @@ namespace DbAPI.Classes {
                     : vehicles[_random.Next(vehicles.Count)];
 
                 // От индекса названия тарифа зависит его стоимость в простое и при поездке
-                var rateTypeIndex = _random.Next(rateTypes.Length);
+
+                int rateTypeIndex;
+                do {
+                    rateTypeIndex = _random.Next(rateTypes.Length);
+                } while (rateTypeIndexes.Any(r => r == rateTypeIndex));
+
+                rateTypeIndexes.Add(rateTypeIndex);
+
                 return new Rate {
                     Id = i,
                     Forename = rateTypes[rateTypeIndex],
@@ -268,7 +276,7 @@ namespace DbAPI.Classes {
             bool[] canUpdate = { true, false, true, false };
             bool[] canDelete = {true, false, false, false };
             
-            return Enumerable.Range(1, 2).Select(i => {
+            return Enumerable.Range(1, 4).Select(i => {
                 return new Role {
                     Id = i,
                     Forename = forenames[i - 1],
@@ -278,8 +286,7 @@ namespace DbAPI.Classes {
                     CanUpdate = canUpdate[i - 1],
                     CanDelete = canDelete[i - 1],
                     WhoAdded = "system",
-                    WhenAdded = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, DateTime.Now.Hour, 
-                        DateTime.Now.Minute, DateTime.Now.Second)
+                    WhenAdded = new DateTime(2025, 10, 24)
                 };
             }).ToList();
         }

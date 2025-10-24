@@ -15,7 +15,7 @@ namespace DbAPI.Contexts {
         public DbSet<Role> Roles { get; set; }
 
         public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options) {
-            //Database.EnsureCreated();
+           Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
@@ -33,13 +33,13 @@ namespace DbAPI.Contexts {
                 entity.Property(e => e.Email).IsRequired().HasColumnOrder(5);
                 entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(6);
                 entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(7);
-                entity.Property(e => e.Note).HasColumnOrder(8);
                 entity.Property(e => e.WhoChanged).HasColumnOrder(9);
                 entity.Property(e => e.WhenChanged).HasColumnOrder(10);
-                entity.Property(e => e.IsDeleted).HasColumnOrder(11);
+                entity.Property(e => e.Note).HasColumnOrder(11);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(12);
             });
 
-            var customers = Generators.GenerateCustomers(500);
+            var customers = Generators.GenerateCustomers(5000);
             modelBuilder.Entity<Customer>().HasData(customers);
 
             ///////////////////////////
@@ -53,10 +53,10 @@ namespace DbAPI.Contexts {
                 entity.Property(e => e.DriverLicenceNumber).IsRequired().HasColumnOrder(6);
                 entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(7);
                 entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(8);
-                entity.Property(e => e.Note).HasColumnOrder(9);
                 entity.Property(e => e.WhoChanged).HasColumnOrder(10);
                 entity.Property(e => e.WhenChanged).HasColumnOrder(11);
-                entity.Property(e => e.IsDeleted).HasColumnOrder(12);
+                entity.Property(e => e.Note).HasColumnOrder(12);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(13);
             });
 
             var drivers = Generators.GenerateDrivers(500);
@@ -70,9 +70,9 @@ namespace DbAPI.Contexts {
                 entity.Property(e => e.DropAddress).IsRequired().HasColumnOrder(3);
                 entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(4);
                 entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(5);
-                entity.Property(e => e.Note).HasColumnOrder(6);
-                entity.Property(e => e.WhoChanged).HasColumnOrder(7);
-                entity.Property(e => e.WhenChanged).HasColumnOrder(8);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(6);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(7);
+                entity.Property(e => e.Note).HasColumnOrder(8);
                 entity.Property(e => e.IsDeleted).HasColumnOrder(9);
             });
 
@@ -92,9 +92,9 @@ namespace DbAPI.Contexts {
                 entity.Property(e => e.ReleaseYear).IsRequired().HasColumnOrder(8);
                 entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(9);
                 entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(10);
-                entity.Property(e => e.Note).HasColumnOrder(11);
-                entity.Property(e => e.WhoChanged).HasColumnOrder(12);
-                entity.Property(e => e.WhenChanged).HasColumnOrder(13);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(11);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(12);
+                entity.Property(e => e.Note).HasColumnOrder(13);
                 entity.Property(e => e.IsDeleted).HasColumnOrder(14);
             });
 
@@ -112,13 +112,13 @@ namespace DbAPI.Contexts {
                 entity.Property(e => e.IdlePrice).IsRequired().HasColumnOrder(6);
                 entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(7);
                 entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(8);
-                entity.Property(e => e.Note).HasColumnOrder(9);
-                entity.Property(e => e.WhoChanged).HasColumnOrder(10);
-                entity.Property(e => e.WhenChanged).HasColumnOrder(11);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(9);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(10);
+                entity.Property(e => e.Note).HasColumnOrder(11);
                 entity.Property(e => e.IsDeleted).HasColumnOrder(12);
             });
 
-            var rates = Generators.GenerateRates(drivers, vehicles, 500);
+            var rates = Generators.GenerateRates(drivers, vehicles);
             modelBuilder.Entity<Rate>().HasData(rates);
 
             ///////////////////////////
@@ -131,13 +131,13 @@ namespace DbAPI.Contexts {
                 entity.Property(e => e.Distance).IsRequired().HasColumnOrder(5);
                 entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(6);
                 entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(7);
-                entity.Property(e => e.Note).HasColumnOrder(8);
-                entity.Property(e => e.WhoChanged).HasColumnOrder(9);
-                entity.Property(e => e.WhenChanged).HasColumnOrder(10);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(8);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(9);
+                entity.Property(e => e.Note).HasColumnOrder(10);
                 entity.Property(e => e.IsDeleted).HasColumnOrder(11);
             });
 
-            var orders = Generators.GenerateOrders(customers, routes, rates, 240);
+            var orders = Generators.GenerateOrders(customers, routes, rates, 10000);
             modelBuilder.Entity<Order>().HasData(orders);
 
             ///////////////////////////
@@ -155,7 +155,8 @@ namespace DbAPI.Contexts {
                 entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(9);
                 entity.Property(e => e.WhoChanged).HasColumnOrder(10);
                 entity.Property(e => e.WhenChanged).HasColumnOrder(11);
-                entity.Property(e => e.IsDeleted).HasColumnOrder(12);
+                entity.Property(e => e.Note).HasColumnOrder(12);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(13);
             });
 
             modelBuilder.Entity<Role>().HasData(roles);
@@ -172,9 +173,9 @@ namespace DbAPI.Contexts {
                 entity.Property(e => e.Email).IsRequired().HasColumnOrder(5);
                 entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(6);
                 entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(7);
-                entity.Property(e => e.Note).HasColumnOrder(8);
-                entity.Property(e => e.WhoChanged).HasColumnOrder(9);
-                entity.Property(e => e.WhenChanged).HasColumnOrder(10);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(8);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(9);
+                entity.Property(e => e.Note).HasColumnOrder(10);
                 entity.Property(e => e.IsDeleted).HasColumnOrder(11);
             });
 

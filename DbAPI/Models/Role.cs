@@ -32,6 +32,8 @@ namespace DbAPI.Models {
         [Display(Order = 11)]
         public DateTime? WhenChanged { get; set; } = null;
         [Display(Order = 12)]
+        public string? Note { get; set; } = null;
+        [Display(Order = 13)]
         public DateTime? IsDeleted { get; set; } = null;
     }
 }
