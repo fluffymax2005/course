@@ -5,22 +5,46 @@ using static DbAPI.Interfaces.IInformation;
 namespace DbAPI.Classes {
     public static class Generators {
         private static readonly Random _random = new Random(1000);
-        private static readonly string PERSON_DATA_PATH = @"../Person_Data";
+        private static readonly string PERSON_DATA_PATH = @"Person_Data";
+
+        private static readonly string[] phone_numbers = new string[] { };
 
         public static List<Customer> GenerateCustomers(int count) {
-            string[] firstNames = File.ReadAllLines($"{PERSON_DATA_PATH}/names.txt");
-            string[] lastNames = File.ReadAllLines($"{PERSON_DATA_PATH}/surnames.txt");
+            string[] male_names = File.ReadAllLines($"{PERSON_DATA_PATH}/male_names.txt");
+            string[] male_surnames = File.ReadAllLines($"{PERSON_DATA_PATH}/male_surnames.txt");
+
+            string[] female_names = File.ReadAllLines($"{PERSON_DATA_PATH}/female_names.txt");
+            string[] female_surnames = File.ReadAllLines($"{PERSON_DATA_PATH}/female_surnames.txt");
+
             string[] domains = { "gmail.com", "mail.ru", "yandex.ru", "outlook.com", "hotmail.com" };
 
-            return Enumerable.Range(1, count).Select(i => new Customer {
-                Id = i,
-                Forename = firstNames[_random.Next(firstNames.Length)],
-                Surname = lastNames[_random.Next(lastNames.Length)],
-                PhoneNumber = $"+79{_random.Next(100000000, 999999999)}",
-                Email = $"user{i}@example.com",
-                WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
-                WhoAdded = "system",
-                Note = $"Клиент #{i}"
+            return Enumerable.Range(1, count).Select(i => {
+                bool isMale = _random.Next(0, 2) == 0 ? false : true;
+                string? forename = null, surname = null;
+                if (isMale) {
+                    forename = male_names[_random.Next(male_names.Length)];
+                    surname = male_surnames[_random.Next(male_surnames.Length)];
+                } else {
+                    forename = female_names[_random.Next(female_names.Length)];
+                    surname = female_surnames[_random.Next(female_surnames.Length)];
+                }
+
+                string? phoneNumber = null;
+                do {
+                    phoneNumber = $"+79{_random.Next(100000000, 999999999)}";
+                } while (phone_numbers.Any(p => p.Equals(phoneNumber)));
+                
+
+                return new Customer {
+                    Id = i,
+                    Forename = forename,
+                    Surname = surname,
+                    PhoneNumber = phoneNumber,
+                    Email = $"user{i}@example.com",
+                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
+                    WhoAdded = "system",
+                    Note = $"Клиент #{i}"
+                };
             }).ToList();
         }
 
@@ -59,26 +83,49 @@ namespace DbAPI.Classes {
         }
 
         public static List<Driver> GenerateDrivers(int count) {
-            var firstNames = new[] { "Иван", "Алексей", "Дмитрий", "Сергей", "Андрей", "Михаил", "Артем", "Николай", "Александр", "Юрий", "Игорь", "Максим", "Никита" };
-            var lastNames = new[] { "Иванов", "Петров", "Сидоров", "Смирнов", "Кузнецов", "Васильев", "Попов", "Соколов", "Гарбарь", "Ляшенок", "Минко", "Фетисов", "Топорков" };
+            string[] male_names = File.ReadAllLines($"{PERSON_DATA_PATH}/male_names.txt");
+            string[] male_surnames = File.ReadAllLines($"{PERSON_DATA_PATH}/male_surnames.txt");
+
+            string[] female_names = File.ReadAllLines($"{PERSON_DATA_PATH}/female_names.txt");
+            string[] female_surnames = File.ReadAllLines($"{PERSON_DATA_PATH}/female_surnames.txt");
+
+            string[] phone_numbers = new string[] { };
+
             var licenseSeries = Enumerable.Range('A', 26)
                 .Select(c => ((char)c).ToString() + (char)_random.Next('A', 'Z' + 1))
                 .Distinct()
                 .Take(20)
                 .ToArray();
 
-            return Enumerable.Range(1, count).Select(i => new Driver {
-                Id = i,
-                Forename = firstNames[_random.Next(firstNames.Length)],
-                Surname = lastNames[_random.Next(lastNames.Length)],
-                PhoneNumber = $"+79{_random.Next(10000000, 99999999)}",
-                DriverLicenceSeries = licenseSeries[_random.Next(licenseSeries.Length)],
-                DriverLicenceNumber = _random.Next(100000, 999999).ToString(),
-                WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
-                WhoAdded = "system",
-                WhenChanged = new DateTime(2023, 1, 1).AddDays(i + _random.Next(1, 30)),
-                WhoChanged = "system",
-                Note = $"Водитель #{i}"
+            return Enumerable.Range(1, count).Select(i => {
+                bool isMale = _random.Next(0, 2) == 0 ? false : true;
+                string? forename = null, surname = null;
+                if (isMale) {
+                    forename = male_names[_random.Next(male_names.Length)];
+                    surname = male_surnames[_random.Next(male_surnames.Length)];
+                } else {
+                    forename = female_names[_random.Next(female_names.Length)];
+                    surname = female_surnames[_random.Next(female_surnames.Length)];
+                }
+
+                string? phoneNumber = null;
+                do {
+                    phoneNumber = $"+79{_random.Next(100000000, 999999999)}";
+                } while (phone_numbers.Any(p => p.Equals(phoneNumber)));
+
+                return new Driver {
+                    Id = i,
+                    Forename = forename,
+                    Surname = surname,
+                    PhoneNumber = phoneNumber,
+                    DriverLicenceSeries = licenseSeries[_random.Next(licenseSeries.Length)],
+                    DriverLicenceNumber = _random.Next(100000, 999999).ToString(),
+                    WhoAdded = "system",
+                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
+                    WhenChanged = null,
+                    WhoChanged = null,
+                    Note = null
+                };
             }).ToList();
         }
 
@@ -87,7 +134,7 @@ namespace DbAPI.Classes {
             if (drivers == null || drivers.Count == 0)
                 return null;
 
-            var regions = new[] { 77, 78, 99, 97, 177, 150, 190, 197, 199, 750 };
+            var regions = File.ReadAllLines($"{PERSON_DATA_PATH}/region_numbers.txt");
             var letters = "ABCEHKMOPTXY";
             var models = new[]
             {
@@ -125,7 +172,7 @@ namespace DbAPI.Classes {
                             $"{_random.Next(0, 10)}{_random.Next(0, 10)}{_random.Next(0, 10)}" +
                             $"{letters[_random.Next(letters.Length)]}{letters[_random.Next(letters.Length)]}",
                     Series = letters[_random.Next(letters.Length)].ToString(),
-                    RegistrationCode = regions[_random.Next(regions.Length)],
+                    RegistrationCode = int.Parse(regions[_random.Next(regions.Length)]),
                     Model = models[_random.Next(models.Length)],
                     Color = colors[_random.Next(colors.Length)],
                     ReleaseYear = _random.Next(2000, 2024),
@@ -148,6 +195,9 @@ namespace DbAPI.Classes {
 
             var rateTypes = new[] { "Стандарт", "Премиум", "Эконом", "Бизнес", "Комфорт" };
 
+            int[] move_prices = { 15, 25, 10, 30, 20 };
+            int[] idle_prices = { 5, 8, 3, 10, 7 };
+
             return Enumerable.Range(1, count).Select(i => {
                 // Выбираем случайного водителя и его транспортное средство
                 var driver = drivers[_random.Next(drivers.Count)];
@@ -156,18 +206,20 @@ namespace DbAPI.Classes {
                     ? driverVehicles[_random.Next(driverVehicles.Count)]
                     : vehicles[_random.Next(vehicles.Count)];
 
+                // От индекса названия тарифа зависит его стоимость в простое и при поездке
+                var rateTypeIndex = _random.Next(rateTypes.Length);
                 return new Rate {
                     Id = i,
-                    Forename = rateTypes[_random.Next(rateTypes.Length)],
+                    Forename = rateTypes[rateTypeIndex],
                     DriverId = driver.Id,
                     VehicleId = vehicle.Id,
-                    MovePrice = _random.Next(10, 50),  // Цена за км (10-50 руб)
-                    IdlePrice = _random.Next(5, 25),    // Цена за минуту простоя (5-25 руб)
-                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
+                    MovePrice = move_prices[rateTypeIndex],
+                    IdlePrice = idle_prices[rateTypeIndex],
                     WhoAdded = "system",
-                    WhenChanged = new DateTime(2023, 1, 1).AddDays(i + _random.Next(1, 30)),
-                    WhoChanged = "system",
-                    Note = $"Тариф для {driver.Surname} ({vehicle.Model})"
+                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
+                    WhoChanged = null,
+                    WhenChanged = null,
+                    Note = null
                 };
             }).ToList();
         }
@@ -201,9 +253,9 @@ namespace DbAPI.Classes {
                     Distance = distance,
                     WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
                     WhoAdded = "system",
-                    WhenChanged = new DateTime(2023, 1, 1).AddDays(i + _random.Next(1, 30)),
-                    WhoChanged = "system",
-                    Note = $"Заказ #{i} от {customer.Surname} ({distance} км)"
+                    WhoChanged = null,
+                    WhenChanged = null,
+                    Note = null
                 };
             }).ToList();
         }
