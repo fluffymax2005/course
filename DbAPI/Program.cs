@@ -5,7 +5,7 @@ using DbAPI.Contexts;
 using DbAPI.Interfaces;
 using DbAPI.Models;
 using DbAPI.Repositories;
-using DbAPI.Services;
+using DbAPI.Repositories.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
