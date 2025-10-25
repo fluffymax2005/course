@@ -23,7 +23,7 @@ namespace DbAPI.Repositories {
 
         public async Task AddAsync(Rate entity) {
 
-            await EntityValidate(entity.Forename, entity.DriverId, entity.VehicleId, entity.MovePrice,
+            await EntityValidate(entity.Forename, entity.MovePrice,
                 entity.IdlePrice, entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged,
                 entity.WhenChanged, entity.Note, entity.IsDeleted);
 
@@ -31,17 +31,15 @@ namespace DbAPI.Repositories {
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddAsync(string forename, TypeId driverId, TypeId vehicleId, int movePrice,
-        int idlePrice, string whoAdded, DateTime whenAdded, string? whoChanged = null,
-        TypeId? id = null, DateTime? whenChanged = null, string? note = null, DateTime? isDeleted = null) {
+        public async Task AddAsync(string forename, int movePrice, int idlePrice, string whoAdded,
+            DateTime whenAdded, string? whoChanged = null, TypeId? id = null, DateTime? whenChanged = null,
+            string? note = null, DateTime? isDeleted = null) {
 
-            await EntityValidate(forename, driverId, vehicleId, movePrice, idlePrice, whoAdded, whenAdded,
+            await EntityValidate(forename, movePrice, idlePrice, whoAdded, whenAdded,
                 id, whoChanged, whenChanged, note, isDeleted);
 
             var entity = new Rate {
                 Forename = forename,
-                DriverId = driverId,
-                VehicleId = vehicleId,
                 MovePrice = movePrice,
                 IdlePrice = idlePrice,
                 WhoAdded = whoAdded,
@@ -56,9 +54,9 @@ namespace DbAPI.Repositories {
             await _context.SaveChangesAsync();
         }
 
-        private async Task EntityValidate(string forename, TypeId driverId, TypeId vehicleId, int movePrice,
-        int idlePrice, string whoAdded, DateTime whenAdded, TypeId? id, string? whoChanged = null,
-        DateTime? whenChanged = null, string? note = null, DateTime? isDeleted = null) {
+        private async Task EntityValidate(string forename, int movePrice, int idlePrice,
+            string whoAdded, DateTime whenAdded, TypeId? id, string? whoChanged = null,
+            DateTime? whenChanged = null, string? note = null, DateTime? isDeleted = null) {
 
             if (forename.IsNullOrEmpty()) {
                 throw new ArgumentNullException("Название тарифа должно быть непустой строкой");
@@ -71,12 +69,6 @@ namespace DbAPI.Repositories {
             else if (!Rate.IdlePriceValidate(idlePrice))
                 throw new ArgumentException("Цена простоя должна быть положительным целым числом");
 
-            if (await _context.Drivers.AnyAsync(d => d.Id == driverId) == false) {
-                throw new InvalidDataException($"Водитель с ID = {driverId} не существует");
-            } else if (await _context.TransportVehicles.AnyAsync(t => t.Id == vehicleId) == false) {
-                throw new InvalidDataException($"Транспортное средство с ID = {vehicleId} не существует");
-            }
-
             if (id != 0) {
                 throw new InvalidDataException("Сущность должна содержать ненулевой ID. Автогенерация включена");
             } else if (id == null)
@@ -84,11 +76,6 @@ namespace DbAPI.Repositories {
         }
 
         public async Task UpdateAsync(Rate entity) {
-            if (await _context.Drivers.Where(d => d.Id == entity.DriverId).AnyAsync() == false) {
-                throw new InvalidDataException($"Водитель с ID = {entity.DriverId} не существует");
-            } else if (await _context.TransportVehicles.Where(d => d.Id == entity.VehicleId).AnyAsync() == false) {
-                throw new InvalidDataException($"Транспортное средство с ID = {entity.VehicleId} не существует");
-            }
             _context.Rates.Update(entity);
             await _context.SaveChangesAsync();
         }

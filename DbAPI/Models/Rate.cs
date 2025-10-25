@@ -14,30 +14,22 @@ namespace DbAPI.Models {
         [Display(Order = 2)]
         public required string Forename { get; set; }
 
-        [ForeignKey("Driver")]
         [Display(Order = 3)]
-        public TypeId DriverId { get; set; }
-
-        [ForeignKey("Vehicle")]
-        [Display(Order = 4)]
-        public TypeId VehicleId { get; set; }
-
-        [Display(Order = 5)]
         public int MovePrice { set; get; }
-        [Display(Order = 6)]
+        [Display(Order = 4)]
         public int IdlePrice { set; get; }
 
-        [Display(Order = 7)]
+        [Display(Order = 5)]
         public required string WhoAdded { get; set; }
-        [Display(Order = 8)]
+        [Display(Order = 6)]
         public DateTime WhenAdded { get; set; }
-        [Display(Order = 9)]
+        [Display(Order = 7)]
         public string? WhoChanged { get; set; } = null;
-        [Display(Order = 10)]
+        [Display(Order = 8)]
         public DateTime? WhenChanged { get; set; } = null;
-        [Display(Order = 11)]
+        [Display(Order = 9)]
         public string? Note { get; set; } = null;
-        [Display(Order = 12)]
+        [Display(Order = 10)]
         public DateTime? IsDeleted { get; set; } = null;
 
         //public ICollection<Order> Orders { get; set; } = new List<Order>();

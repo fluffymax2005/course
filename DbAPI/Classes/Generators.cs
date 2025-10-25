@@ -42,9 +42,9 @@ namespace DbAPI.Classes {
                     Surname = surname,
                     PhoneNumber = phoneNumber,
                     Email = $"user{i}@example.com",
-                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
                     WhoAdded = "system",
-                    Note = $"Клиент #{i}"
+                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
+                    Note = null
                 };
             }).ToList();
         }
@@ -75,9 +75,9 @@ namespace DbAPI.Classes {
                     Id = i,
                     BoardingAddress = boarding,
                     DropAddress = dropOff,
-                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
                     WhoAdded = "system",
-                    Note = $"Маршрут #{i}"
+                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
+                    Note = null
                 };
             }).ToList();
         }
@@ -176,11 +176,11 @@ namespace DbAPI.Classes {
                     Model = models[_random.Next(models.Length)],
                     Color = colors[_random.Next(colors.Length)],
                     ReleaseYear = _random.Next(2000, 2024),
-                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
                     WhoAdded = "system",
-                    WhenChanged = new DateTime(2023, 1, 1).AddDays(i + _random.Next(1, 30)),
-                    WhoChanged = "system",
-                    Note = $"ТС #{i} (Водитель: {driver.Surname} {driver.Forename})"
+                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
+                    WhoChanged = null,
+                    WhenChanged = null,
+                    Note = null
                 };
             }).ToList();
         }
@@ -219,8 +219,6 @@ namespace DbAPI.Classes {
                 return new Rate {
                     Id = i,
                     Forename = rateTypes[rateTypeIndex],
-                    DriverId = driver.Id,
-                    VehicleId = vehicle.Id,
                     MovePrice = move_prices[rateTypeIndex],
                     IdlePrice = idle_prices[rateTypeIndex],
                     WhoAdded = "system",
