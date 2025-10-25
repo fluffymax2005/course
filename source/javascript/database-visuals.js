@@ -17,7 +17,7 @@ const fieldNameMapping = {
     'rateId': 'ID тарифа',
     'driverId': 'ID шофера',
     'vehicleId': 'ID транспортного средства',
-    'forename': 'Название',
+    'forename': 'Имя',
     'surname': 'Фамилия',
     'phoneNumber': 'Номер телефона',
     'boardingAddress': 'Адрес посадки',

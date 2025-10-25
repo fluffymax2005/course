@@ -388,18 +388,30 @@ window.showRoleForm = function showRoleForm() {
 }
 
 window.editRole = function editRole(roleId) {
-    // Здесь должна быть логика загрузки данных роли
-    // Для демонстрации используем заглушку
     currentEditingRole = roleId;
     document.getElementById('roleModalTitle').textContent = 'Редактировать роль';
     
-    // Загружаем данные роли (заглушка)
-    document.getElementById('forename').value = 'Пример роли';
+    // Находим таблицу
+    const rolesTable = document.getElementById('rolesTable');
+    
+    // Ищем строку с нужным ID
+    let roleName = '';
+    const rows = rolesTable.getElementsByTagName('tr');
+    
+    for (let i = 1; i < rows.length; i++) { // начинаем с 1, пропускаем заголовок
+        const cells = rows[i].getElementsByTagName('td');
+        const idCell = cells[0]; // первая ячейка с ID
+        const nameCell = cells[1]; // вторая ячейка с названием
+        
+        if (idCell && parseInt(idCell.textContent) === roleId) {
+            roleName = nameCell.textContent;
+            break;
+        }
+    }
+    
+    // Заполняем поля в модальном окне
+    document.getElementById('forename').value = roleName;
     document.getElementById('rights').value = '1';
-    document.getElementById('canGet').checked = true;
-    document.getElementById('canPost').checked = true;
-    document.getElementById('canUpdate').checked = false;
-    document.getElementById('canDelete').checked = false;
     
     document.getElementById('roleModal').style.display = 'block';
 }
