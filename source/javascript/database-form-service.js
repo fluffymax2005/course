@@ -1,6 +1,6 @@
 import {getToken, getTokenExpireTime} from './cookie.js'
 import {BASE_API_URL} from './api.js';
-import { messageBoxShow } from "./index.js";
+import { messageBoxShowFromLeft, messageBoxShowFromRight } from "./index.js";
 import { DatabaseCache } from "./database-cache.js";
 import { isFieldRequired, getMinValue, getMaxValue } from './database-table-service.js';
 import { hideTableInterface, displayTableData, fieldNameMapping } from "./database-visuals.js";

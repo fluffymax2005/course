@@ -2,7 +2,7 @@ import { getToken, getUserName } from "./cookie.js";
 import { fetchTableData, populateEditForm, currentEditingRecord, changeCurrentSearchId, allTableData, 
     changeCurrentDataPage, changeCurrentEditingRecord, detectFieldType, tableMap, dbCache } from "./database-form-service.js";
 import { displaySearchResults, showSearchInfo } from "./database-visuals.js";
-import { messageBoxShow } from "./index.js";
+import { messageBoxShowFromLeft, messageBoxShowFromRight } from "./index.js";
 import { BASE_API_URL } from "./api.js";
 
 export {editRecord, isFieldRequired, getMinValue, getMaxValue};

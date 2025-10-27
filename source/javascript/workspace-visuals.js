@@ -1,5 +1,5 @@
-import { getCookie } from "./cookie.js";
-import { messageBoxShow } from "./index.js";
+import { getCookie, getTokenExpireTime, getUserRights } from "./cookie.js";
+import { messageBoxShowFromLeft, messageBoxShowFromRight } from "./index.js";
 import { hideTableInterface } from "./database-form-service.js";
 
 // Визуальные функции
@@ -23,12 +23,15 @@ window.showSection = async function showSection(sectionName = null, isLoadListen
     }
 
     if (sectionName !== 'main') {
+        const rightPos = document.getElementById('menuLeftDropDown').offsetWidth + 10; // отступ по левому краю в пикселя для messageBox
+
+
         // Получаем из куки роль пользователя для ограничения доступа и его срок жизни
-        const userRights = getCookie('userRights');
-        const tokenExpireTime = getCookie('tokenExpireTime'); // время жизни токена из куки
+        const userRights = getUserRights();
+        const tokenExpireTime = getTokenExpireTime(); // время жизни токена из куки
         if (tokenExpireTime === undefined) {
             console.error('Не удалось извлечь срок жизни токена, либо пользователь вышел из системы самостоятельно');
-            messageBoxShow('Авторизуйтесь в системе', 'red', '44%', 'translateY(50px)');
+            messageBoxShowFromLeft('Авторизуйтесь в системе', 'red', true, rightPos, 'translateY(50px)');
             return;
         }
 
@@ -37,21 +40,22 @@ window.showSection = async function showSection(sectionName = null, isLoadListen
         // Проверяем жизнь токена
         if (userRights === undefined) {
             console.error('Не удалось извлечь права пользователя');
-            messageBoxShow('Внутренняя ошибка', 'red', '45%', 'translateY(50px)');
+            messageBoxShowFromLeft('Внутренняя ошибка', 'red', true, rightPos, 'translateY(50px)');
             return;
         } else if (tokenExpireDateTime < new Date()) {
             console.error('Время сессии истекло');
-            messageBoxShow('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', '37%', 'translateY(50px)');
+            messageBoxShowFromLeft('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', true, rightPos, 'translateY(50px)');
             return;
         }
 
-        if (userRights === '0' && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
-            messageBoxShow('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
-                'red', '35%', 'translateY(50px)');
+        // Ограничение на переход в области для пользователя
+        if ((userRights === '0' || userRights === 1) && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
+            messageBoxShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
+                'red', true, rightPos, 'translateY(50px)');
             return;
-        } else if (userRights === '1' && (sectionName === 'admin-panel')) {
-            messageBoxShow('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
-                'red', '35%', 'translateY(50px)');
+        } else if (userRights === '3' && (sectionName === 'database' || sectionName === 'statstics' || sectionName === 'admin-panel')) {
+            messageBoxShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
+                'red', true, rightPos, 'translateY(50px)');
             return;
         }
     }
