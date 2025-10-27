@@ -8,9 +8,9 @@ using TypeId = int;
 
 namespace DbAPI.Repositories {
     public class RoleRepository : IRepository<Role, TypeId> {
-        private readonly OrderDbContext _context;
+        private readonly CredentialDbContext _context;
 
-        public RoleRepository(OrderDbContext context) {
+        public RoleRepository(CredentialDbContext context) {
             _context = context;
         }
 

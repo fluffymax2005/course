@@ -9,9 +9,9 @@ using TypeId = int;
 
 namespace DbAPI.Repositories {
     public class CredentialRepository : IRepository<Credential, TypeId> {
-        private readonly OrderDbContext _context;
+        private readonly CredentialDbContext _context;
 
-        public CredentialRepository(OrderDbContext context) {
+        public CredentialRepository(CredentialDbContext context) {
             _context = context;
         }
 

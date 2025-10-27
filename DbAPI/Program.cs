@@ -81,13 +81,21 @@ builder.Services.AddRateLimiter(options => {
         ));
 });
 
-// Register OrderDbContext + reposes
+// Register OrderDbContext and CredentialDbContext + reposes
 builder.Services.AddDbContext<OrderDbContext>(options =>
 #if DOCKER
     options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnection")));
 #else
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDataConnection")));
 #endif
+
+builder.Services.AddDbContext<CredentialDbContext>(options =>
+#if DOCKER
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnection")));
+#else
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultCredentialConnection")));
+#endif
+
 builder.Services.AddScoped<IRepository<Order, TypeId>, OrderRepository>();
 builder.Services.AddScoped<IRepository<Customer, TypeId>, CustomerRepository>();
 builder.Services.AddScoped<IRepository<Driver, TypeId>, DriverRepository>();

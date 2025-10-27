@@ -34,7 +34,7 @@ namespace DbAPI.Factories {
                 .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<OrderDbContext>();
-            optionsBuilder.UseSqlServer(config.GetConnectionString("DefaultConnection"));
+            optionsBuilder.UseSqlServer(config.GetConnectionString("DefaultDataConnection"));
 
             return new OrderDbContext(optionsBuilder.Options);
         }
