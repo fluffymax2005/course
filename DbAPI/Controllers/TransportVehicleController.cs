@@ -70,7 +70,7 @@ namespace DbAPI.Controllers {
                 _logger.LogError($"TransportVehicle:UpdateAsync({id}): {ex.Message}");
                 return BadRequest($"Ошибка сохранения: {ex.Message}");
             }
-            
+
             _logger.LogInformation($"Запрос \"TransportVehicle.Update({id})\" пользователя \"{User.Identity.Name}\" успешен");
             return NoContent();
         }

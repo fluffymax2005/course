@@ -38,7 +38,7 @@ namespace DbAPI.Controllers {
         [HttpGet("test")]
         public async Task<IActionResult> Test() {
             _logger.LogInformation("CredentialController:Test()");
-            return Ok(await _repository.GetAllAsync());
+            return Ok($"Подключение к БД успешно установлено: {DateTime.Now}");
         }
 
         [HttpPost("login")]
@@ -81,7 +81,7 @@ namespace DbAPI.Controllers {
 
                 var token = _jwtService.GenerateToken(credential, role);
 
-                
+
                 var response = new LoginResponse {
                     UserId = credential.Id,
                     Username = credential.Username,
@@ -139,8 +139,10 @@ namespace DbAPI.Controllers {
             if (credential != null) {
                 _logger.LogError($"Пользователь с именем \"{request.UserName}\" и адресом электронной почты " +
                     $"\"{request.Email}\" уже существует");
-                return BadRequest(new { message = $"Пользователь с именем \"{request.UserName}\" и адресом электронной почты " +
-                    $"\"{request.Email}\" уже существует" });
+                return BadRequest(new {
+                    message = $"Пользователь с именем \"{request.UserName}\" и адресом электронной почты " +
+                    $"\"{request.Email}\" уже существует"
+                });
             }
 
             // Check whether password is strong

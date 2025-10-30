@@ -15,3 +15,7 @@ DbAPI/logs/
 DbAPI/DbAPI.csproj
 DbAPI/DbAPI.csproj.user
 DbAPI/appsettings.json
+
+DockerCompose/.vs
+DockerCompose/bin
+DockerCompose/obj

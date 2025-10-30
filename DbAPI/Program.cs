@@ -1,5 +1,5 @@
-﻿//#define DOCKER
-#define USE_SWAGGER
+﻿#define DOCKER
+//#define SWAGGER
 
 using DbAPI.Contexts;
 using DbAPI.Interfaces;
@@ -82,17 +82,28 @@ builder.Services.AddRateLimiter(options => {
 });
 
 // Register OrderDbContext and CredentialDbContext + reposes
-builder.Services.AddDbContext<OrderDbContext>(options =>
+
 #if DOCKER
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnection")));
-#else
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDataConnection")));
+var dbHostData = Environment.GetEnvironmentVariable("DB_HOST1");
+var dbHostUserData = Environment.GetEnvironmentVariable("DB_HOST2");
+
+var dbDataName = Environment.GetEnvironmentVariable("DB_NAME1");
+var dbUserDataName = Environment.GetEnvironmentVariable("DB_NAME2");
+
+var saPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD");
+
+var connectionDataString = $"Data Source={dbHostData};Initial Catalog={dbDataName};User Id=sa;Password={saPassword};TrustServerCertificate=true";
+var connectionUserDataString = $"Data Source={dbHostUserData};Initial Catalog={dbUserDataName};User Id=sa;Password={saPassword};TrustServerCertificate=true";
+
+builder.Services.AddDbContext<OrderDbContext>(options => options.UseSqlServer(connectionDataString));
+builder.Services.AddDbContext<CredentialDbContext>(options => options.UseSqlServer(connectionUserDataString));
 #endif
 
+#if SWAGGER
 builder.Services.AddDbContext<CredentialDbContext>(options =>
-#if DOCKER
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnection")));
-#else
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDataConnection")));
+
+builder.Services.AddDbContext<CredentialDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultCredentialConnection")));
 #endif
 
@@ -134,15 +145,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // CORS policy
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowFrontend", policy => {
-        policy.WithOrigins(
-                "http://127.0.0.1:5500", 
-                "http://localhost:5500",
-                "http://localhost:5091",
-                "http://localhost:8081"
-            )
+        policy.AllowAnyOrigin()
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowAnyMethod();
     });
 });
 
@@ -153,10 +158,10 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
-    #if USE_SWAGGER
+#if USE_SWAGGER
         app.UseSwagger();    
         app.UseSwaggerUI();
-    #endif
+#endif
 }
 
 app.UseRouting();

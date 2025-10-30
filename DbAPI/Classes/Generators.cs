@@ -1,5 +1,4 @@
-﻿using DbAPI.Interfaces;
-using DbAPI.Models;
+﻿using DbAPI.Models;
 using static DbAPI.Interfaces.IInformation;
 
 namespace DbAPI.Classes {
@@ -272,8 +271,8 @@ namespace DbAPI.Classes {
             UserRights[] rights = [UserRights.Admin, UserRights.Basic, UserRights.Editor, UserRights.Director];
             bool[] canPost = { true, false, true, false };
             bool[] canUpdate = { true, false, true, false };
-            bool[] canDelete = {true, false, false, false };
-            
+            bool[] canDelete = { true, false, false, false };
+
             return Enumerable.Range(1, 4).Select(i => {
                 return new Role {
                     Id = i,

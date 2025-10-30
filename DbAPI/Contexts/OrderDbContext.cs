@@ -13,7 +13,7 @@ namespace DbAPI.Contexts {
         public DbSet<Customer> Customers { get; set; }
 
         public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options) {
-           Database.EnsureCreated();
+            Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
