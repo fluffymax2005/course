@@ -27,20 +27,12 @@ export class ApiService {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/${path}`, config);
+            const response = await fetch(`${BASE_API_URL}/${path}`, config);
             
             if (!response.ok) {
                 // Пытаемся получить детальную информацию об ошибке из response
-                let errorMessage = `HTTP error! status: ${response.status}`;
-                let errorData = null;
-                
-                try {
-                    errorData = await response.json();
-                    errorMessage = errorData.message || errorMessage;
-                } catch {
-                    // Если не удалось распарсить JSON, используем стандартное сообщение
-                    errorMessage = await response.text() || errorMessage;
-                }
+                let errorMessage = `HTTP ошибка! Статус: ${response.status}`;
+                let errorData = await response.json();
                 
                 throw new ApiError(errorMessage, response.status, errorData);
             }
@@ -52,14 +44,8 @@ export class ApiService {
             if (error instanceof ApiError) {
                 throw error;
             }
-            
-            // Если это сетевая ошибка или другая ошибка fetch
-            throw new ApiError(
-                error.message || 'Network error', 
-                0, 
-                null, 
-                error
-            );
+
+            throw error;
         }
     }
 

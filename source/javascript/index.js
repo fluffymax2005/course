@@ -1,4 +1,5 @@
-import { deleteCookie } from "./cookie.js";
+import { deleteCookie, getToken } from "./cookie.js";
+import { ApiService} from "./api.js";
 
 export {messageBoxShowFromLeft, messageBoxShowFromRight};
 
@@ -188,3 +189,17 @@ function recalculateToastPositions() {
     // Обновляем глобальный offset
     MESSAGE_BOX_HEIGHT_OFFSET = currentOffset;
 }
+
+// При загрузке формы проверяется актуальность сессии
+document.addEventListener('DOMContentLoaded', function() {
+    // При загрузке главной формы проверяем актуальность сохраненного токена
+    const token = getToken();
+    console.log(token);
+    try {
+        ApiService.get(`Credential/validate_token?token=${token}`);
+    } catch (error) {
+        // Токен отсутствует или просрочен
+        // Проброс пользователя в окно авторизации
+        window.location.href = './authorize-form/authorize.html';
+    }
+});
