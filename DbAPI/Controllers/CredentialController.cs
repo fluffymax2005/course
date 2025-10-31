@@ -81,7 +81,6 @@ namespace DbAPI.Controllers {
 
                 var token = _jwtService.GenerateToken(credential, role);
 
-
                 var response = new LoginResponse {
                     UserId = credential.Id,
                     Username = credential.Username,
@@ -265,15 +264,26 @@ namespace DbAPI.Controllers {
             }
         }
 
-        // GET: api/{entity}/validate-token
-        [HttpGet("validate-token")]
-        public async Task<IActionResult> ValidateTokenAsync([FromQuery] string token) {
+        // GET: api/{entity}/validate-recovery-token?token={token}
+        [HttpGet("validate-recovery-token")]
+        public async Task<IActionResult> ValidateRecoveryTokenAsync([FromQuery] string token) {
             try {
                 var userId = await _passwordRecoveryService.ValidateRecoveryToken(token);
                 return Ok(new { valid = userId != null });
             } catch (Exception ex) {
-                _logger.LogError($"Ошибка при проверке токена: {ex.Message}");
+                _logger.LogError($"Ошибка при проверке токена восстановления: {ex.Message}");
                 return Ok(new { valid = false });
+            }
+        }
+
+        [HttpGet("validate-token")]
+        public async Task<IActionResult> ValidateTokenAsync([FromQuery] string token) {
+            try {
+                var result = _jwtService.ValidateToken(token);
+                return Ok(new { message = "Token is valid", });
+            } catch (Exception ex) {
+                _logger.LogError($"ошибка при проверке токена: {ex.Message}");
+                return BadRequest(new { message = ex.Message });
             }
         }
 

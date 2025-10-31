@@ -89,9 +89,12 @@ namespace DbAPI.Services {
         }
 
         private string GetRoleName(Role role) {
-            if (role.CanDelete) return "Admin";
-            if (role.CanPost || role.CanUpdate) return "Editor";
-            return "Basic";
+            return role.Id switch {
+                0 => "Basic",
+                1 => "Editor",
+                2 => "Admin",
+                3 => "Director"
+            };
         }
     }
 }

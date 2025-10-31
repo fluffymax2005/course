@@ -1,5 +1,5 @@
-﻿#define DOCKER
-//#define SWAGGER
+﻿//#define DOCKER
+#define SWAGGER
 
 using DbAPI.Contexts;
 using DbAPI.Interfaces;
@@ -100,7 +100,7 @@ builder.Services.AddDbContext<CredentialDbContext>(options => options.UseSqlServ
 #endif
 
 #if SWAGGER
-builder.Services.AddDbContext<CredentialDbContext>(options =>
+builder.Services.AddDbContext<OrderDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDataConnection")));
 
 builder.Services.AddDbContext<CredentialDbContext>(options =>
@@ -158,7 +158,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
-#if USE_SWAGGER
+#if SWAGGER
         app.UseSwagger();    
         app.UseSwaggerUI();
 #endif
