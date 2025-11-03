@@ -21,7 +21,7 @@ public abstract class BaseCrudController<TEntity, TKey> : ControllerBase {
 
     // POST: api/{entity}/
     [HttpPost]
-    public abstract Task<ActionResult<TEntity>> CreateAsync([FromBody] TEntity entity);
+    public abstract Task<IActionResult> CreateAsync([FromBody] TEntity entity);
 
     // PUT: api/{entity}/{id}
     [HttpPut("{id}")]

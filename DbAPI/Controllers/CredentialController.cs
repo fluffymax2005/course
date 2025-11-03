@@ -6,6 +6,7 @@ using DbAPI.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using static DbAPI.Interfaces.IInformation;
 using TypeId = int;
@@ -14,21 +15,23 @@ namespace DbAPI.Controllers {
 
     [ApiController]
     [Route("api/[controller]")]
-    public class CredentialController : BaseCrudController<Credential, TypeId> {
+    public class CredentialController : BaseCrudController<Credential, TypeId>, ITableState {
         private readonly RoleRepository _roleRepository;
         private readonly IJwtService _jwtService;
         private readonly ILogger<CredentialController> _logger;
         private readonly IEmailService _emailService;
         private readonly IPasswordRecoveryService _passwordRecoveryService;
+        private readonly IMemoryCache _cache;
 
         public CredentialController(CredentialRepository credentialRepository, RoleRepository roleRepository,
             IJwtService jwtService, ILogger<CredentialController> logger, IEmailService emailService,
-            IPasswordRecoveryService passwordRecoveryService) : base(credentialRepository) {
+            IPasswordRecoveryService passwordRecoveryService, IMemoryCache cache) : base(credentialRepository) {
             _roleRepository = roleRepository;
             _jwtService = jwtService;
             _logger = logger;
             _emailService = emailService;
             _passwordRecoveryService = passwordRecoveryService;
+            _cache = cache;
         }
 
         protected int GetEntityId(Credential entity) {
@@ -278,9 +281,9 @@ namespace DbAPI.Controllers {
 
         [HttpGet("validate-token")]
         [AllowAnonymous]
-        public IActionResult ValidateToken([FromHeader] string authorization) {
+        public IActionResult ValidateToken([FromQuery] string token) {
             try {
-                var result = _jwtService.ValidateToken(authorization);
+                var result = _jwtService.ValidateToken(token);
                 return Ok(new { message = "Token is valid", });
             } catch (Exception ex) {
                 _logger.LogError($"Ошибка при проверке токена: {ex.Message}");
@@ -314,7 +317,7 @@ namespace DbAPI.Controllers {
         // POST: api/{entity}/
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public override async Task<ActionResult<Credential>> CreateAsync([FromBody] Credential entity) {
+        public override async Task<IActionResult> CreateAsync([FromBody] Credential entity) {
             try {
                 await _repository.AddAsync(entity);
                 _logger.LogInformation($"Администратор {User.Identity.Name} создал новую учетную запись с ID = {entity.Id}");
@@ -324,7 +327,8 @@ namespace DbAPI.Controllers {
                 return BadRequest(new { message = ex.Message });
             }
 
-            return CreatedAtAction(nameof(GetAsync), new { id = GetEntityId(entity) }, entity);
+
+            return Ok(new { hash = UpdateTableHash() });
         }
 
         // PUT: api/{entity}/{id}
@@ -347,7 +351,7 @@ namespace DbAPI.Controllers {
 
             _logger.LogInformation($"Администратор {User.Identity.Name} обновил учетную запись с ID = {entity.Id}");
             await _repository.UpdateAsync(entity);
-            return NoContent();
+            return Ok(new { hash = UpdateTableHash() });
         }
 
         // DELETE: api/{entity}/{id}
@@ -363,7 +367,7 @@ namespace DbAPI.Controllers {
 
             _logger.LogInformation($"Администратор {User.Identity.Name} удалил учетную запись с ID = {id}");
             await _repository.SoftDeleteAsync(id);
-            return NoContent();
+            return Ok(new { hash = UpdateTableHash() });
         }
 
         // Update: api/{entity}/{id}/recover
@@ -379,12 +383,54 @@ namespace DbAPI.Controllers {
                 await _repository.UpdateAsync(entity);
 
                 _logger.LogInformation($"Администратор {User.Identity.Name} восстановил учетную запись с ID = {id}");
-                return Ok("Восстановление прошло успешно");
+                return Ok( new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
             }
 
             _logger.LogError($"Администратору {User.Identity.Name} не удалось восстановить учетную запись с ID = {id}. " +
                     $"Причина: сущность не найдена");
             return NotFound(new { message = $"Сущность с ID = {id} не найдена или уже существует" });
         }
+
+        // api/{entity}/generate-table-state-hash
+        [HttpGet("generate-table-state-hash")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult GenerateTableStateHash() {
+            _logger.LogInformation($"Перегенерация хэша актульности таблицы \"Credential\"");
+
+            return Ok(new { hash = UpdateTableHash() });
+        }
+
+        // api/{entity}/verify-table-state-hash
+        [HttpPost("verify-table-state-hash")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult VerifyTableStateHash([FromBody] string hash) {
+            var cacheKey = "Credential";
+            var cacheHash = _cache.Get<string>(cacheKey);
+
+            // Создаем новый хэш для сравнения
+            var newHash = Hasher.CreateTableHash();
+
+            if (cacheHash == null) {
+                _cache.Set(cacheKey, newHash);
+                return Ok(new { result = "0", hash = newHash });
+            } else {
+                var verifyResult = cacheHash.Equals(hash);
+                return Ok(new {
+                    result = verifyResult ? "1" : "0",
+                    hash = verifyResult ? hash : newHash,
+                });
+            }
+        }
+
+        public string UpdateTableHash() {
+            var cacheKey = "Credential";
+            var hash = Hasher.CreateTableHash();
+
+            _cache.Remove(cacheKey); // remove old hash
+            _cache.Set(cacheKey, hash); // add new hash
+
+            return hash;
+        }
+
     }
 }

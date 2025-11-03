@@ -2,6 +2,7 @@
 #define SWAGGER
 
 using DbAPI.Contexts;
+using DbAPI.Controllers;
 using DbAPI.Interfaces;
 using DbAPI.Models;
 using DbAPI.Repositories;

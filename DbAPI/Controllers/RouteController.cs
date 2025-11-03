@@ -1,18 +1,22 @@
-﻿using DbAPI.Interfaces;
+﻿using DbAPI.Classes;
+using DbAPI.Interfaces;
 using DbAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Caching.Memory;
 using TypeId = int;
 
 namespace DbAPI.Controllers {
     [ApiController]
     [Route("api/[controller]")]
-    public class RouteController : BaseCrudController<Models.Route, TypeId> {
+    public class RouteController : BaseCrudController<Models.Route, TypeId>, ITableState {
         private readonly ILogger<RouteController> _logger;
+        private readonly IMemoryCache _cache;
 
-        public RouteController(IRepository<Models.Route, int> repository, ILogger<RouteController> logger) : base(repository) {
+        public RouteController(IRepository<Models.Route, int> repository, ILogger<RouteController> logger,
+            IMemoryCache cache) : base(repository) {
             _logger = logger;
+            _cache = cache;
         }
 
         protected int GetEntityId(Models.Route entity) {
@@ -39,7 +43,7 @@ namespace DbAPI.Controllers {
         // POST: api/{entity}/
         [HttpPost]
         [Authorize(Roles = "Editor, Admin")]
-        public override async Task<ActionResult<Models.Route>> CreateAsync([FromBody] Models.Route entity) {
+        public override async Task<IActionResult> CreateAsync([FromBody] Models.Route entity) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Route.Create()\"");
             try {
                 await _repository.AddAsync(entity);
@@ -49,7 +53,7 @@ namespace DbAPI.Controllers {
             }
 
             _logger.LogInformation($"Запрос \"Route.Create()\" пользователя \"{User.Identity.Name}\" успешен");
-            return CreatedAtAction(nameof(GetAsync), new { id = GetEntityId(entity) }, entity);
+            return Ok(new { hash = UpdateTableHash() });
         }
 
         // PUT: api/{entity}/{id}
@@ -65,7 +69,7 @@ namespace DbAPI.Controllers {
 
             await _repository.UpdateAsync(entity);
             _logger.LogInformation($"Запрос \"Route.Update({id})\" пользователя \"{User.Identity.Name}\" успешен");
-            return NoContent();
+            return Ok(new { hash = UpdateTableHash() });
         }
 
         // DELETE: api/{entity}/{id}
@@ -80,7 +84,7 @@ namespace DbAPI.Controllers {
             }
             await _repository.SoftDeleteAsync(id);
             _logger.LogInformation($"Запрос \"Route.Delete({id})\" пользователя \"{User.Identity.Name}\" успешен");
-            return NoContent();
+            return Ok(new { hash = UpdateTableHash() });
         }
 
         // Update: api/{entity}/{id}/recover
@@ -95,12 +99,53 @@ namespace DbAPI.Controllers {
                 await _repository.UpdateAsync(entity);
 
                 _logger.LogInformation($"Запрос \"Route.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" успешен");
-                return Ok("Восстановление прошло успешно");
+                return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
             }
 
             _logger.LogError($"Запрос \"Route.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: сущность не найдена или уже существует");
             return NotFound(new { message = $"Сущность с ID = {id} не найдена или уже существует" });
+        }
+
+        // api/{entity}/generate-table-state-hash
+        [HttpGet("generate-table-state-hash")]
+        [Authorize]
+        public IActionResult GenerateTableStateHash() {
+            _logger.LogInformation($"Перегенерация хэша актульности таблицы \"Credential\"");
+
+            return Ok(new { hash = UpdateTableHash() });
+        }
+
+        // api/{entity}/verify-table-state-hash
+        [HttpPost("verify-table-state-hash")]
+        [Authorize]
+        public IActionResult VerifyTableStateHash([FromBody] string hash) {
+            var cacheKey = "Route";
+            var cacheHash = _cache.Get<string>(cacheKey);
+
+            // Создаем новый хэш для сравнения
+            var newHash = Hasher.CreateTableHash();
+
+            if (cacheHash == null) {
+                _cache.Set(cacheKey, newHash);
+                return Ok(new { result = "0", hash = newHash });
+            } else {
+                var verifyResult = cacheHash.Equals(hash);
+                return Ok(new {
+                    result = verifyResult ? "1" : "0",
+                    hash = verifyResult ? hash : newHash,
+                });
+            }
+        }
+
+        public string UpdateTableHash() {
+            var cacheKey = "Route";
+            var hash = Hasher.CreateTableHash();
+
+            _cache.Remove(cacheKey); // remove old hash
+            _cache.Set(cacheKey, hash); // add new hash
+
+            return hash;
         }
     }
 }
