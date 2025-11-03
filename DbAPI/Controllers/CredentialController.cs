@@ -277,12 +277,13 @@ namespace DbAPI.Controllers {
         }
 
         [HttpGet("validate-token")]
-        public async Task<IActionResult> ValidateTokenAsync([FromQuery] string token) {
+        [AllowAnonymous]
+        public IActionResult ValidateToken([FromHeader] string authorization) {
             try {
-                var result = _jwtService.ValidateToken(token);
+                var result = _jwtService.ValidateToken(authorization);
                 return Ok(new { message = "Token is valid", });
             } catch (Exception ex) {
-                _logger.LogError($"ошибка при проверке токена: {ex.Message}");
+                _logger.LogError($"Ошибка при проверке токена: {ex.Message}");
                 return BadRequest(new { message = ex.Message });
             }
         }
