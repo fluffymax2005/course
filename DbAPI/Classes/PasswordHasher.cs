@@ -8,7 +8,7 @@ namespace DbAPI.Classes {
         // Hash size (bytes)
         private const int HashSize = 32;
 
-        // Iterations coount for PBKDF2
+        // Iterations count for PBKDF2
         private const int Iterations = 10000;
 
         /// <summary>
