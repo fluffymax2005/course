@@ -66,7 +66,7 @@ namespace DbAPI.Controllers {
 
 
                 // Password verification
-                if (!PasswordHasher.VerifyPassword(request.Password, credential.Password)) {
+                if (!Hasher.VerifyPassword(request.Password, credential.Password)) {
                     _logger.LogError($"Введен неверный логин или пароль пользователя \"{request.Login}\"");
                     return Unauthorized(new { message = "Введен неверный логин или пароль" });
                 }
@@ -145,7 +145,7 @@ namespace DbAPI.Controllers {
             }
 
             // Check whether password is strong
-            if (!PasswordHasher.IsPasswordStrong(request.Password)) {
+            if (!Hasher.IsPasswordStrong(request.Password)) {
                 _logger.LogError("Введенный пароль ненадёжен");
                 return BadRequest(new { message = "Введенный пароль ненадёжен" });
             }
@@ -169,7 +169,7 @@ namespace DbAPI.Controllers {
             await _credentialRepository.AddAsync(new Credential {
                 RoleId = role.Id,
                 Username = request.UserName,
-                Password = PasswordHasher.HashPassword(request.Password),
+                Password = Hasher.HashPassword(request.Password),
                 Email = request.Email,
                 WhoAdded = request.WhoRegister.IsNullOrEmpty() ? request.UserName : request.WhoRegister,
                 WhenAdded = DateTime.Now,
@@ -230,7 +230,7 @@ namespace DbAPI.Controllers {
                     return BadRequest(new { message = "Пароли не совпадают" });
                 }
 
-                if (!PasswordHasher.IsPasswordStrong(request.NewPassword)) {
+                if (!Hasher.IsPasswordStrong(request.NewPassword)) {
                     return BadRequest(new { message = "Пароль ненадежен" });
                 }
 
@@ -247,7 +247,7 @@ namespace DbAPI.Controllers {
                 }
 
                 // Update password
-                credential.Password = PasswordHasher.HashPassword(request.NewPassword);
+                credential.Password = Hasher.HashPassword(request.NewPassword);
                 credential.WhenChanged = DateTime.Now;
 
                 await _credentialRepository.UpdateAsync(credential);

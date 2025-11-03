@@ -293,7 +293,7 @@ namespace DbAPI.Classes {
                 return new Credential {
                     Id = i,
                     Username = i == 1 ? "admin" : "basic",
-                    Password = PasswordHasher.HashPassword("JcGDN9ST5KEG!"),
+                    Password = Hasher.HashPassword("JcGDN9ST5KEG!"),
                     Email = $"santech_montage@mail.ru",
                     RoleId = i,
                     WhoAdded = "system",

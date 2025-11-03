@@ -68,7 +68,7 @@ namespace DbAPI.Repositories {
                 throw new ArgumentNullException("\"Who added\" должен быть непустой строкой");
             }
 
-            if (!PasswordHasher.IsPasswordStrong(password))
+            if (!Hasher.IsPasswordStrong(password))
                 throw new ArgumentException($"Введенный пароль недопустим.{Environment.NewLine}" +
                     $"Пароль должен содержать как минимум:{Environment.NewLine}" +
                     $"1. Одну латинскую букву нижнего и верхнего регистра.{Environment.NewLine}" +

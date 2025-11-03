@@ -1,15 +1,43 @@
 ﻿using System.Security.Cryptography;
+using System.Text;
 
 namespace DbAPI.Classes {
-    public static class PasswordHasher {
+    public static class Hasher {
         // Salt size (bytes)
-        private const int SaltSize = 16;
+        private static readonly int SaltSize = 16;
 
         // Hash size (bytes)
-        private const int HashSize = 32;
+        private static readonly int HashSize = 32;
 
         // Iterations count for PBKDF2
-        private const int Iterations = 10000;
+        private static readonly int Iterations = 10000;
+
+        // Secret size (bytes)
+        private static readonly int SecretSize = 64;
+
+        /// <summary>
+        /// Create current table hash
+        /// </summary>
+        public static string CreateTableHash() {
+            // Generate random salt
+            byte[] salt = new byte[SaltSize];
+            byte[] secret = new byte[SecretSize];
+            using (var rng = RandomNumberGenerator.Create()) {
+                rng.GetBytes(salt);
+                rng.GetBytes(secret);
+            }
+
+            // Make password hash
+            byte[] hash = CreateHash(Encoding.UTF8.GetString(secret, 0, secret.Length), salt);
+
+            // Join salt and hash
+            byte[] hashBytes = new byte[SaltSize + SecretSize];
+            Array.Copy(salt, 0, hashBytes, 0, SaltSize);
+            Array.Copy(hash, 0, hashBytes, SaltSize, SecretSize);
+
+            // Convert into base64 string
+            return Convert.ToBase64String(hashBytes);
+        }
 
         /// <summary>
         /// Make password hash using random salt
@@ -61,11 +89,11 @@ namespace DbAPI.Classes {
         }
 
         /// <summary>
-        /// Make hash from given password using PBKDF2
+        /// Make hash from given secret using PBKDF2
         /// </summary>
-        private static byte[] CreateHash(string password, byte[] salt) {
+        private static byte[] CreateHash(string secret, byte[] salt) {
             using (var pbkdf2 = new Rfc2898DeriveBytes(
-                password: password,
+                password: secret,
                 salt: salt,
                 iterations: Iterations,
                 hashAlgorithm: HashAlgorithmName.SHA256)) {
