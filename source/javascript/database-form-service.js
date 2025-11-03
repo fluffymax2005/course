@@ -39,21 +39,6 @@ export function changeCurrentEditingRecord(value) {
 }
 
 export async function fetchTableData(useCache = true) {
-    // Текущая сессия актульна
-    const tokenExpireTime = getTokenExpireTime();
-    if (tokenExpireTime === undefined) {
-        console.error('Не удалось извлечь срок жизни токена, либо пользователь вышел из системы самостоятельно');
-        messageBoxShow('Авторизуйтесь в системе', 'red', '0', '44%', 'translateY(50px)');
-        return;
-    }
-
-    const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
-    if (tokenExpireDateTime < new Date()) {
-        console.error('Время сессии истекло');
-        messageBoxShow('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', '0', '37%', 'translateY(50px)');
-        return;
-    }
-
     // Выпадающий список
     const tableSelect = document.getElementById('tableSelect');
     const tableName = tableSelect.options[tableSelect.selectedIndex].text;

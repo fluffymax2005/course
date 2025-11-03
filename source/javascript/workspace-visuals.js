@@ -29,15 +29,6 @@ window.showSection = async function showSection(sectionName = null, isLoadListen
 
         // Получаем из куки роль пользователя для ограничения доступа и его срок жизни
         const userRights = getUserRights();
-        const tokenExpireTime = getTokenExpireTime(); // время жизни токена из куки
-        const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
-
-        // Проверяем жизнь токена
-        if (tokenExpireDateTime < new Date()) {
-            console.error('Время сессии истекло');
-            messageBoxShowFromLeft('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', true, rightPos, 'translateY(50px)');
-            return;
-        }
 
         // Ограничение на переход в области для пользователя
         if ((userRights === 0 || userRights === 1) && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
@@ -128,24 +119,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const registerItem = this.document.getElementById('registerItem');
         const quitItem = this.document.getElementById('quitItem');
         
-        const tokenExpireTime = getCookie('tokenExpireTime'); // время жизни токена из куки
-        if (tokenExpireTime === undefined) {
-            quitItem.style.display = 'none';
-            return;
-        }
-
-        const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
-        
-        if (tokenExpireDateTime < new Date()) { // Если токен просрочен то автоматически выходим из системы
-            authorizeItem.style.display = 'block';
-            registerItem.style.display = 'block';
-            quitItem.style.display = 'none';
-        } else {
-            authorizeItem.style.display = 'none';
-            registerItem.style.display = 'none';
-            quitItem.style.display = 'block';
-        }
-
+        authorizeItem.style.display = 'none';
+        registerItem.style.display = 'none';
+        quitItem.style.display = 'block';
     });
 });
 
