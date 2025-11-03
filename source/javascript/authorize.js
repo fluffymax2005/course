@@ -2,7 +2,6 @@
 
 class AuthService {
     static API_BASE_URL = 'http://localhost:5091/api/Credential';
-    static hoursTokenExpiresAt = 1;
 
     static async login() {
         const loginInput = document.getElementById('loginAuthorize');
@@ -21,8 +20,6 @@ class AuthService {
             return;
         }
 
-        console.log("Отправка запроса:", `${this.API_BASE_URL}/login`);
-
         try {
             const response = await fetch(`${this.API_BASE_URL}/login`, {
                 method: 'POST',
@@ -36,7 +33,6 @@ class AuthService {
                 })
             });
 
-            console.log("Код ответа:", response.status);
             
             if (!response.ok) {
                 try {
@@ -55,38 +51,23 @@ class AuthService {
             const data = await response.json();
 
             this.setTextMessage(outputText, false, 'Авторизация прошла успешно');
-            console.log("Авторизация прошла успешно: ", data);
 
-            // Удаление старых куки
-            this.deleteCookie('token');
-            this.deleteCookie('tokenExpireTime');
-            
-            // Запись токена в куки
-            const tokenExpireTime = data.tokenExpireTime;
-            const token = data.token;
-            document.cookie = "token=" + token + ";expires=" + tokenExpireTime + ";path=/";
-            document.cookie = "tokenExpireTime=" + tokenExpireTime + ";expire=" + tokenExpireTime + ";path=/";
+            // Замена старых куки на новые
+            const cookies = ['token, tokenExpireTime, userRights, userName'];
+            const cookiesValues = [data.token, data.tokenExpireTime, data.userRights, data.username];
 
-            // Запись прав доступа и роль пользователя в куки
-            const userRights = data.userRights;
-            document.cookie = "userRights=" + userRights + ";expires=" + tokenExpireTime + ";path=/";
-
-            // Запись имени пользователя в куки
-            const username = data.username;
-            document.cookie = "userName=" + username + ";expires=" + tokenExpireTime + ";path=/";
-
-
-            console.log(document.cookie);
-
+            cookies.forEach((cookie, index) => {
+                localStorage.removeItem(cookie);
+                localStorage.setItem(cookie, cookiesValues[index]);
+            })
         } catch (error) {
-            console.error("Ошибка авторизации:", error);
             this.setTextMessage(outputText, true, 'Внутреняя ошибка. Попробуйте позже');
             return;
         }
 
         // Успешный переход в рабочую область
         setTimeout(() => {
-            window.location.href = '/workspace-form/index.html';
+            window.location.href = '../../workspace-form/index.html';
         }, 1000);
     }
 
@@ -100,11 +81,6 @@ class AuthService {
         const email = emailInput.value.toString();
         const password = passwordInput.value.toString();
         const confirmPassword = confirmPasswordInput.value.toString();
-
-        console.log(login);
-        console.log(email);
-        console.log(password);
-        console.log(confirmPassword);
 
         var outputText = document.getElementById('registerMessage');
         if (login.trim().length === 0) {
@@ -124,8 +100,6 @@ class AuthService {
             return;
         }
 
-        console.log("Отправка запроса:", `${this.API_BASE_URL}/register`);
-
         try {
             const response = await fetch(`${this.API_BASE_URL}/register`, {
                 method: 'POST',
@@ -142,11 +116,8 @@ class AuthService {
                 })
             });
 
-            console.log('Код ответа', response.status);
-
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error('Ошибка регистрации: ', response.status, errorData);
 
                 let errorMessage = errorData.message;
                 this.setTextMessage(outputText, true, errorMessage);
@@ -159,8 +130,6 @@ class AuthService {
             console.error('Ошибка регистрации', error);
             this.setTextMessage(outputText, true, 'Внутренняя ошибка. Попробуйте позже');
         }
-
-        console.log('Регистрация прошла успешно');
     }
 
     static async recover() {
@@ -229,34 +198,4 @@ class AuthService {
             }, 450);
         }
     }
-
-    static setCookie(name, value, options = {}) {
-    options = {
-        path: '/',
-        // при необходимости добавьте другие значения по умолчанию
-        ...options
-    };
-
-    if (options.expires instanceof Date) {
-        options.expires = options.expires.toUTCString();
-    }
-
-    let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
-
-    for (let optionKey in options) {
-        updatedCookie += "; " + optionKey;
-        let optionValue = options[optionKey];
-        if (optionValue !== true) {
-            updatedCookie += "=" + optionValue;
-        }
-    }
-
-    document.cookie = updatedCookie;
-}
-    
-    static deleteCookie(name) {
-    this.setCookie(name, "", {
-        'max-age': -1
-    })
-}
 }
