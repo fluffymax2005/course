@@ -12,7 +12,7 @@ export class ApiService {
      * @returns {Promise<any>} - результат запроса
      * @throws {Error} - исключение в случае ошибки
      */
-    static async apiCall(path, methodType = 'GET', requestBody = null, additionalHeaders = {}) {
+    static async apiCall(path, methodType = 'GET', requestBody = null, additionalHeaders = {}, isCheckingAuthorization = false) {
         const config = {
             method: methodType,
             headers: {
@@ -28,6 +28,13 @@ export class ApiService {
 
         try {
             const response = await fetch(`${BASE_API_URL}/${path}`, config);
+
+            console.log(response);
+
+            if (isCheckingAuthorization && !response.ok && response.status === 401) {
+                let errorMessage = `HTTP ошибка! Статус: ${response.status}`;
+                throw new ApiError(errorMessage, response.status, null);
+            }
             
             if (!response.ok) {
                 // Пытаемся получить детальную информацию об ошибке из response
@@ -50,8 +57,8 @@ export class ApiService {
     }
 
     // Вспомогательные методы для конкретных HTTP методов
-    static async get(path, additionalHeaders = {}) {
-        return this.apiCall(path, 'GET', null, additionalHeaders);
+    static async get(path, additionalHeaders = {}, isCheckingAuthorization = false) {
+        return this.apiCall(path, 'GET', null, additionalHeaders, isCheckingAuthorization);
     }
 
     static async post(path, body, additionalHeaders = {}) {
