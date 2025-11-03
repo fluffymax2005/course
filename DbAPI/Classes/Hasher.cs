@@ -27,13 +27,13 @@ namespace DbAPI.Classes {
                 rng.GetBytes(secret);
             }
 
-            // Make password hash
-            byte[] hash = CreateHash(Encoding.UTF8.GetString(secret, 0, secret.Length), salt);
+            // Make secret hash
+            byte[] hash = CreateHash(Encoding.UTF8.GetString(secret), salt);
 
             // Join salt and hash
-            byte[] hashBytes = new byte[SaltSize + SecretSize];
+            byte[] hashBytes = new byte[SaltSize + HashSize];
             Array.Copy(salt, 0, hashBytes, 0, SaltSize);
-            Array.Copy(hash, 0, hashBytes, SaltSize, SecretSize);
+            Array.Copy(hash, 0, hashBytes, SaltSize, HashSize);
 
             // Convert into base64 string
             return Convert.ToBase64String(hashBytes);
