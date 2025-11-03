@@ -191,15 +191,19 @@ function recalculateToastPositions() {
 }
 
 // При загрузке формы проверяется актуальность сессии
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // При загрузке главной формы проверяем актуальность сохраненного токена
     const token = getToken();
-    console.log(token);
     try {
-        ApiService.get(`Credential/validate_token?token=${token}`);
+        await ApiService.get(
+            `Credential/validate-token`, 
+        {
+            'Authorization': `${token}`
+        }, 
+        true);
     } catch (error) {
         // Токен отсутствует или просрочен
         // Проброс пользователя в окно авторизации
-        window.location.href = './authorize-form/authorize.html';
+        window.location.href = '../../authorize-form/authorize.html';
     }
 });

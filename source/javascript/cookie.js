@@ -3,45 +3,20 @@
 export {getCookie, setCookie, deleteCookie, getUserRights, getToken, getTokenExpireTime, getUserName};
 
 function getCookie(name) {
-    let matches = document.cookie.match(new RegExp(
-        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-        ));
-    return matches ? decodeURIComponent(matches[1]) : undefined;
+    return localStorage.getItem(name);
 }
 
 function setCookie(name, value, options = {}) {
-    options = {
-        path: '/',
-        // при необходимости добавьте другие значения по умолчанию
-        ...options
-    };
-
-    if (options.expires instanceof Date) {
-        options.expires = options.expires.toUTCString();
-    }
-
-    let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
-
-    for (let optionKey in options) {
-        updatedCookie += "; " + optionKey;
-        let optionValue = options[optionKey];
-        if (optionValue !== true) {
-            updatedCookie += "=" + optionValue;
-        }
-    }
-
-    document.cookie = updatedCookie;
+    localStorage.setItem(name, value);
 }
 
 function deleteCookie(name) {
-    setCookie(name, "", {
-        'max-age': -1
-    })
+    localStorage.removeItem(name);
 }
 
 
 function getUserRights() {
-    return getCookie('userRights');
+    return parseInt(getCookie('userRights'));
 }
 
 function getToken() {
