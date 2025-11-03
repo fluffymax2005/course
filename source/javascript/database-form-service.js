@@ -6,21 +6,17 @@ import { isFieldRequired, getMinValue, getMaxValue } from './database-table-serv
 import { hideTableInterface, displayTableData, fieldNameMapping } from "./database-visuals.js";
 import { checkDatabaseAccess, getCurrentPageData } from "./database-general-service.js";
 
-export {hideTableInterface, checkDatabaseAccess, setupPagination, fetchTableData, populateEditForm, changeCurrentSearchId, 
-    changeCurrentDataPage, detectFieldType, changeCurrentEditingRecord};
+export const dbCache = new DatabaseCache();
 
-export {currentEditingRecord, currentSearchId, allTableData, currentDataPage, DATA_PER_PAGE, tableMap, dbCache};
-
-const dbCache = new DatabaseCache();
-
-let currentSearchId = null;
-let currentEditingRecord = null;
-let allTableData = []; // данные всех таблиц
-let currentDataPage = 1;
-const DATA_PER_PAGE = 20; // Число строк на каждой странице - пагинация
+export let currentSearchId = null;
+export let currentEditingRecord = null;
+export let allTableData = []; // данные всех таблиц
+export let currentDataPage = 1;
+export const DATA_PER_PAGE = 20; // Число строк на каждой странице - пагинация
 
 // Словарь для доступа к API
-var tableMap = new Map();
+export var tableMap = new Map();
+
 tableMap.set('Заказы', 'Order');
 tableMap.set('Заказчики', 'Customer');
 tableMap.set('Маршруты', 'Route');
@@ -30,19 +26,19 @@ tableMap.set('Транспортные средства', 'TransportVehicle');
 
 // Функции для изменения значений переменных
 
-function changeCurrentSearchId(value) {
+export function changeCurrentSearchId(value) {
     currentSearchId = value;
 }
 
-function changeCurrentDataPage(value) {
+export function changeCurrentDataPage(value) {
     currentDataPage = value;
 }
 
-function changeCurrentEditingRecord(value) {
+export function changeCurrentEditingRecord(value) {
     currentEditingRecord = value;
 }
 
-async function fetchTableData(useCache = true) {
+export async function fetchTableData(useCache = true) {
     // Текущая сессия актульна
     const tokenExpireTime = getTokenExpireTime();
     if (tokenExpireTime === undefined) {
@@ -110,7 +106,7 @@ async function fetchTableData(useCache = true) {
 }
 
 // Настройка пагинации
-function setupPagination() {
+export function setupPagination() {
     const pagination = document.getElementById('dataPagination');
     const totalRecords = currentSearchId ? 1 : allTableData.length;
     const totalPages = Math.ceil(totalRecords / DATA_PER_PAGE);
@@ -150,7 +146,7 @@ function setupPagination() {
 }
 
 // Вспомогательные функции
-function detectFieldType(fieldName, value) {
+export function detectFieldType(fieldName, value) {
     if (value === null || value === undefined) return 'text';
     
     // Определяем по имени поля
@@ -183,7 +179,7 @@ function detectFieldType(fieldName, value) {
 }
 
 // Заполнение формы редактирования
-function populateEditForm(record, tableName) {
+export function populateEditForm(record, tableName) {
     const formFields = document.getElementById('editRecordFields');
     formFields.innerHTML = '';
     

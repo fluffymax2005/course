@@ -1,7 +1,6 @@
-import { deleteCookie, deleteUserData, getToken } from "./cookie.js";
+import { deleteUserData, getToken } from "./cookie.js";
 import { ApiService} from "./api.js";
-
-export {messageBoxShowFromLeft, messageBoxShowFromRight};
+import { dbCache } from "./database-form-service.js";
 
 let MESSAGE_BOX_HEIGHT_OFFSET = 20; // начальный отступ
 const TOAST_MARGIN = 10; // отступ между тостами
@@ -23,7 +22,7 @@ window.quitSystem = function quitSystem() {
     window.location.href = '../../authorize-form/authorize.html';
 }
 
-async function messageBoxShowFromLeft(message, background_color, isUsingPixels, left_pos, transform, duration = 3000) {
+export async function messageBoxShowFromLeft(message, background_color, isUsingPixels, left_pos, transform, duration = 3000) {
     if (activeToasts.size >= 10)
         return;
     
@@ -84,7 +83,7 @@ async function messageBoxShowFromLeft(message, background_color, isUsingPixels, 
     return toastId;
 }
 
-async function messageBoxShowFromRight(message, background_color, isUsingPixels, right_pos, transform, duration = 3000) {
+export async function messageBoxShowFromRight(message, background_color, isUsingPixels, right_pos, transform, duration = 3000) {
     if (activeToasts.size >= 10)
         return;
     
@@ -190,6 +189,10 @@ function recalculateToastPositions() {
 
 // При загрузке формы проверяется актуальность сессии
 document.addEventListener('DOMContentLoaded', async function() {
+    
+    // Стираем старые кэшированные данные таблиц
+    dbCache.clearAll();
+
     // При загрузке главной формы проверяем актуальность сохраненного токена
     const token = getToken();
     try {

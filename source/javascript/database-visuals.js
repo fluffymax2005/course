@@ -1,16 +1,14 @@
-import { fetchTableData, checkDatabaseAccess, setupPagination, currentSearchId, changeCurrentSearchId, 
+import { fetchTableData, setupPagination, currentSearchId, changeCurrentSearchId, 
     changeCurrentDataPage, allTableData, currentDataPage, DATA_PER_PAGE, detectFieldType, currentEditingRecord,  
     changeCurrentEditingRecord} from "./database-form-service.js";
-import { getUserRights, formatValue, getCellClassName, getCurrentPageData } from "./database-general-service.js";
+import { formatValue, getCellClassName, getCurrentPageData, checkDatabaseAccess } from "./database-general-service.js";
 import { editRecord } from "./database-table-service.js";
-
-export {hideTableInterface, displayTableData, displaySearchResults, showNoSearchResults, showSearchInfo, getUserRights};
-export {fieldNameMapping}
+import { getUserRights } from "./cookie.js";
 
 let currentTable = '';
 
 // Маппинг русских названий для полей
-const fieldNameMapping = {
+export const fieldNameMapping = {
     'id': 'ID',
     'customerId': 'ID заказчика',
     'routeId': 'ID маршрута',
@@ -81,7 +79,7 @@ window.loadTableData = function loadTableData(useCache = true) {
 }
 
 // Сокрытие интерфейса таблиц
-function hideTableInterface() {
+export function hideTableInterface() {
     document.getElementById('tableInfo').style.display = 'none';
     document.getElementById('dataTable').style.display = 'none';
     document.getElementById('noDataMessage').style.display = 'none';
@@ -91,7 +89,7 @@ function hideTableInterface() {
 }
 
 // Отображение данных таблицы
-function displayTableData(data) {
+export function displayTableData(data) {
     const tableHead = document.getElementById('dataTableHead');
     const tableBody = document.getElementById('dataTableBody');
     const tableInfo = document.getElementById('tableInfo');
@@ -231,7 +229,7 @@ function displayTableData(data) {
 }
 
 // Отображение результатов поиска
-function displaySearchResults(results) {
+export function displaySearchResults(results) {
     const tableHead = document.getElementById('dataTableHead');
     const tableBody = document.getElementById('dataTableBody');
     const dataTable = document.getElementById('dataTable');
@@ -306,7 +304,7 @@ function displaySearchResults(results) {
 }
 
 // Показать информацию о поиске
-function showSearchInfo() {
+export function showSearchInfo() {
     const searchResultsInfo = document.getElementById('searchResultsInfo');
     const searchResultsText = document.getElementById('searchResultsText');
     
@@ -315,7 +313,7 @@ function showSearchInfo() {
 }
 
 // Показать сообщение о ненайденных результатах
-function showNoSearchResults() {
+export function showNoSearchResults() {
     const dataTable = document.getElementById('dataTable');
     const noSearchResultsMessage = document.getElementById('noSearchResultsMessage');
     const searchResultsInfo = document.getElementById('searchResultsInfo');

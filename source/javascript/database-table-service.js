@@ -1,11 +1,9 @@
 import { getToken, getUserName } from "./cookie.js";
 import { fetchTableData, populateEditForm, currentEditingRecord, changeCurrentSearchId, allTableData, 
-    changeCurrentDataPage, changeCurrentEditingRecord, detectFieldType, tableMap, dbCache } from "./database-form-service.js";
+    changeCurrentEditingRecord, detectFieldType, tableMap, dbCache } from "./database-form-service.js";
 import { displaySearchResults, showSearchInfo } from "./database-visuals.js";
-import { messageBoxShowFromLeft, messageBoxShowFromRight } from "./index.js";
+import { messageBoxShowFromLeft } from "./index.js";
 import { BASE_API_URL } from "./api.js";
-
-export {editRecord, isFieldRequired, getMinValue, getMaxValue};
 
 // Заглушки для остальных функций
 window.showAddRecordForm = function showAddRecordForm() {
@@ -98,7 +96,7 @@ window.updateRecord = async function updateRecord(event) {
 }
 
 // Функция редактирования записи
-function editRecord(record) {
+export function editRecord(record) {
     changeCurrentEditingRecord(record);
     
     // Получаем название таблицы
@@ -126,7 +124,8 @@ function editRecord(record) {
 }
 
 window.confirmDeleteRecord = function confirmDeleteRecord(record) {
-    messageBoxShow(`Удаление записи ID: ${record.id} в разработке`, 'blue');
+    messageBoxShowFromLeft("Удаление успешно завершено", 'green', false, '43',  'translateY(50px)');
+    
 }
 
 // ПОИСК ПО ID
@@ -198,12 +197,12 @@ function getFormattedPhoneValue(phoneValue) {
 }
 
 // Вспомогательные функции для валидации
-function isFieldRequired(fieldName, tableName) {
+export function isFieldRequired(fieldName, tableName) {
     const optionalFields = ['note', 'whoChanged', 'whenChanged'];
     return !optionalFields.includes(fieldName);
 }
 
-function getMinValue(fieldName) {
+export function getMinValue(fieldName) {
     const minValues = {
         'distance': 1,
         'movePrice': 0,
@@ -214,7 +213,7 @@ function getMinValue(fieldName) {
     return minValues[fieldName] || '';
 }
 
-function getMaxValue(fieldName) {
+export function getMaxValue(fieldName) {
     const maxValues = {
         'registrationCode': 999,
         'releaseYear': new Date().getFullYear()

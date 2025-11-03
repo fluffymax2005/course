@@ -1,6 +1,7 @@
 import { getCookie, getTokenExpireTime, getUserRights } from "./cookie.js";
-import { messageBoxShowFromLeft, messageBoxShowFromRight } from "./index.js";
-import { hideTableInterface } from "./database-form-service.js";
+import { messageBoxShowFromLeft } from "./index.js";
+import { checkDatabaseAccess } from "./database-general-service.js";
+import { hideTableInterface } from "./database-visuals.js";
 
 // Визуальные функции
 
@@ -29,31 +30,21 @@ window.showSection = async function showSection(sectionName = null, isLoadListen
         // Получаем из куки роль пользователя для ограничения доступа и его срок жизни
         const userRights = getUserRights();
         const tokenExpireTime = getTokenExpireTime(); // время жизни токена из куки
-        if (tokenExpireTime === undefined) {
-            console.error('Не удалось извлечь срок жизни токена, либо пользователь вышел из системы самостоятельно');
-            messageBoxShowFromLeft('Авторизуйтесь в системе', 'red', true, rightPos, 'translateY(50px)');
-            return;
-        }
-
         const tokenExpireDateTime = new Date(tokenExpireTime); //  время жизни токена типа js
 
         // Проверяем жизнь токена
-        if (userRights === undefined) {
-            console.error('Не удалось извлечь права пользователя');
-            messageBoxShowFromLeft('Внутренняя ошибка', 'red', true, rightPos, 'translateY(50px)');
-            return;
-        } else if (tokenExpireDateTime < new Date()) {
+        if (tokenExpireDateTime < new Date()) {
             console.error('Время сессии истекло');
             messageBoxShowFromLeft('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', true, rightPos, 'translateY(50px)');
             return;
         }
 
         // Ограничение на переход в области для пользователя
-        if ((userRights === '0' || userRights === 1) && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
+        if ((userRights === 0 || userRights === 1) && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
             messageBoxShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
                 'red', true, rightPos, 'translateY(50px)');
             return;
-        } else if (userRights === '3' && (sectionName === 'database' || sectionName === 'statstics' || sectionName === 'admin-panel')) {
+        } else if (userRights === 3 && (sectionName === 'database' || sectionName === 'statstics' || sectionName === 'admin-panel')) {
             messageBoxShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
                 'red', true, rightPos, 'translateY(50px)');
             return;

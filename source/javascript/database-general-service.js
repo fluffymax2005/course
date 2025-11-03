@@ -1,9 +1,7 @@
 import { getUserRights } from "./cookie.js";
 import { allTableData, currentDataPage, DATA_PER_PAGE } from "./database-form-service.js";
 
-export {getUserRights, checkDatabaseAccess, getCurrentPageData, formatValue, getCellClassName};
-
-function checkDatabaseAccess() {
+export function checkDatabaseAccess() {
     const userRights = getUserRights(); // Функция должна быть реализована
     const actionButtons = document.getElementById('dbActionButtons');
     
@@ -15,7 +13,7 @@ function checkDatabaseAccess() {
 }
 
 // Получение данных для текущей страницы
-function getCurrentPageData() {
+export function getCurrentPageData() {
     if (!allTableData || allTableData.length === 0) return [];
     
     const startIndex = (currentDataPage - 1) * DATA_PER_PAGE;
@@ -23,7 +21,7 @@ function getCurrentPageData() {
     return allTableData.slice(startIndex, endIndex);
 }
 
-function formatValue(value, type) {
+export function formatValue(value, type) {
     if (value === null || value === undefined) return '-';
     
     switch (type) {
@@ -44,7 +42,7 @@ function formatValue(value, type) {
     }
 }
 
-function getCellClassName(type, value) {
+export function getCellClassName(type, value) {
     switch (type) {
         case 'boolean':
             return value ? 'status-active' : 'status-inactive';
