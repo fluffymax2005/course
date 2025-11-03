@@ -90,10 +90,10 @@ namespace DbAPI.Services {
 
         private string GetRoleName(Role role) {
             return role.Id switch {
-                0 => "Basic",
-                1 => "Editor",
-                2 => "Admin",
-                3 => "Director"
+                1 => "Basic",
+                2 => "Editor",
+                3 => "Admin",
+                4 => "Director"
             };
         }
     }

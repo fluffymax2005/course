@@ -1,6 +1,8 @@
 ﻿using DbAPI.Models;
 using static DbAPI.Interfaces.IInformation;
 
+using TypeId = int;
+
 namespace DbAPI.Classes {
     public static class Generators {
         private static readonly Random _random = new Random(1000);
@@ -8,7 +10,7 @@ namespace DbAPI.Classes {
 
         private static readonly string[] phone_numbers = new string[] { };
 
-        public static List<Customer> GenerateCustomers(int count) {
+        public static List<Customer> GenerateCustomers(TypeId count) {
             string[] male_names = File.ReadAllLines($"{PERSON_DATA_PATH}/male_names.txt");
             string[] male_surnames = File.ReadAllLines($"{PERSON_DATA_PATH}/male_surnames.txt");
 
@@ -48,7 +50,7 @@ namespace DbAPI.Classes {
             }).ToList();
         }
 
-        public static List<Models.Route> GenerateRoutes(int count) {
+        public static List<Models.Route> GenerateRoutes(TypeId count) {
             var districts = new[] { "Центральный", "Северный", "Южный", "Западный", "Восточный" };
             var streetTypes = new[] { "ул.", "пр.", "пер.", "б-р", "наб." };
             var streetNames = new[] { "Ленина", "Гагарина", "Пушкина", "Советская", "Мира" };
@@ -81,7 +83,7 @@ namespace DbAPI.Classes {
             }).ToList();
         }
 
-        public static List<Driver> GenerateDrivers(int count) {
+        public static List<Driver> GenerateDrivers(TypeId count) {
             string[] male_names = File.ReadAllLines($"{PERSON_DATA_PATH}/male_names.txt");
             string[] male_surnames = File.ReadAllLines($"{PERSON_DATA_PATH}/male_surnames.txt");
 
@@ -128,7 +130,7 @@ namespace DbAPI.Classes {
             }).ToList();
         }
 
-        public static List<TransportVehicle>? GenerateTransportVehicles(List<Driver> drivers, int count) {
+        public static List<TransportVehicle>? GenerateTransportVehicles(List<Driver> drivers, TypeId count) {
             // Проверка, что список водителей не пуст
             if (drivers == null || drivers.Count == 0)
                 return null;
@@ -184,7 +186,7 @@ namespace DbAPI.Classes {
             }).ToList();
         }
 
-        public static List<Rate>? GenerateRates(List<Driver> drivers, List<TransportVehicle> vehicles, int count = 5) {
+        public static List<Rate>? GenerateRates(List<Driver> drivers, List<TransportVehicle> vehicles, TypeId count = 5) {
             // Проверка наличия связанных данных
             if (drivers == null || drivers.Count == 0)
                 return null;
@@ -233,7 +235,7 @@ namespace DbAPI.Classes {
             List<Customer> customers,
             List<Models.Route> routes,
             List<Rate> rates,
-            int count) {
+            TypeId count) {
             // Проверка наличия связанных данных
             if (customers == null || customers.Count == 0)
                 return null;
@@ -267,11 +269,11 @@ namespace DbAPI.Classes {
 
         public static List<Role>? GenerateRoles() {
 
-            string[] forenames = ["admin", "basic", "editor", "director"];
-            UserRights[] rights = [UserRights.Admin, UserRights.Basic, UserRights.Editor, UserRights.Director];
-            bool[] canPost = { true, false, true, false };
-            bool[] canUpdate = { true, false, true, false };
-            bool[] canDelete = { true, false, false, false };
+            string[] forenames = [ "basic", "editor", "admin", "director"];
+            UserRights[] rights = [UserRights.Basic, UserRights.Editor, UserRights.Admin, UserRights.Director];
+            bool[] canPost = { false, true, true, false };
+            bool[] canUpdate = { false, true, true, false };
+            bool[] canDelete = { false, false, true, false };
 
             return Enumerable.Range(1, 4).Select(i => {
                 return new Role {
@@ -289,13 +291,16 @@ namespace DbAPI.Classes {
         }
 
         public static List<Credential>? GenerateCredentials() {
+            TypeId[] roleIDs = { 1, 3 };
+            string[] usernames = { "basic", "admin" };
+            
             return Enumerable.Range(1, 2).Select(i => {
                 return new Credential {
                     Id = i,
-                    Username = i == 1 ? "admin" : "basic",
+                    Username = usernames[i - 1],
                     Password = Hasher.HashPassword("JcGDN9ST5KEG!"),
                     Email = $"santech_montage@mail.ru",
-                    RoleId = i,
+                    RoleId = roleIDs[i - 1],
                     WhoAdded = "system",
                     WhenAdded = new DateTime(2023, 1, 1)
                 };
