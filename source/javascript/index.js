@@ -1,4 +1,4 @@
-import { deleteCookie, getToken } from "./cookie.js";
+import { deleteCookie, deleteUserData, getToken } from "./cookie.js";
 import { ApiService} from "./api.js";
 
 export {messageBoxShowFromLeft, messageBoxShowFromRight};
@@ -8,8 +8,7 @@ const TOAST_MARGIN = 10; // отступ между тостами
 const activeToasts = new Map(); // храним активные тосты
 
 window.quitSystem = function quitSystem() {       
-    deleteCookie('token');
-    deleteCookie('tokenExpireTime');
+    deleteUserData();
 
     setTimeout(() => {
         const authorizeItem = document.getElementById('authorizeItem');
@@ -19,10 +18,9 @@ window.quitSystem = function quitSystem() {
         authorizeItem.style.display = 'block';
         registerItem.style.display = 'block';
         quitItem.style.display = 'none';
-    }, 10);
+    }, 100);
 
-    // Создаем элемент уведомления
-    messageBoxShow('Выход из системы успешно выполнен', '#4CAF50', false, '100', 'translateY(-50px)');
+    window.location.href = '../../authorize-form/authorize.html';
 }
 
 async function messageBoxShowFromLeft(message, background_color, isUsingPixels, left_pos, transform, duration = 3000) {
@@ -197,13 +195,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         await ApiService.get(
             `Credential/validate-token`, 
-        {
-            'Authorization': `${token}`
-        }, 
-        true);
+            {
+                'Authorization': `${token}`
+            }, 
+            true
+        );
     } catch (error) {
         // Токен отсутствует или просрочен
         // Проброс пользователя в окно авторизации
+        deleteUserData();
         window.location.href = '../../authorize-form/authorize.html';
     }
 });

@@ -1,32 +1,39 @@
 /* Служебные функции для куки */
 
-export {getCookie, setCookie, deleteCookie, getUserRights, getToken, getTokenExpireTime, getUserName};
-
-function getCookie(name) {
+export function getCookie(name) {
     return localStorage.getItem(name);
 }
 
-function setCookie(name, value, options = {}) {
+export function setCookie(name, value, options = {}) {
     localStorage.setItem(name, value);
 }
 
-function deleteCookie(name) {
+export function deleteCookie(name) {
     localStorage.removeItem(name);
 }
 
+export function deleteUserData() {
+    // Замена старых куки на новые
+    const cookies = ['token', 'tokenExpireTime', 'userRights', 'userName'];
 
-function getUserRights() {
+    cookies.forEach(cookie => {
+        localStorage.removeItem(cookie);
+    });
+}
+
+
+export function getUserRights() {
     return parseInt(getCookie('userRights'));
 }
 
-function getToken() {
+export function getToken() {
     return getCookie('token');
 }
 
-function getTokenExpireTime() {
+export function getTokenExpireTime() {
     return getCookie('tokenExpireTime');
 }
 
-function getUserName() {
+export function getUserName() {
     return getCookie('userName');
 }
