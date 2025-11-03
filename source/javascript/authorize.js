@@ -53,13 +53,13 @@ class AuthService {
             this.setTextMessage(outputText, false, 'Авторизация прошла успешно');
 
             // Замена старых куки на новые
-            const cookies = ['token, tokenExpireTime, userRights, userName'];
+            const cookies = ['token', 'tokenExpireTime', 'userRights', 'userName'];
             const cookiesValues = [data.token, data.tokenExpireTime, data.userRights, data.username];
 
             cookies.forEach((cookie, index) => {
                 localStorage.removeItem(cookie);
                 localStorage.setItem(cookie, cookiesValues[index]);
-            })
+            });
         } catch (error) {
             this.setTextMessage(outputText, true, 'Внутреняя ошибка. Попробуйте позже');
             return;
