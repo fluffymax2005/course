@@ -291,10 +291,10 @@ namespace DbAPI.Classes {
         }
 
         public static List<Credential>? GenerateCredentials() {
-            TypeId[] roleIDs = { 1, 3 };
-            string[] usernames = { "basic", "admin" };
+            TypeId[] roleIDs = { 1, 2, 3 };
+            string[] usernames = { "basic", "editor", "admin" };
             
-            return Enumerable.Range(1, 2).Select(i => {
+            return Enumerable.Range(1, 3).Select(i => {
                 return new Credential {
                     Id = i,
                     Username = usernames[i - 1],
