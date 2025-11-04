@@ -359,9 +359,14 @@ namespace DbAPI.Controllers {
         [Authorize(Roles = "Admin")]
         public override async Task<IActionResult> DeleteAsync(TypeId id) {
             _logger.LogWarning($"Администратор {User.Identity.Name} пытается удалить учетную запись с ID = {id}");
-            if (await _repository.GetByIdAsync(id) == null) {
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null) {
                 _logger.LogError($"Администратору {User.Identity.Name} не удалось удалить учетную запись с ID = {id}. " +
                     $"Причина: сущность не найдена");
+                return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
+            } else if (entity.IsDeleted != null) {
+                _logger.LogError($"Администратору {User.Identity.Name} не удалось удалить учетную запись с ID = {id}. " +
+                    $"Причина: сущность уже удалена");
                 return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
             }
 
