@@ -55,5 +55,6 @@ export function getTableHash(name) {
 }
 
 export function setTableHash(name, hash) {
+    deleteCookie(`table_hash_${name}`);
     setCookie(`table_hash_${name}`, hash)
 }

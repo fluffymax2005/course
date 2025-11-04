@@ -1,28 +1,53 @@
-import {getCookie, getTableHash, getToken, getTokenExpireTime, setCookie, setTableHash} from './cookie.js'
-import {ApiService, BASE_API_URL} from './api.js';
-import { messageBoxShowFromLeft, messageBoxShowFromRight } from "./index.js";
+import {getTableHash, getToken, setTableHash} from './cookie.js'
+import {ApiService} from './api.js';
+import { messageBoxShowFromRight } from "./index.js";
 import { DatabaseCache } from "./database-cache.js";
-import { isFieldRequired, getMinValue, getMaxValue } from './database-table-service.js';
-import { hideTableInterface, displayTableData, fieldNameMapping } from "./database-visuals.js";
-import { checkDatabaseAccess, getCurrentPageData } from "./database-general-service.js";
+import { isFieldRequired, getMinValue, getMaxValue, TableAction } from './database-table-service.js';
+import { displayTableData, fieldNameMapping } from "./database-visuals.js";
+import { getCurrentPageData } from "./database-general-service.js";
 
 export const dbCache = new DatabaseCache();
 
-export let currentSearchId = null;
-export let currentEditingRecord = null;
+export let currentSearchId = null; // текущая запись, подлежащая поиску
+export let currentRecord = null; // текущая запись, с коротой производятся действия
+export let currentRecordAction = null; // тип операции, применяемый к текущей записи
+
 export let allTableData = []; // данные всех таблиц
-export let currentDataPage = 1;
+
+export let currentDataPage = 1; // текущая отображаемая страницы - пагинация
 export const DATA_PER_PAGE = 20; // Число строк на каждой странице - пагинация
 
 // Словарь для доступа к API
+
 export var tableMap = new Map();
 
-tableMap.set('Заказы', 'Order');
-tableMap.set('Заказчики', 'Customer');
-tableMap.set('Маршруты', 'Route');
-tableMap.set('Тарифы', 'Rate');
-tableMap.set('Шоферы', 'Driver');
-tableMap.set('Транспортные средства', 'TransportVehicle');
+tableMap.set('Заказы', 'Order')
+    .set('Заказчики', 'Customer')
+    .set('Маршруты', 'Route')
+    .set('Тарифы', 'Rate')
+    .set('Шоферы', 'Driver')
+    .set('Транспортные средства', 'TransportVehicle');
+
+// Текстовое содержимое кнопок форм при подтвержении действия:
+// 1. Добавить набор.
+// 2. Редактировать набор.
+
+const EDIT_BUTTON_TEXT = 'Сохранить';
+const INSERT_BUTTON_TEXT = 'Добавить';
+const DELETE_BUTTON_TEXT = 'Удалить';
+
+class TableButton {
+    static get Edit() {return EDIT_BUTTON_TEXT};
+    static get Insert() {return INSERT_BUTTON_TEXT};
+    static get Delete() {return DELETE_BUTTON_TEXT};
+    static Text(action) {
+        switch (action) {
+            case TableAction.Edit: return this.Edit;
+            case TableAction.Insert: return this.Insert;
+            case TableAction.Delete: return this.Delete;
+        }
+    }
+}
 
 // Функции для изменения значений переменных
 
@@ -34,8 +59,9 @@ export function changeCurrentDataPage(value) {
     currentDataPage = value;
 }
 
-export function changeCurrentEditingRecord(value) {
-    currentEditingRecord = value;
+export function changeCurrentRecord(value, action) {
+    currentRecord = value;
+    currentRecordAction = action;
 }
 
 export async function fetchTableData(useCache = true) {
@@ -45,7 +71,7 @@ export async function fetchTableData(useCache = true) {
 
     const token = getToken(); // токен сессии
 
-    const tableHash = getTableHash(tableName); // имя таблицы
+    const tableHash = getTableHash(tableName); // хэш таблицы
     let isGoingToFetch = false; // нужно ли выполнять вытягивание данных из БД - данные несвежие
     
     // Данных нет в памяти - вытягивание
@@ -77,8 +103,6 @@ export async function fetchTableData(useCache = true) {
             return;
         }
     }
-
-    
 
     // Пользователь обращается к кэшированной таблице со свежими данными
     if (useCache && !isGoingToFetch) {
@@ -187,31 +211,57 @@ export function detectFieldType(fieldName, value) {
     return 'text';
 }
 
-// Заполнение формы редактирования
-export function populateEditForm(record, tableName) {
+// Заполнение формы действия над таблицей
+export function populateEditForm(record, tableName, action = TableAction.Edit) {
     const formFields = document.getElementById('editRecordFields');
     formFields.innerHTML = '';
+
+    // Задаем текст в поле кнопки подтверждения действия
+    document.getElementById('applyModalForm').textContent = TableButton.Text(action);
     
     // Поля, которые нельзя редактировать
     const nonEditableFields = ['id', 'whoAdded', 'whenAdded', 'whoChanged', 'whenChanged', 'isDeleted'];
-    
-    // Создаем поля для каждого свойства записи
-    Object.keys(record).forEach(key => {
-        if (nonEditableFields.includes(key)) return;
-        
+
+    // В случае, если добавляется новый набор, то дин. верстка будет по нулевому набору (он дб)
+    if (action === TableAction.Insert) {
+        record = allTableData[0];
+    }
+
+    // Производим дин. верстку
+    if (action === TableAction.Delete) { // Удаление требует лишь подтверждения
         const formGroup = document.createElement('div');
         formGroup.className = 'form-field';
         
         const label = document.createElement('label');
-        label.textContent = fieldNameMapping[key] || key;
-        label.htmlFor = `edit_${key}`;
-        
-        const input = createFormField(key, record[key], tableName);
-        
+        label.textContent = `Вы действительно хотите удалить набор с ID = ${record.id}?`;
+        label.style.fontSize = '12pt';
+
         formGroup.appendChild(label);
-        formGroup.appendChild(input);
         formFields.appendChild(formGroup);
-    });
+    } else {
+        // Создаем поля для каждого свойства записи
+        Object.keys(record).forEach(key => {
+            if (nonEditableFields.includes(key)) return;
+            
+            const formGroup = document.createElement('div');
+            formGroup.className = 'form-field';
+            
+            const label = document.createElement('label');
+            label.textContent = fieldNameMapping[key] || key;
+            label.htmlFor = `edit_${key}`;
+            
+            // Добавление нового элемента требует пустых начальных значений <input>
+            let input;
+            switch (action) {
+                case TableAction.Edit: input = createFormField(key, record[key], tableName); break;
+                case TableAction.Insert: input = createFormField(key, null, tableName); break;
+            }
+            
+            formGroup.appendChild(label);
+            formGroup.appendChild(input);
+            formFields.appendChild(formGroup);
+        });
+    }
 }
 
 // Создание поля формы в зависимости от типа данных

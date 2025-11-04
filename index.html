@@ -118,20 +118,20 @@
 
     <!-- Блок database -->
     <div class="database">
-        <!-- Модальное окно для редактирования записи -->
+        <!-- Модальное окно для операций над записями -->
         <div id="editRecordModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="editRecordModalTitle">Редактировать запись</h3>
                     <span class="close" onclick="closeEditRecordModal()">&times;</span>
                 </div>
-                <form id="editRecordForm" onsubmit="updateRecord(event)">
+                <form id="editRecordForm" onsubmit="recordAction(event)">
                     <div class="form-fields" id="editRecordFields">
                         <!-- Поля формы будут заполнены динамически -->
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary-db" id="closeModalForm" onclick="closeEditRecordModal()">Отмена</button>
-                        <button type="submit" class="btn-primary-db" id="applyModalForm">Сохранить изменения</button>
+                        <button type="submit" class="btn-primary-db" id="applyModalForm">Сохранить</button>
                     </div>
                 </form>
             </div>

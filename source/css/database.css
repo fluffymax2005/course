@@ -373,6 +373,25 @@
     transform: translateY(-1px);
 }
 
+.btn-recover-small {
+  background: rgb(50, 183, 108);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-recover-small:hover {
+    background: lime;
+    transform: translateY(-1px);
+}
+
 #closeModalForm {
     background:  rgba(255, 0, 0, 70%);
 }
@@ -383,7 +402,7 @@
 }
 
 #applyModalForm {
-    background:  linear-gradient(135deg, #667eea, #764ba2);
+    background:  rgb(50, 183, 108);
 }
 
 #applyModalForm:hover {

@@ -1,8 +1,8 @@
 import { fetchTableData, setupPagination, currentSearchId, changeCurrentSearchId, 
-    changeCurrentDataPage, allTableData, currentDataPage, DATA_PER_PAGE, detectFieldType, currentEditingRecord,  
-    changeCurrentEditingRecord} from "./database-form-service.js";
+    changeCurrentDataPage, allTableData, currentDataPage, DATA_PER_PAGE, detectFieldType,
+    changeCurrentRecord} from "./database-form-service.js";
 import { formatValue, getCellClassName, getCurrentPageData, checkDatabaseAccess } from "./database-general-service.js";
-import { editRecord } from "./database-table-service.js";
+import { TableAction, TableModifying } from "./database-table-service.js";
 import { getUserRights, UserRights } from "./cookie.js";
 
 let currentTable = '';
@@ -97,6 +97,8 @@ export function displayTableData(data) {
     const noDataMessage = document.getElementById('noDataMessage');
     const noSearchResultsMessage = document.getElementById('noSearchResultsMessage');
     const pagination = document.getElementById('dataPagination');
+
+    const userRights = getUserRights();
     
     // Очищаем таблицу
     tableHead.innerHTML = '';
@@ -150,7 +152,7 @@ export function displayTableData(data) {
     dataKeys.forEach(key => {
         
         // Не отображаем графу ID для базового пользователя
-        if (getUserRights() === UserRights.Basic && key === 'id') {
+        if (userRights === UserRights.Basic && key === 'id') {
             return;
         }
 
@@ -173,7 +175,7 @@ export function displayTableData(data) {
     });
     
     // Добавляем столбец для действий если есть права
-    if (getUserRights() != UserRights.Basic) {
+    if (userRights != UserRights.Basic) {
         const actionsTh = document.createElement('th');
         actionsTh.textContent = 'Действия';
         actionsTh.setAttribute('data-field', 'actions');
@@ -193,7 +195,7 @@ export function displayTableData(data) {
         dataKeys.forEach(key => {
 
             // Не отображаем графу ID для базового пользователя
-            if (getUserRights() === UserRights.Basic && key === 'id') {
+            if (userRights === UserRights.Basic && key === 'id') {
                 return;
             }
 
@@ -212,25 +214,38 @@ export function displayTableData(data) {
         });
         
         // Добавляем кнопки действий если есть права
-        if (getUserRights() != UserRights.Basic) {
+        if (userRights != UserRights.Basic) {
             const actionsTd = document.createElement('td');
             actionsTd.className = 'table-actions';
             actionsTd.setAttribute('data-field', 'actions');
             
-            const editBtn = document.createElement('button');
-            editBtn.className = 'btn-edit-small';
-            editBtn.innerHTML = '✏️';
-            editBtn.title = 'Редактировать';
-            editBtn.onclick = () => editRecord(record);
+            if (userRights === UserRights.Editor || userRights === UserRights.Admin) {
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn-edit-small';
+                editBtn.innerHTML = '✏️';
+                editBtn.title = 'Редактировать';
+                editBtn.onclick = () => TableModifying(record, TableAction.Edit);
+
+                actionsTd.appendChild(editBtn);
+            }
+             
+            if (userRights === UserRights.Admin) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-delete-small';
+                deleteBtn.innerHTML = '🗑️';
+                deleteBtn.title = 'Удалить';
+                deleteBtn.onclick = () => TableModifying(record, TableAction.Delete);
+
+                const recoverBtn = document.createElement('button');
+                recoverBtn.className = 'btn-recover-small';
+                recoverBtn.innerHTML = '🔄';
+                recoverBtn.title = 'Восстановить';
+                recoverBtn.onclick = () => TableModifying(record, TableAction.Recover);      
+
+                actionsTd.appendChild(deleteBtn);
+                actionsTd.appendChild(recoverBtn);
+            }
             
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn-delete-small';
-            deleteBtn.innerHTML = '🗑️';
-            deleteBtn.title = 'Удалить';
-            deleteBtn.onclick = () => confirmDeleteRecord(record);
-            
-            actionsTd.appendChild(editBtn);
-            actionsTd.appendChild(deleteBtn);
             row.appendChild(actionsTd);
         }
         
@@ -248,6 +263,8 @@ export function displaySearchResults(results) {
     const dataTable = document.getElementById('dataTable');
     const noDataMessage = document.getElementById('noDataMessage');
     const noSearchResultsMessage = document.getElementById('noSearchResultsMessage');
+
+    const userRights = getUserRights();
     
     // Скрываем другие сообщения
     noDataMessage.style.display = 'none';
@@ -290,22 +307,26 @@ export function displaySearchResults(results) {
         });
         
         // Добавляем кнопки действий если есть права
-        if (getUserRights() >= 1) {
+        if (userRights != UserRights.Basic) {
             const actionsTd = document.createElement('td');
             actionsTd.className = 'table-actions';
             actionsTd.setAttribute('data-field', 'actions');
             
-            const editBtn = document.createElement('button');
-            editBtn.className = 'btn-edit-small';
-            editBtn.innerHTML = '✏️';
-            editBtn.title = 'Редактировать';
-            editBtn.onclick = () => editRecord(record);
-            
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn-delete-small';
-            deleteBtn.innerHTML = '🗑️';
-            deleteBtn.title = 'Удалить';
-            deleteBtn.onclick = () => confirmDeleteRecord(record);
+            if (userRights === UserRights.Editor || userRights === UserRights.Admin) {
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn-edit-small';
+                editBtn.innerHTML = '✏️';
+                editBtn.title = 'Редактировать';
+                editBtn.onclick = () => TableModifying(record, TableAction.Edit);
+            }
+             
+            if (userRights === UserRights.Admin) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-delete-small';
+                deleteBtn.innerHTML = '🗑️';
+                deleteBtn.title = 'Удалить';
+                deleteBtn.onclick = () => confirmDeleteRecord(record);
+            }
             
             actionsTd.appendChild(editBtn);
             actionsTd.appendChild(deleteBtn);
@@ -412,7 +433,7 @@ document.addEventListener('click', function(event) {
 // Закрытие модального окна
 window.closeEditRecordModal = function closeEditRecordModal() {
     document.getElementById('editRecordModal').style.display = 'none';
-    changeCurrentEditingRecord(null);
+    changeCurrentRecord(null, null);
     
     // Разблокируем скролл body
     document.body.classList.remove('modal-open');

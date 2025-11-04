@@ -1,43 +1,63 @@
-import { getToken, getUserName } from "./cookie.js";
-import { fetchTableData, populateEditForm, currentEditingRecord, changeCurrentSearchId, allTableData, 
-    changeCurrentEditingRecord, detectFieldType, tableMap, dbCache } from "./database-form-service.js";
+import { getToken, getUserName, getUserRights, setTableHash, UserRights } from "./cookie.js";
+import { populateEditForm, currentRecord, changeCurrentSearchId, allTableData, detectFieldType, tableMap, changeCurrentRecord, currentRecordAction } from "./database-form-service.js";
 import { displaySearchResults, showSearchInfo } from "./database-visuals.js";
 import { messageBoxShowFromLeft } from "./index.js";
-import { BASE_API_URL } from "./api.js";
+import { ApiService } from "./api.js";
 
-// Заглушки для остальных функций
+const TABLE_EDIT = 0;
+const TABLE_INSERT = 1;
+const TABLE_DELETE = 2;
+const TABLE_RECOVER = 3;
+
+export class TableAction {
+    static get Edit() {return TABLE_EDIT;}
+    static get Insert() {return TABLE_INSERT;}
+    static get Delete() {return TABLE_DELETE;}
+    static get Recover() {return TABLE_RECOVER;}
+}
+
+// Отобразить форму добавления новой записи
 window.showAddRecordForm = function showAddRecordForm() {
-    messageBoxShow('Функция добавления записи в разработке', 'blue');
+    TableModifying(null, TableAction.Insert);
 }
 
 // Обновление записи
-window.updateRecord = async function updateRecord(event) {
+window.recordAction = async function recordAction(event) {
     event.preventDefault();
-    
-    if (!currentEditingRecord) {
-        messageBoxShow('Ошибка: запись для редактирования не найдена', 'red', 0, 'translateY(50px)');
-        return;
-    }
+
+    // Задаем тип действия
+    let action = currentRecordAction;
     
     const formData = new FormData(event.target);
-    const updatedData = {};
+    const body = {};
+
+    // Копируем все наименования ключей.
+    // 1. Добавление записей - копирование ключей первой входящей записи
+    // 2. Редактирование записей - копирование ключей текущей записи
+    // 3. Удаление записей - копирование ключей текущей записи
+    let localRecord;
+    if (action === TableAction.Insert) { // Добавление
+        localRecord = allTableData[0];
+    } else {
+        localRecord = currentRecord;
+    }
     
     // Копируем ВСЕ поля из исходной записи
-    Object.keys(currentEditingRecord).forEach(key => {
-        updatedData[key] = currentEditingRecord[key];
+    Object.keys(localRecord).forEach(key => {
+        body[key] = localRecord[key];
     });
     
     // Обновляем данные из формы
     for (let [key, value] of formData.entries()) {
         // Обработка чекбоксов
         if (value === 'on') {
-            updatedData[key] = true;
+            body[key] = true;
             continue;
         }
         
         // Пропускаем пустые чекбоксы (оставляем исходное значение)
         if (document.getElementById(`edit_${key}`)?.type === 'checkbox' && !document.getElementById(`edit_${key}`)?.checked) {
-            updatedData[key] = false;
+            body[key] = false;
             continue;
         }
         
@@ -52,63 +72,116 @@ window.updateRecord = async function updateRecord(event) {
         }
         
         // Преобразуем типы данных и обновляем значение
-        const fieldType = detectFieldType(key, currentEditingRecord[key]);
-        updatedData[key] = convertValueType(value, fieldType);
+        const fieldType = detectFieldType(key, localRecord[key]);
+        body[key] = convertValueType(value, fieldType);
     }
     
     // Обновляем служебные поля
-    updatedData.whoChanged = getUserName();
-    updatedData.whenChanged = new Date().toISOString();
+    switch (action) {
+        case TableAction.Insert:
+            body.id = '0';
+            body.whoAdded = getUserName();
+            body.whenAdded = new Date().toISOString();
+            break;
+        case TableAction.Edit:
+            body.whoChanged = getUserName();
+            body.whenChanged = new Date().toISOString();
+            break;
+        case TableAction.Delete: {
+            body.whoChanged = getUserName();
+
+            const time = new Date().toISOString();
+            body.whenChanged = time;
+            body.isDeleted = time;
+            break;
+        }
+        case TableAction.Recover: {
+            body.whoChanged = getUserName();
+            body.whenChanged = new Date().toISOString();
+            body.isDeleted = null;
+            break;
+        }
+    }
     
     try {
         const token = getToken();
         const tableSelect = document.getElementById('tableSelect');
         const apiTableName = tableMap.get(tableSelect.options[tableSelect.selectedIndex].text);
+
+        let data;
         
-        console.log('Sending update data:', updatedData); // Для отладки
-        
-        const response = await fetch(`${BASE_API_URL}/${apiTableName}/${currentEditingRecord.id}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedData)
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`${errorText}`);
+        switch (action) {
+            case TableAction.Insert:
+                data = await ApiService.post(`${apiTableName}`, body, {
+                    'Authorization': `Bearer ${token}`
+                });
+                break;
+            case TableAction.Edit:
+                data = await ApiService.put(`${apiTableName}/${currentRecord.id}`, body, {
+                    'Authorization': `Bearer ${token}`
+                });
+                break;
+            case TableAction.Delete:
+                data = await ApiService.delete(`${apiTableName}/${currentRecord.id}`, {
+                    'Authorization': `Bearer ${token}`
+                });
+                break;
+            case TableAction.Recover:
+                data = await ApiService.patch(`${apiTableName}/${currentRecord.id}/recover`, {
+                    'Authorization': `Bearer ${token}`
+                });
+                break;
         }
 
-        // Инвалидируем кэш после успешного обновления
-        dbCache.onDataChanged(tableSelect.options[tableSelect.selectedIndex].text, 'update');
-        
-        messageBoxShow('Запись успешно обновлена', '#4CAF50', 0, 'translateY(50px)');
-        closeEditRecordModal();
-        
-        // Обновляем данные таблицы
-        await fetchTableData();
-        
+        // Запись нового хэша состояния таблицы
+        const tableName = tableSelect.options[tableSelect.selectedIndex].text;
+        setTableHash(tableName, data.hash);
+
+        messageBoxShowFromLeft('Операция успешна завершена', 'green', false, '40', 'translateY(50px)');
     } catch (error) {
-        console.error('Error updating record:', error);
-        messageBoxShow(error.message, 'red', 0, 'translateY(50px)');
+        messageBoxShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(50px)');
+        console.error(error);
+        return;
     }
+
+    // В случае, если пользователь не админ и произведено удаление, то надо удалить из памяти запись
+    const userRights = getUserRights();
+    if (userRights !== UserRights.Admin && action === TableAction.Delete) {
+        allTableData = allTableData.filter(item => item !== record);
+    }
+
+    // В случае, если пользователь добавил запись, то надо добавить её
+    if (action === TableAction.Insert) {
+        allTableData.push(body);
+    }
+
+    displayTableData(getCurrentPageData()); // обновляем отображение страницы
 }
 
 // Функция редактирования записи
-export function editRecord(record) {
-    changeCurrentEditingRecord(record);
+export function TableModifying(record, action = TableAction.Edit) {
+    changeCurrentRecord(record, action);
     
     // Получаем название таблицы
     const tableSelect = document.getElementById('tableSelect');
     const tableName = tableSelect.options[tableSelect.selectedIndex].text;
+
+    let formHeader;
+    switch (action) {
+        case TableAction.Edit: formHeader = `Редактировать запись (ID: ${record.id}) - ${tableName}`; break;
+        case TableAction.Insert: formHeader = `Добавить запись - ${tableName}`; break;
+        case TableAction.Delete: formHeader = `Удалить запись (ID: ${record.id}) - ${tableName}`; break;
+    }
     
     // Устанавливаем заголовок модального окна
-    document.getElementById('editRecordModalTitle').textContent = 
-        `Редактировать запись (ID: ${record.id}) - ${tableName}`;
-    
+    document.getElementById('editRecordModalTitle').textContent = formHeader;
+
     // Заполняем поля формы
-    populateEditForm(record, tableName);
+    switch (action) {
+        case TableAction.Edit: 
+        case TableAction.Delete: populateEditForm(record, tableName, action); break;
+        case TableAction.Insert: populateEditForm(null, tableName, action); break;
+    }
     
     // Показываем модальное окно
     document.getElementById('editRecordModal').style.display = 'block';
@@ -121,11 +194,6 @@ export function editRecord(record) {
     if (formFields) {
         formFields.scrollTop = 0;
     }
-}
-
-window.confirmDeleteRecord = function confirmDeleteRecord(record) {
-    messageBoxShowFromLeft("Удаление успешно завершено", 'green', false, '43',  'translateY(50px)');
-    
 }
 
 // ПОИСК ПО ID

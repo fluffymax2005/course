@@ -1,6 +1,5 @@
-import { getCookie, getTokenExpireTime, getUserRights } from "./cookie.js";
+import { getUserRights, UserRights } from "./cookie.js";
 import { messageBoxShowFromLeft } from "./index.js";
-import { checkDatabaseAccess } from "./database-general-service.js";
 import { hideTableInterface } from "./database-visuals.js";
 
 // Визуальные функции
@@ -31,11 +30,11 @@ window.showSection = async function showSection(sectionName = null, isLoadListen
         const userRights = getUserRights();
 
         // Ограничение на переход в области для пользователя
-        if ((userRights === 0 || userRights === 1) && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
+        if ((userRights === UserRights.Basic || userRights === UserRights.Editor) && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
             messageBoxShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
                 'red', true, rightPos, 'translateY(50px)');
             return;
-        } else if (userRights === 3 && (sectionName === 'database' || sectionName === 'statstics' || sectionName === 'admin-panel')) {
+        } else if (userRights === UserRights.Director && (sectionName === 'database' || sectionName === 'statstics' || sectionName === 'admin-panel')) {
             messageBoxShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
                 'red', true, rightPos, 'translateY(50px)');
             return;

@@ -32,7 +32,7 @@ export class ApiService {
             console.log(response);
 
             if (isCheckingAuthorization && !response.ok && response.status === 401) {
-                let errorMessage = `HTTP ошибка! Статус: ${response.status}`;
+                let errorMessage = response.text(); /*`HTTP ошибка! Статус: ${response.status}`*/;
                 throw new ApiError(errorMessage, response.status, null);
             }
             
@@ -71,6 +71,10 @@ export class ApiService {
 
     static async delete(path, additionalHeaders = {}) {
         return this.apiCall(path, 'DELETE', null, additionalHeaders);
+    }
+
+    static async patch(path, additionalHeaders = {}) {
+        return this.apiCall(path, 'PATCH', null, additionalHeaders);
     }
 }
 
