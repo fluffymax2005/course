@@ -3,7 +3,7 @@ import { fetchTableData, setupPagination, currentSearchId, changeCurrentSearchId
     changeCurrentEditingRecord} from "./database-form-service.js";
 import { formatValue, getCellClassName, getCurrentPageData, checkDatabaseAccess } from "./database-general-service.js";
 import { editRecord } from "./database-table-service.js";
-import { getUserRights } from "./cookie.js";
+import { getUserRights, UserRights } from "./cookie.js";
 
 let currentTable = '';
 
@@ -144,9 +144,16 @@ export function displayTableData(data) {
     // Создаем заголовки таблицы ДИНАМИЧЕСКИ из первого объекта массива
     const headerRow = document.createElement('tr');
     const dataKeys = Object.keys(data[0]);
+    console.log(dataKeys);
     
     // Создаем заголовки для каждого ключа данных
     dataKeys.forEach(key => {
+        
+        // Не отображаем графу ID для базового пользователя
+        if (getUserRights() === UserRights.Basic && key === 'id') {
+            return;
+        }
+
         const th = document.createElement('th');
         
         // Используем маппинг для русских названий или преобразуем ключ
@@ -166,7 +173,7 @@ export function displayTableData(data) {
     });
     
     // Добавляем столбец для действий если есть права
-    if (getUserRights() >= 1) {
+    if (getUserRights() != UserRights.Basic) {
         const actionsTh = document.createElement('th');
         actionsTh.textContent = 'Действия';
         actionsTh.setAttribute('data-field', 'actions');
@@ -184,6 +191,12 @@ export function displayTableData(data) {
         
         // Проходим по всем ключам объекта
         dataKeys.forEach(key => {
+
+            // Не отображаем графу ID для базового пользователя
+            if (getUserRights() === UserRights.Basic && key === 'id') {
+                return;
+            }
+
             const td = document.createElement('td');
             const value = record[key];
             
@@ -199,7 +212,7 @@ export function displayTableData(data) {
         });
         
         // Добавляем кнопки действий если есть права
-        if (getUserRights() >= 1) {
+        if (getUserRights() != UserRights.Basic) {
             const actionsTd = document.createElement('td');
             actionsTd.className = 'table-actions';
             actionsTd.setAttribute('data-field', 'actions');

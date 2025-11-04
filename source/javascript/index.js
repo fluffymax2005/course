@@ -196,13 +196,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // При загрузке главной формы проверяем актуальность сохраненного токена
     const token = getToken();
     try {
-        await ApiService.get(
-            `Credential/validate-token`, 
-            {
-                'Authorization': `${token}`
-            }, 
-            true
-        );
+        await ApiService.get(`Credential/validate-token?token=${token}`, true);
     } catch (error) {
         // Токен отсутствует или просрочен
         // Проброс пользователя в окно авторизации

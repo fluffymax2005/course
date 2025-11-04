@@ -1,5 +1,5 @@
-import {getToken, getTokenExpireTime} from './cookie.js'
-import {BASE_API_URL} from './api.js';
+import {getCookie, getTableHash, getToken, getTokenExpireTime, setCookie, setTableHash} from './cookie.js'
+import {ApiService, BASE_API_URL} from './api.js';
 import { messageBoxShowFromLeft, messageBoxShowFromRight } from "./index.js";
 import { DatabaseCache } from "./database-cache.js";
 import { isFieldRequired, getMinValue, getMaxValue } from './database-table-service.js';
@@ -43,8 +43,45 @@ export async function fetchTableData(useCache = true) {
     const tableSelect = document.getElementById('tableSelect');
     const tableName = tableSelect.options[tableSelect.selectedIndex].text;
 
-    // Пользователь обращается к кэшированной таблице
-    if (useCache) {
+    const token = getToken(); // токен сессии
+
+    const tableHash = getTableHash(tableName); // имя таблицы
+    let isGoingToFetch = false; // нужно ли выполнять вытягивание данных из БД - данные несвежие
+    
+    // Данных нет в памяти - вытягивание
+    if (tableHash === undefined || tableHash === null) {
+        try {
+            const data = await ApiService.post(`${tableMap.get(tableSelect.options[tableSelect.selectedIndex].text)}/verify-table-state-hash`, "-", {
+                'Authorization': `Bearer ${token}`,
+            });
+
+            setTableHash(tableName, data.hash);
+            isGoingToFetch = true;
+        } catch (error) {
+            messageBoxShowFromRight(`Ошибка: ${error.message}`, 'red', false, 0, 'translateY(50px)');
+            return;
+        }
+    } else { // Данные есть, но не ясно, свежие ли?
+        try {
+            const data = await ApiService.post(`${tableMap.get(tableSelect.options[tableSelect.selectedIndex].text)}/verify-table-state-hash`, tableHash, {
+                'Authorization': `Bearer ${token}`,
+            });
+
+            if (data.hash != tableHash) {
+                isGoingToFetch = true;
+                setTableHash(tableName, data.hash);
+            }
+
+        } catch (error) {
+            messageBoxShowFromRight(`Ошибка: ${error.message}`, 'red', false, 0, 'translateY(50px)');
+            return;
+        }
+    }
+
+    
+
+    // Пользователь обращается к кэшированной таблице со свежими данными
+    if (useCache && !isGoingToFetch) {
         const cachedData = dbCache.get(tableName);
         if (cachedData) {
             allTableData = cachedData;
@@ -54,21 +91,11 @@ export async function fetchTableData(useCache = true) {
         }
     }
 
-    // Запрос
-    const token = getToken();
-
-    try {
-        const response = await fetch(`${BASE_API_URL}/${tableMap.get(tableSelect.options[tableSelect.selectedIndex].text)}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+    // Вытягиваем данные
+    try {       
+        const data = await ApiService.get(`${tableMap.get(tableSelect.options[tableSelect.selectedIndex].text)}`, {
+            'Authorization': `Bearer ${token}`
         });
-        
-        if (!response.ok) throw new Error(response.status);
-        
-        const data = await response.json();
 
         if (Array.isArray(data)) {
             // Сохраняем в кэш
@@ -82,11 +109,8 @@ export async function fetchTableData(useCache = true) {
             throw new Error('API returned non-array response');
         }
 
-    } catch (error) {
-        console.error('Error loading users:', error);
-        
-        const errorMessage = error.message == 401 ? 'Срок вашей сессии истек. Авторизуйтесь повторно' : 'Внутренняя ошибка';        
-        messageBoxShow(errorMessage, 'red', '0', '40%', 'translateY(50px)');
+    } catch (error) {       
+        messageBoxShowFromRight('Внутренняя ошибка', 'red', false, '43', 'translateY(50px)');
     }
 }
 
