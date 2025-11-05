@@ -23,20 +23,24 @@ namespace DbAPI.Models {
         [Display(Order = 4)]
         public TypeId RateId { get; set; }
 
+        [ForeignKey("TransportVehicle")]
         [Display(Order = 5)]
-        public int Distance { get; set; }
+        public TypeId TransportVehicleId { get; set; }
 
         [Display(Order = 6)]
-        public required string WhoAdded { get; set; }
+        public int Distance { get; set; }
+
         [Display(Order = 7)]
-        public DateTime WhenAdded { get; set; }
+        public required string WhoAdded { get; set; }
         [Display(Order = 8)]
-        public string? WhoChanged { get; set; } = null;
+        public DateTime WhenAdded { get; set; }
         [Display(Order = 9)]
-        public DateTime? WhenChanged { get; set; } = null;
+        public string? WhoChanged { get; set; } = null;
         [Display(Order = 10)]
-        public string? Note { get; set; } = null;
+        public DateTime? WhenChanged { get; set; } = null;
         [Display(Order = 11)]
+        public string? Note { get; set; } = null;
+        [Display(Order = 12)]
         public DateTime? IsDeleted { get; set; } = null;
 
         //public ICollection<Customer> Customers { get; set; } = new List<Customer>();

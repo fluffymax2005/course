@@ -231,11 +231,7 @@ namespace DbAPI.Classes {
             }).ToList();
         }
 
-        public static List<Order>? GenerateOrders(
-            List<Customer> customers,
-            List<Models.Route> routes,
-            List<Rate> rates,
-            TypeId count) {
+        public static List<Order>? GenerateOrders(List<Customer> customers, List<Models.Route> routes, List<Rate> rates, List<TransportVehicle> vehicles, TypeId count) {
             // Проверка наличия связанных данных
             if (customers == null || customers.Count == 0)
                 return null;
@@ -246,10 +242,14 @@ namespace DbAPI.Classes {
             if (rates == null || rates.Count == 0)
                 return null;
 
+            if (vehicles == null || vehicles.Count == 0)
+                return null;
+
             return Enumerable.Range(1, count).Select(i => {
                 var customer = customers[_random.Next(customers.Count)];
                 var route = routes[_random.Next(routes.Count)];
                 var rate = rates[_random.Next(rates.Count)];
+                var vehicle = vehicles[_random.Next(vehicles.Count)];
                 var distance = _random.Next(1, 50); // Дистанция 1-50 км
 
                 return new Order {
@@ -257,6 +257,7 @@ namespace DbAPI.Classes {
                     CustomerId = customer.Id,
                     RouteId = route.Id,
                     RateId = rate.Id,
+                    TransportVehicleId = vehicle.Id,
                     Distance = distance,
                     WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
                     WhoAdded = "system",
@@ -269,7 +270,7 @@ namespace DbAPI.Classes {
 
         public static List<Role>? GenerateRoles() {
 
-            string[] forenames = [ "basic", "editor", "admin", "director"];
+            string[] forenames = ["basic", "editor", "admin", "director"];
             UserRights[] rights = [UserRights.Basic, UserRights.Editor, UserRights.Admin, UserRights.Director];
             bool[] canPost = { false, true, true, false };
             bool[] canUpdate = { false, true, true, false };
@@ -293,7 +294,7 @@ namespace DbAPI.Classes {
         public static List<Credential>? GenerateCredentials() {
             TypeId[] roleIDs = { 1, 2, 3 };
             string[] usernames = { "basic", "editor", "admin" };
-            
+
             return Enumerable.Range(1, 3).Select(i => {
                 return new Credential {
                     Id = i,

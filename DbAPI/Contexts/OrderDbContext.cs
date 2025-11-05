@@ -96,7 +96,7 @@ namespace DbAPI.Contexts {
                 entity.Property(e => e.IsDeleted).HasColumnOrder(14);
             });
 
-            var vehicles = Generators.GenerateTransportVehicles(drivers, 500);
+            var vehicles = Generators.GenerateTransportVehicles(drivers, 250);
             modelBuilder.Entity<TransportVehicle>().HasData(vehicles);
 
             ///////////////////////////
@@ -124,16 +124,17 @@ namespace DbAPI.Contexts {
                 entity.Property(e => e.CustomerId).IsRequired().HasColumnOrder(2);
                 entity.Property(e => e.RouteId).IsRequired().HasColumnOrder(3);
                 entity.Property(e => e.RateId).IsRequired().HasColumnOrder(4);
-                entity.Property(e => e.Distance).IsRequired().HasColumnOrder(5);
-                entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(6);
-                entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(7);
-                entity.Property(e => e.WhoChanged).HasColumnOrder(8);
-                entity.Property(e => e.WhenChanged).HasColumnOrder(9);
-                entity.Property(e => e.Note).HasColumnOrder(10);
-                entity.Property(e => e.IsDeleted).HasColumnOrder(11);
+                entity.Property(e => e.TransportVehicleId).IsRequired().HasColumnOrder(5);
+                entity.Property(e => e.Distance).IsRequired().HasColumnOrder(6);
+                entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(7);
+                entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(8);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(9);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(10);
+                entity.Property(e => e.Note).HasColumnOrder(11);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(12);
             });
 
-            var orders = Generators.GenerateOrders(customers, routes, rates, 10000);
+            var orders = Generators.GenerateOrders(customers, routes, rates, vehicles, 10000);
             modelBuilder.Entity<Order>().HasData(orders);
         }
     }
