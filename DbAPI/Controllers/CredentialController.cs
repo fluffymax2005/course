@@ -388,7 +388,7 @@ namespace DbAPI.Controllers {
                 await _repository.UpdateAsync(entity);
 
                 _logger.LogInformation($"Администратор {User.Identity.Name} восстановил учетную запись с ID = {id}");
-                return Ok( new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
+                return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
             }
 
             _logger.LogError($"Администратору {User.Identity.Name} не удалось восстановить учетную запись с ID = {id}. " +

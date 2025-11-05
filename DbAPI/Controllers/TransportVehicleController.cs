@@ -93,7 +93,7 @@ namespace DbAPI.Controllers {
                     $"Причина: сущность уже удалена");
                 return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
             }
-            
+
             await _repository.SoftDeleteAsync(id);
             _logger.LogInformation($"Запрос \"TransportVehicle.Delete({id})\" пользователя \"{User.Identity.Name}\" успешен");
             return Ok(new { hash = UpdateTableHash() });
