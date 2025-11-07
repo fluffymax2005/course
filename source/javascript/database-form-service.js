@@ -31,23 +31,55 @@ tableMap.set('Заказы', 'Order')
 // Текстовое содержимое кнопок форм при подтвержении действия:
 // 1. Добавить набор.
 // 2. Редактировать набор.
+// 3. Удалить набор.
+// 4. Восстановить набор.
 
 const EDIT_BUTTON_TEXT = 'Сохранить';
 const INSERT_BUTTON_TEXT = 'Добавить';
 const DELETE_BUTTON_TEXT = 'Удалить';
+const RECOVER_BUTTON_TEXT = 'Восстановить';
 
-class TableButton {
+export class TableFormConfirmButton {
     static get Edit() {return EDIT_BUTTON_TEXT};
     static get Insert() {return INSERT_BUTTON_TEXT};
     static get Delete() {return DELETE_BUTTON_TEXT};
+    static get Recover() {return RECOVER_BUTTON_TEXT;}
     static Text(action) {
         switch (action) {
             case TableAction.Edit: return this.Edit;
             case TableAction.Insert: return this.Insert;
             case TableAction.Delete: return this.Delete;
+            case TableAction.Recover: return this.Recover;
         }
     }
 }
+
+// Текстовое содержимое заголовков форм при подтвержении действия:
+// 1. Добавить набор.
+// 2. Редактировать набор.
+// 3. Удалить набор.
+// 4. Восстановить набор.
+
+const EDIT_FORM_HEADER = 'Редактировать';
+const INSERT_FORM_HEADER = 'Добавить';
+const DELETE_FORM_HEADER = 'Удалить';
+const RECOVER_FORM_HEADER = 'Восстановить';
+
+export class TableFormConfirmHeader {
+    static get Edit() {return EDIT_FORM_HEADER};
+    static get Insert() {return INSERT_FORM_HEADER};
+    static get Delete() {return DELETE_FORM_HEADER};
+    static get Recover() {return RECOVER_FORM_HEADER;}
+    static Text(action) {
+        switch (action) {
+            case TableAction.Edit: return this.Edit;
+            case TableAction.Insert: return this.Insert;
+            case TableAction.Delete: return this.Delete;
+            case TableAction.Recover: return this.Recover;
+        }
+    }
+}
+
 
 // Функции для изменения значений переменных
 
@@ -212,12 +244,12 @@ export function detectFieldType(fieldName, value) {
 }
 
 // Заполнение формы действия над таблицей
-export function populateEditForm(record, tableName, action = TableAction.Edit) {
+export function populateEditForm(record, tableName, action) {
     const formFields = document.getElementById('editRecordFields');
     formFields.innerHTML = '';
 
     // Задаем текст в поле кнопки подтверждения действия
-    document.getElementById('applyModalForm').textContent = TableButton.Text(action);
+    document.getElementById('applyModalForm').textContent = TableFormConfirmButton.Text(action);
     
     // Поля, которые нельзя редактировать
     const nonEditableFields = ['id', 'whoAdded', 'whenAdded', 'whoChanged', 'whenChanged', 'isDeleted'];
@@ -228,12 +260,14 @@ export function populateEditForm(record, tableName, action = TableAction.Edit) {
     }
 
     // Производим дин. верстку
-    if (action === TableAction.Delete) { // Удаление требует лишь подтверждения
+    if (action === TableAction.Delete || action === TableAction.Recover) { // Удаление и восстановление требует лишь подтверждения
         const formGroup = document.createElement('div');
         formGroup.className = 'form-field';
         
         const label = document.createElement('label');
-        label.textContent = `Вы действительно хотите удалить набор с ID = ${record.id}?`;
+
+        const actionString = action === TableAction.Delete ? "удалить" : "восстановить";
+        label.textContent = `Вы действительно хотите ${actionString} набор с ID = ${record.id}?`;
         label.style.fontSize = '12pt';
 
         formGroup.appendChild(label);

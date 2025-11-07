@@ -1,10 +1,7 @@
-export {DatabaseCache};
-
-// Кэширование данных при запросе из БД. Срок службы - 10 минут
-class DatabaseCache {
+// Кэширование данных при запросе из БД.
+export class DatabaseCache {
     constructor() {
         this.cacheKey = 'db_cache_';
-        this.cacheDuration = 10 * 60 * 1000; // 10 минут
     }
 
     // Сохраняем данные в кэш

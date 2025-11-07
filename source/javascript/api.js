@@ -38,8 +38,8 @@ export class ApiService {
             
             if (!response.ok) {
                 // Пытаемся получить детальную информацию об ошибке из response
-                let errorMessage = `HTTP ошибка! Статус: ${response.status}`;
                 let errorData = await response.json();
+                let errorMessage = errorData.message;
                 
                 throw new ApiError(errorMessage, response.status, errorData);
             }

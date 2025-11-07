@@ -27,7 +27,18 @@ export function formatValue(value, type) {
     switch (type) {
         case 'date':
             try {
-                return new Date(value).toLocaleDateString('ru-RU');
+                const date = new Date(value);
+                
+                let dateString = '';
+                dateString += date.getDate() <= 9 ? `0${date.getDate()}.` : `${date.getDate()}.`; // номер дня
+                dateString += date.getMonth() <= 8 ? `0${date.getMonth() + 1}.` : `${date.getMonth()}.`; // номер месяца
+                dateString += `${date.getFullYear()} `; // номер года
+
+                dateString += date.getHours() <= 9 ? `0${date.getHours()}:` : `${date.getHours()}:`; // номер часа
+                dateString += date.getMinutes() <= 9 ? `0${date.getMinutes()}:` : `${date.getMinutes()}:`; // номер минут
+                dateString += date.getSeconds() <= 9 ? `0${date.getSeconds()}` : `${date.getSeconds()}`; // номер секунд
+                
+                return dateString;
             } catch {
                 return String(value);
             }

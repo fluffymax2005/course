@@ -1,8 +1,9 @@
 import { getToken, getUserName, getUserRights, setTableHash, UserRights } from "./cookie.js";
-import { populateEditForm, currentRecord, changeCurrentSearchId, allTableData, detectFieldType, tableMap, changeCurrentRecord, currentRecordAction } from "./database-form-service.js";
-import { displaySearchResults, showSearchInfo } from "./database-visuals.js";
+import { populateEditForm, currentRecord, changeCurrentSearchId, allTableData, detectFieldType, tableMap, changeCurrentRecord, currentRecordAction, TableFormConfirmButton } from "./database-form-service.js";
+import { displaySearchResults, displayTableData, showSearchInfo } from "./database-visuals.js";
 import { messageBoxShowFromLeft } from "./index.js";
 import { ApiService } from "./api.js";
+import { getCurrentPageData } from "./database-general-service.js";
 
 const TABLE_EDIT = 0;
 const TABLE_INSERT = 1;
@@ -41,6 +42,8 @@ window.recordAction = async function recordAction(event) {
     } else {
         localRecord = currentRecord;
     }
+
+    let recordIndex = allTableData.indexOf(localRecord); // индекс записи
     
     // Копируем ВСЕ поля из исходной записи
     Object.keys(localRecord).forEach(key => {
@@ -109,57 +112,104 @@ window.recordAction = async function recordAction(event) {
         const apiTableName = tableMap.get(tableSelect.options[tableSelect.selectedIndex].text);
 
         let data;
+        let hash;
         
         switch (action) {
             case TableAction.Insert:
                 data = await ApiService.post(`${apiTableName}`, body, {
                     'Authorization': `Bearer ${token}`
                 });
+
+                // Добавление в конец новой записи
+                const newSet = await ApiService.get(`${apiTableName}`, {
+                    'Authorization': `Bearer ${token}`
+                });
+
+                allTableData.push(newSet);
+
                 break;
-            case TableAction.Edit:
+            case TableAction.Edit: {
                 data = await ApiService.put(`${apiTableName}/${currentRecord.id}`, body, {
                     'Authorization': `Bearer ${token}`
                 });
+
+                hash = data.hash;
+
+                // Обновление текущей записи на актуальную
+                const updatedSet = await ApiService.get(`${apiTableName}/${currentRecord.id}`, {
+                    'Authorization': `Bearer ${token}`
+                });
+
+                allTableData[recordIndex] = updatedSet;
+
+                hash = updatedSet.hash;
+
                 break;
-            case TableAction.Delete:
+            }
+                
+            case TableAction.Delete: {
                 data = await ApiService.delete(`${apiTableName}/${currentRecord.id}`, {
                     'Authorization': `Bearer ${token}`
                 });
+
+                // В случае, если пользователь не админ и произведено удаление, то надо удалить из памяти запись
+                const userRights = getUserRights();
+                if (userRights !== UserRights.Admin) {
+                    allTableData.splice(recordIndex);
+                } else {
+                    // Если пользователь админ, то нужно получить свежую запись
+                    const updatedSet = await ApiService.get(`${apiTableName}/${currentRecord.id}`, {
+                        'Authorization': `Bearer ${token}`
+                    });
+
+                    allTableData[recordIndex] = updatedSet;
+                }
+
+                hash = data.hash;
+
                 break;
+            }
+                
             case TableAction.Recover:
                 data = await ApiService.patch(`${apiTableName}/${currentRecord.id}/recover`, {
                     'Authorization': `Bearer ${token}`
                 });
+
+                hash = data.hash;
+
+                // Обновление текущей записи на актуальную
+                const updatedSet = await ApiService.get(`${apiTableName}/${currentRecord.id}`, {
+                    'Authorization': `Bearer ${token}`
+                });
+
+                allTableData[recordIndex] = updatedSet;
+
+                hash = updatedSet.hash;
+
                 break;
         }
 
         // Запись нового хэша состояния таблицы
         const tableName = tableSelect.options[tableSelect.selectedIndex].text;
-        setTableHash(tableName, data.hash);
+        setTableHash(tableName, hash);
 
         messageBoxShowFromLeft('Операция успешна завершена', 'green', false, '40', 'translateY(50px)');
     } catch (error) {
-        messageBoxShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(50px)');
+        if (action === TableAction.Insert && error.status === 400) {
+            messageBoxShowFromLeft(`Введены некорректные данные. Проверьте содержимое и повторите попытку снова.`, 'red', false, '40', 'translateY(50px)');
+        } else {
+            messageBoxShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(50px)');
+        }
+        
         console.error(error);
         return;
-    }
-
-    // В случае, если пользователь не админ и произведено удаление, то надо удалить из памяти запись
-    const userRights = getUserRights();
-    if (userRights !== UserRights.Admin && action === TableAction.Delete) {
-        allTableData = allTableData.filter(item => item !== record);
-    }
-
-    // В случае, если пользователь добавил запись, то надо добавить её
-    if (action === TableAction.Insert) {
-        allTableData.push(body);
     }
 
     displayTableData(getCurrentPageData()); // обновляем отображение страницы
 }
 
 // Функция редактирования записи
-export function TableModifying(record, action = TableAction.Edit) {
+export function TableModifying(record, action) {
     changeCurrentRecord(record, action);
     
     // Получаем название таблицы
@@ -168,9 +218,10 @@ export function TableModifying(record, action = TableAction.Edit) {
 
     let formHeader;
     switch (action) {
-        case TableAction.Edit: formHeader = `Редактировать запись (ID: ${record.id}) - ${tableName}`; break;
-        case TableAction.Insert: formHeader = `Добавить запись - ${tableName}`; break;
-        case TableAction.Delete: formHeader = `Удалить запись (ID: ${record.id}) - ${tableName}`; break;
+        case TableAction.Edit:
+        case TableAction.Delete:
+        case TableAction.Recover: formHeader = `${TableFormConfirmButton.Text(action)} запись (ID: ${record.id}) - ${tableName}`; break;
+        case TableAction.Insert: formHeader = `${TableFormConfirmButton.Text(action)} запись - ${tableName}`; break;
     }
     
     // Устанавливаем заголовок модального окна
@@ -179,8 +230,9 @@ export function TableModifying(record, action = TableAction.Edit) {
     // Заполняем поля формы
     switch (action) {
         case TableAction.Edit: 
-        case TableAction.Delete: populateEditForm(record, tableName, action); break;
-        case TableAction.Insert: populateEditForm(null, tableName, action); break;
+        case TableAction.Delete:
+        case TableAction.Recover: populateEditForm(record, tableName, action); break;
+        case TableAction.Insert: populateEditForm(null, tableName, action); break;   
     }
     
     // Показываем модальное окно
