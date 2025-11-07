@@ -28,9 +28,11 @@ namespace DbAPI.Repositories {
             return await _context.Roles.ToListAsync();
         }
 
-        public async Task AddAsync(Role entity) {
+        public async Task<TypeId?> AddAsync(Role entity) {
             await _context.Roles.AddAsync(entity);
             await _context.SaveChangesAsync();
+
+            return entity.Id; ;
         }
 
         public async Task UpdateAsync(Role entity) {

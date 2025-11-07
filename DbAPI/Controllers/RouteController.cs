@@ -45,15 +45,16 @@ namespace DbAPI.Controllers {
         [Authorize(Roles = "Editor, Admin")]
         public override async Task<IActionResult> CreateAsync([FromBody] Models.Route entity) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Route.Create()\"");
+            TypeId? id;
             try {
-                await _repository.AddAsync(entity);
+                id = await _repository.AddAsync(entity);
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Route.Create()\" пользователя \"{User.Identity.Name}\" завершился ошибкой. Причина: {ex.Message}");
                 return BadRequest(new { message = ex.Message });
             }
 
             _logger.LogInformation($"Запрос \"Route.Create()\" пользователя \"{User.Identity.Name}\" успешен");
-            return Ok(new { hash = UpdateTableHash() });
+            return Ok(new { hash = UpdateTableHash(), id = id });
         }
 
         // PUT: api/{entity}/{id}

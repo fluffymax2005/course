@@ -23,13 +23,15 @@ namespace DbAPI.Repositories {
             return await _context.TransportVehicles.FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task AddAsync(TransportVehicle entity) {
+        public async Task<TypeId?> AddAsync(TransportVehicle entity) {
             await EntityValidate(entity.DriverId, entity.Number, entity.Series, entity.RegistrationCode,
                 entity.Model, entity.Color, entity.ReleaseYear, entity.WhoAdded, entity.WhenAdded,
                 entity.Id, entity.WhoChanged, entity.WhenChanged, entity.Note, entity.IsDeleted);
 
             await _context.TransportVehicles.AddAsync(entity);
             await _context.SaveChangesAsync();
+
+            return entity.Id;
         }
 
         public async Task AddAsync(TypeId driverId, string number, string series,

@@ -318,8 +318,10 @@ namespace DbAPI.Controllers {
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public override async Task<IActionResult> CreateAsync([FromBody] Credential entity) {
+            _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Credential.Create()\"");
+            TypeId? id;
             try {
-                await _repository.AddAsync(entity);
+                id = await _repository.AddAsync(entity);
                 _logger.LogInformation($"Администратор {User.Identity.Name} создал новую учетную запись с ID = {entity.Id}");
             } catch (Exception ex) {
                 _logger.LogError($"Администратору {User.Identity.Name} не удалось создать новую учетную запись с ID = {entity.Id}. " +
@@ -327,8 +329,8 @@ namespace DbAPI.Controllers {
                 return BadRequest(new { message = ex.Message });
             }
 
-
-            return Ok(new { hash = UpdateTableHash() });
+            _logger.LogInformation($"Запрос \"Role.Create()\" пользователя \"{User.Identity.Name}\" успешен");
+            return Ok(new { hash = UpdateTableHash(), id = id });
         }
 
         // PUT: api/{entity}/{id}

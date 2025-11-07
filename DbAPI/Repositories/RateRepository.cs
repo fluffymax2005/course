@@ -21,7 +21,7 @@ namespace DbAPI.Repositories {
             return await _context.Rates.ToListAsync();
         }
 
-        public async Task AddAsync(Rate entity) {
+        public async Task<TypeId?> AddAsync(Rate entity) {
 
             await EntityValidate(entity.Forename, entity.MovePrice,
                 entity.IdlePrice, entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged,
@@ -29,6 +29,8 @@ namespace DbAPI.Repositories {
 
             await _context.Rates.AddAsync(entity);
             await _context.SaveChangesAsync();
+
+            return entity.Id;
         }
 
         public async Task AddAsync(string forename, int movePrice, int idlePrice, string whoAdded,

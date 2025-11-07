@@ -22,7 +22,7 @@ namespace DbAPI.Repositories {
             return await _context.Drivers.ToListAsync();
         }
 
-        public async Task AddAsync(Driver entity) {
+        public async Task<TypeId?> AddAsync(Driver entity) {
 
             await EntityValidate(entity.Forename, entity.Surname, entity.PhoneNumber, entity.DriverLicenceSeries,
                 entity.DriverLicenceNumber, entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged,
@@ -30,6 +30,8 @@ namespace DbAPI.Repositories {
 
             await _context.Drivers.AddAsync(entity);
             await _context.SaveChangesAsync();
+
+            return entity.Id;
         }
 
         public async Task AddAsync(string forename, string surname, string phoneNumber,

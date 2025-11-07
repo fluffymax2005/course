@@ -44,15 +44,16 @@ namespace db.Controllers {
         [Authorize(Roles = "Editor, Admin")]
         public override async Task<IActionResult> CreateAsync([FromBody] Rate entity) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Rate.Create()\"");
+            TypeId? id;
             try {
-                await _repository.AddAsync(entity);
+                id = await _repository.AddAsync(entity);
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Rate.Create()\" пользователя \"{User.Identity.Name}\" завершился ошибкой. Причина: {ex.Message}");
                 return BadRequest(new { message = ex.Message });
             }
 
             _logger.LogInformation($"Запрос \"Rate.Create()\" пользователя \"{User.Identity.Name}\" успешен");
-            return Ok(new { hash = UpdateTableHash() });
+            return Ok(new { hash = UpdateTableHash(), id = id });
         }
 
         // PUT: api/{entity}/{id}

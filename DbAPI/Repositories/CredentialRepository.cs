@@ -23,7 +23,7 @@ namespace DbAPI.Repositories {
             return await _context.Credentials.ToListAsync();
         }
 
-        public async Task AddAsync(Credential entity) {
+        public async Task<TypeId?> AddAsync(Credential entity) {
 
             await EntityValidate(entity.RoleId, entity.Username, entity.Password, entity.WhoAdded,
                 entity.WhenAdded, entity.Id, entity.WhoChanged, entity.WhenChanged, entity.Note,
@@ -31,6 +31,8 @@ namespace DbAPI.Repositories {
 
             await _context.Credentials.AddAsync(entity);
             await _context.SaveChangesAsync();
+
+            return entity.Id;
         }
 
         public async Task AddAsync(TypeId roleId, string username, string password, UserRights Rights, string whoAdded,

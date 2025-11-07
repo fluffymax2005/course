@@ -21,7 +21,7 @@ namespace DbAPI.Repositories {
             return await _context.Orders.ToListAsync();
         }
 
-        public async Task AddAsync(Order entity) {
+        public async Task<TypeId?> AddAsync(Order entity) {
 
             await EntityValidate(entity.CustomerId, entity.RouteId, entity.RateId, entity.Distance,
                 entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged, entity.WhenChanged,
@@ -29,6 +29,8 @@ namespace DbAPI.Repositories {
 
             await _context.Orders.AddAsync(entity);
             await _context.SaveChangesAsync();
+
+            return entity.Id;
         }
 
         public async Task AddAsync(TypeId customerId, TypeId routeId, TypeId rateId, int distance,

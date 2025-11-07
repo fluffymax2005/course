@@ -20,13 +20,15 @@ namespace DbAPI.Repositories {
             return await _context.Routes.ToListAsync();
         }
 
-        public async Task AddAsync(Models.Route entity) {
+        public async Task<TypeId?> AddAsync(Models.Route entity) {
             await EntityValidate(entity.BoardingAddress, entity.DropAddress, entity.WhoAdded,
                 entity.WhenAdded, entity.Id, entity.WhoChanged, entity.WhenChanged, entity.Note,
                 entity.IsDeleted);
 
             await _context.Routes.AddAsync(entity);
             await _context.SaveChangesAsync();
+
+            return entity.Id;
         }
 
         public async Task AddAsync(string boardingAddress, string dropAddress, string whoAdded,
