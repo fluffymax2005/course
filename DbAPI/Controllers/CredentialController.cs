@@ -409,22 +409,19 @@ namespace DbAPI.Controllers {
 
         // api/{entity}/verify-table-state-hash
         [HttpPost("verify-table-state-hash")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public IActionResult VerifyTableStateHash([FromBody] string hash) {
             var cacheKey = "Credential";
             var cacheHash = _cache.Get<string>(cacheKey);
 
-            // Создаем новый хэш для сравнения
-            var newHash = Hasher.CreateTableHash();
-
             if (cacheHash == null) {
-                _cache.Set(cacheKey, newHash);
+                var newHash = UpdateTableHash();
                 return Ok(new { result = "0", hash = newHash });
             } else {
                 var verifyResult = cacheHash.Equals(hash);
                 return Ok(new {
                     result = verifyResult ? "1" : "0",
-                    hash = verifyResult ? hash : newHash,
+                    hash = hash,
                 });
             }
         }
