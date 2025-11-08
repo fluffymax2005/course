@@ -124,7 +124,7 @@ namespace DbAPI.Controllers {
 
         // api/{entity}/verify-table-state-hash
         [HttpPost("verify-table-state-hash")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult VerifyTableStateHash([FromBody] string hash) {
             var cacheKey = "Role";
             var cacheHash = _cache.Get<string>(cacheKey);
