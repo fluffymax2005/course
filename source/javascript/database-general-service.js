@@ -1,15 +1,18 @@
-import { getUserRights } from "./cookie.js";
-import { allTableData, currentDataPage } from "./database-form-service.js";
+import { getUserRights, UserRights } from "./cookie.js";
+import { allTableData, currentDataPage } from "./table-service.js";
 import { DATA_PER_PAGE } from "./table-utils.js";
 
 export function checkDatabaseAccess() {
     const userRights = getUserRights(); // Функция должна быть реализована
     const actionButtons = document.getElementById('dbActionButtons');
     
-    if (userRights >= 1) { // Права редактора или админа
-        actionButtons.style.display = 'flex';
-    } else {
-        actionButtons.style.display = 'none';
+    switch (userRights) {
+        case UserRights.Basic:
+        case UserRights.Director:
+            actionButtons.style.display = 'none';
+            break;
+        default:
+            actionButtons.style.display = 'flex';
     }
 }
 

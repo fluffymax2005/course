@@ -1,31 +1,27 @@
-import { fetchTableData, setupPagination, currentSearchId, changeCurrentSearchId, 
-    changeCurrentDataPage, allTableData, currentDataPage, detectFieldType,
-    changeCurrentRecord} from "./database-form-service.js";
+import { fetchTableData, setupPagination, detectFieldType} from "./form-service.js";
 import { formatValue, getCellClassName, getCurrentPageData, checkDatabaseAccess } from "./database-general-service.js";
-import { TableModifying } from "./database-table-service.js";
+import { allTableData, changeCurrentDataPage, changeCurrentRecord, changeCurrentSearchId, currentDataPage, currentSearchId, TableModifying } from "./table-service.js";
 import { getUserRights, UserRights } from "./cookie.js";
-import { DATA_PER_PAGE, fieldNameMapping, TableAction } from "./table-utils.js";
+import { DATA_PER_PAGE, fieldNameMapping, TableAction, tableMap } from "./table-utils.js";
 
-let currentTable = '';
+window.loadTableData = loadTableData;
 
 // Загрузка данных в таблицу
-window.loadTableData = function loadTableData(useCache = true) {
+export function loadTableData(useCache = true) {
     const tableSelect = document.getElementById('tableSelect');
-    currentTable = tableSelect.value;
     
-    if (!currentTable) {
-        hideTableInterface();
-        return;
-    }
+    const currentTable = tableSelect.value;
+    
+    hideTableInterface();
     
     // Сбрасываем поиск при смене таблицы
     clearSearch();
     
     // Проверяем права доступа
     checkDatabaseAccess();
-    
+
     // Загружаем данные таблицы
-    fetchTableData(useCache);
+    fetchTableData(currentTable, tableMap.get(currentTable), 'dataPagination', useCache);
 }
 
 // Сокрытие интерфейса таблиц
@@ -40,13 +36,15 @@ export function hideTableInterface() {
 
 // Отображение данных таблицы
 export function displayTableData(data) {
+    const paginationId = 'dataPagination';
+    
     const tableHead = document.getElementById('dataTableHead');
     const tableBody = document.getElementById('dataTableBody');
     const tableInfo = document.getElementById('tableInfo');
     const dataTable = document.getElementById('dataTable');
     const noDataMessage = document.getElementById('noDataMessage');
     const noSearchResultsMessage = document.getElementById('noSearchResultsMessage');
-    const pagination = document.getElementById('dataPagination');
+    const pagination = document.getElementById(paginationId);
 
     const userRights = getUserRights();
     
@@ -203,7 +201,7 @@ export function displayTableData(data) {
     });
     
     // Настраиваем пагинацию
-    setupPagination();
+    setupPagination(paginationId);
 }
 
 // Отображение результатов поиска
@@ -319,7 +317,7 @@ export function showNoSearchResults() {
 }
 
 // Очистка поиска
-window.clearSearch = function clearSearch() {
+export function clearSearch() {
     changeCurrentSearchId(null);
     
     // Сбрасываем поле поиска

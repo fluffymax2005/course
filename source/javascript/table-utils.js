@@ -1,4 +1,4 @@
-import { DatabaseCache } from "./database-cache.js";
+import { TableCache } from "./table-cache.js";
 
 export const DATA_PER_PAGE = 20; // Число строк на каждой странице - пагинация
 
@@ -11,7 +11,7 @@ tableMap.set('Заказы', 'Order')
     .set('Тарифы', 'Rate')
     .set('Шоферы', 'Driver')
     .set('Транспортные средства', 'TransportVehicle')
-    .set('Пользователи', 'Credential')
+    .set('Учетные записи', 'Credential')
     .set('Роли', 'Role');
 
 // Маппинг русских названий для полей
@@ -61,4 +61,4 @@ export class TableAction {
     static get Recover() {return this.TABLE_RECOVER;}
 }
 
-export const dbCache = new DatabaseCache();
+export const dbCache = new TableCache();

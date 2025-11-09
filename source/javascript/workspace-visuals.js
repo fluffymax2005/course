@@ -1,5 +1,6 @@
+import { switchTab } from "./admin-panel.js";
 import { getUserRights, UserRights } from "./cookie.js";
-import { hideTableInterface } from "./database-visuals.js";
+import { clearSearch, hideTableInterface } from "./database-visuals.js";
 
 // Визуальные функции
 

@@ -1,29 +1,25 @@
-import { BASE_API_URL } from "./api.js";
-import { getCookie } from "./cookie.js";
+import { fetchTableData } from "./form-service.js";
+import { changeCurrentDataPage, changeCurrentRecord, changeCurrentSearchId, changeTableData } from "./table-service.js";
+import { dbCache, tableMap } from "./table-utils.js";
 
-// Переменные для управления состоянием
-let currentEditingUser = null;
-let currentEditingRole = null;
-let currentUsersPage = 1;
-let currentRolesPage = 1;
-const itemsPerPage = 10;
+// Словарь: наименование сущности -> Имя компонента пагинации
+const paginationNameMap = new Map();
+paginationNameMap.set(tableMap['Пользователи'], 'usersPagination')
+    .set(tableMap['Пользователи'], 'rolesPagination');
+
+// Словарь: Имя компонента вкладки панели админа -> наименование сущности
+const tabsNameMap = new Map();
+tabsNameMap.set('Учетные записи', 'users')
+    .set('Роли', 'roles');
 
 // Функции для вкладок
-window.switchTab = async function switchTab(tabName, event = null) {
-    let loadSuccess = false;
-
+export async function switchTab(tabName) {
     // Загрузить данные для вкладки
-    if (tabName === 'users') {
-        loadSuccess = await loadUsers();
-    } else if (tabName === 'roles') {
-        loadSuccess = await loadRoles();
+    switch (tabsNameMap[tabName]) {
+        case 'users': await loadUsers(); break;
+        case 'roles': await loadRoles(); break;
     }
 
-    if (!loadSuccess) {
-        return false;
-    }
-
-    // Только после успешной загрузки данных переключаем вкладки
     // Скрыть все вкладки
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
@@ -54,56 +50,20 @@ window.switchTab = async function switchTab(tabName, event = null) {
 }
 
 // Функции для пользователей
-async function loadUsers(page = 1) {
-    try {
-        // Проверяем токен перед запросом
-        const token = getCookie('token');
-        const tokenExpireTime = getCookie('tokenExpireTime');
-        
-        if (!token || !tokenExpireTime) {
-            console.error('Токен не найден');
-            messageBoxShow('Авторизуйтесь в системе', 'red', '20px', '44%', 'translateY(50px)');
-            return false;
-        }
+async function loadUsers() {
+    
+    // Смена переменных состояния текущей таблицы
+    changeCurrentDataPage(1);
+    changeCurrentRecord(null, null);
+    changeCurrentSearchId(null);
 
-        const tokenExpireDateTime = new Date(tokenExpireTime);
-        if (tokenExpireDateTime < new Date()) {
-            console.error('Время сессии истекло');
-            messageBoxShow('Время вашей сессии истекло. Авторизуйтесь повторно', 'red', '20px', '50%', 'translateY(50px)');
-            return false;
-        }
-        
-        const response = await fetch(`${BASE_API_URL}/Credential`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!response.ok) throw new Error(response.status);
-        
-        const users = await response.json(); // Получаем массив напрямую
-               
-        if (Array.isArray(users)) {
-            displayUsers(users);
-            setupUsersPagination(users.length, page);
-            currentUsersPage = page;
-        } else {
-            throw new Error('API returned non-array response');
-        }
-        
-    } catch (error) {
-        console.error('Error loading users:', error);
-        
-        const errorMessage = error.message == 401 ? 'Срок вашей сессии истек. Авторизуйтесь повторно' : 'Внутренняя ошибка';        
-        messageBoxShow(errorMessage, 'red', '20px', '40%', 'translateY(50px)');
-        return false;
-    }
-    return true;
+    const tableName = 'Пользователи'; // Название таблицы
+    fetchTableData(tableName, tableMap.get(tableName), paginationNameMap.get(tableMap.get(tableName))); // Загрузка данных
+    
+    changeTableData(dbCache.get(tableName));
 }
 
-function displayUsers(users) {
+/*function displayUsers(users) {
     const tbody = document.getElementById('usersTableBody');
     tbody.innerHTML = '';
     
@@ -136,7 +96,7 @@ function displayUsers(users) {
         `;
         tbody.appendChild(row);
     });
-}
+}*/
 
 function setupUsersPagination(totalCount, currentPage) {
     const pagination = document.getElementById('usersPagination');

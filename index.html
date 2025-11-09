@@ -11,9 +11,9 @@
     <script type="module" src="source/javascript/index.js"></script>
     <script type="module" src="source/javascript/workspace-visuals.js"></script>
 
-    <script type="module" src="source/javascript/database-form-service.js"></script>
+    <script type="module" src="source/javascript/form-service.js"></script>
     <script type="module" src="source/javascript/database-visuals.js"></script>
-    <script type="module" src="source/javascript/database-table-service.js"></script>
+    <script type="module" src="source/javascript/table-service.js"></script>
 
     <script type="module" src="source/javascript/admin-panel.js"></script>
 </head>
@@ -149,12 +149,12 @@
                     <label for="tableSelect">Выберите таблицу:</label>
                     <select id="tableSelect" onchange="loadTableData()">
                         <option value="">-- Выберите таблицу --</option>
-                        <option value="orders">Заказы</option>
-                        <option value="customers">Заказчики</option>
-                        <option value="routes">Маршруты</option>
-                        <option value="rates">Тарифы</option>
-                        <option value="drivers">Шоферы</option>
-                        <option value="transport-vehicles">Транспортные средства</option>
+                        <option value="Заказы">Заказы</option>
+                        <option value="Заказчики">Заказчики</option>
+                        <option value="Маршруты">Маршруты</option>
+                        <option value="Тарифы">Тарифы</option>
+                        <option value="Шоферы">Шоферы</option>
+                        <option value="Транспортные средства">Транспортные средства</option>
                     </select>
                 </div>
 
@@ -238,8 +238,8 @@
         <div class="admin-container">
             <!-- Вкладки -->
             <div class="admin-tabs">
-                <button class="tab-btn active" onclick="switchTab('users')">Учетные записи</button>
-                <button class="tab-btn" onclick="switchTab('roles')">Роли</button>
+                <button class="tab-btn active" onclick="switchTab('Учетные записи')">Учетные записи</button>
+                <button class="tab-btn" onclick="switchTab('Роли')">Роли</button>
             </div>
 
             <!-- Содержимое вкладки пользователей -->
