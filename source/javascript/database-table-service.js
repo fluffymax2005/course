@@ -1,21 +1,10 @@
 import { getToken, getUserName, getUserRights, setTableHash, UserRights } from "./cookie.js";
-import { populateEditForm, currentRecord, changeCurrentSearchId, allTableData, detectFieldType, tableMap, changeCurrentRecord, currentRecordAction, TableFormConfirmButton } from "./database-form-service.js";
+import { populateEditForm, currentRecord, changeCurrentSearchId, allTableData, detectFieldType, currentRecordAction, changeCurrentRecord} from "./database-form-service.js";
 import { displaySearchResults, displayTableData, showSearchInfo } from "./database-visuals.js";
-import { messageBoxShowFromLeft } from "./index.js";
 import { ApiService } from "./api.js";
 import { getCurrentPageData } from "./database-general-service.js";
+import { TableAction, tableMap } from "./table-utils.js";
 
-const TABLE_EDIT = 0;
-const TABLE_INSERT = 1;
-const TABLE_DELETE = 2;
-const TABLE_RECOVER = 3;
-
-export class TableAction {
-    static get Edit() {return TABLE_EDIT;}
-    static get Insert() {return TABLE_INSERT;}
-    static get Delete() {return TABLE_DELETE;}
-    static get Recover() {return TABLE_RECOVER;}
-}
 
 // Отобразить форму добавления новой записи
 window.showAddRecordForm = function showAddRecordForm() {
@@ -24,7 +13,7 @@ window.showAddRecordForm = function showAddRecordForm() {
 
 // Обновление записи
 window.recordAction = async function recordAction(event) {
-    event.preventDefault();
+    //event.preventDefault();
 
     // Задаем тип действия
     let action = currentRecordAction;

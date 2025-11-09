@@ -1,5 +1,4 @@
 import { getUserRights, UserRights } from "./cookie.js";
-import { messageBoxShowFromLeft } from "./index.js";
 import { hideTableInterface } from "./database-visuals.js";
 
 // Визуальные функции

@@ -1,12 +1,9 @@
 import {getTableHash, getToken, setTableHash} from './cookie.js'
 import {ApiService} from './api.js';
-import { messageBoxShowFromRight } from "./index.js";
-import { DatabaseCache } from "./database-cache.js";
-import { isFieldRequired, getMinValue, getMaxValue, TableAction } from './database-table-service.js';
-import { displayTableData, fieldNameMapping } from "./database-visuals.js";
+import { isFieldRequired, getMinValue, getMaxValue } from './database-table-service.js';
+import { displayTableData } from "./database-visuals.js";
 import { getCurrentPageData } from "./database-general-service.js";
-
-export const dbCache = new DatabaseCache();
+import { DATA_PER_PAGE, dbCache, fieldNameMapping, TableAction, tableMap } from './table-utils.js';
 
 export let currentSearchId = null; // текущая запись, подлежащая поиску
 export let currentRecord = null; // текущая запись, с коротой производятся действия
@@ -15,71 +12,6 @@ export let currentRecordAction = null; // тип операции, примен�
 export let allTableData = []; // данные всех таблиц
 
 export let currentDataPage = 1; // текущая отображаемая страницы - пагинация
-export const DATA_PER_PAGE = 20; // Число строк на каждой странице - пагинация
-
-// Словарь для доступа к API
-
-export var tableMap = new Map();
-
-tableMap.set('Заказы', 'Order')
-    .set('Заказчики', 'Customer')
-    .set('Маршруты', 'Route')
-    .set('Тарифы', 'Rate')
-    .set('Шоферы', 'Driver')
-    .set('Транспортные средства', 'TransportVehicle');
-
-// Текстовое содержимое кнопок форм при подтвержении действия:
-// 1. Добавить набор.
-// 2. Редактировать набор.
-// 3. Удалить набор.
-// 4. Восстановить набор.
-
-const EDIT_BUTTON_TEXT = 'Сохранить';
-const INSERT_BUTTON_TEXT = 'Добавить';
-const DELETE_BUTTON_TEXT = 'Удалить';
-const RECOVER_BUTTON_TEXT = 'Восстановить';
-
-export class TableFormConfirmButton {
-    static get Edit() {return EDIT_BUTTON_TEXT};
-    static get Insert() {return INSERT_BUTTON_TEXT};
-    static get Delete() {return DELETE_BUTTON_TEXT};
-    static get Recover() {return RECOVER_BUTTON_TEXT;}
-    static Text(action) {
-        switch (action) {
-            case TableAction.Edit: return this.Edit;
-            case TableAction.Insert: return this.Insert;
-            case TableAction.Delete: return this.Delete;
-            case TableAction.Recover: return this.Recover;
-        }
-    }
-}
-
-// Текстовое содержимое заголовков форм при подтвержении действия:
-// 1. Добавить набор.
-// 2. Редактировать набор.
-// 3. Удалить набор.
-// 4. Восстановить набор.
-
-const EDIT_FORM_HEADER = 'Редактировать';
-const INSERT_FORM_HEADER = 'Добавить';
-const DELETE_FORM_HEADER = 'Удалить';
-const RECOVER_FORM_HEADER = 'Восстановить';
-
-export class TableFormConfirmHeader {
-    static get Edit() {return EDIT_FORM_HEADER};
-    static get Insert() {return INSERT_FORM_HEADER};
-    static get Delete() {return DELETE_FORM_HEADER};
-    static get Recover() {return RECOVER_FORM_HEADER;}
-    static Text(action) {
-        switch (action) {
-            case TableAction.Edit: return this.Edit;
-            case TableAction.Insert: return this.Insert;
-            case TableAction.Delete: return this.Delete;
-            case TableAction.Recover: return this.Recover;
-        }
-    }
-}
-
 
 // Функции для изменения значений переменных
 
@@ -167,6 +99,7 @@ export async function fetchTableData(useCache = true) {
 
     } catch (error) {       
         messageBoxShowFromRight('Внутренняя ошибка', 'red', false, '43', 'translateY(50px)');
+        console.error(error);
     }
 }
 

@@ -1,62 +1,12 @@
 import { fetchTableData, setupPagination, currentSearchId, changeCurrentSearchId, 
-    changeCurrentDataPage, allTableData, currentDataPage, DATA_PER_PAGE, detectFieldType,
+    changeCurrentDataPage, allTableData, currentDataPage, detectFieldType,
     changeCurrentRecord} from "./database-form-service.js";
 import { formatValue, getCellClassName, getCurrentPageData, checkDatabaseAccess } from "./database-general-service.js";
-import { TableAction, TableModifying } from "./database-table-service.js";
+import { TableModifying } from "./database-table-service.js";
 import { getUserRights, UserRights } from "./cookie.js";
+import { DATA_PER_PAGE, fieldNameMapping, TableAction } from "./table-utils.js";
 
 let currentTable = '';
-
-// Маппинг русских названий для полей
-export const fieldNameMapping = {
-    'id': 'ID',
-    'customerId': 'ID заказчика',
-    'routeId': 'ID маршрута',
-    'rateId': 'ID тарифа',
-    'driverId': 'ID шофера',
-    'vehicleId': 'ID транспортного средства',
-    'forename': 'Имя',
-    'surname': 'Фамилия',
-    'phoneNumber': 'Номер телефона',
-    'boardingAddress': 'Адрес посадки',
-    'dropAddress': 'Адрес высадки',
-    'driverLicenceSeries': 'Серия водительских прав',
-    'driverLicenceNumber': 'Номер водительских прав',
-    'number': 'Номер',
-    'series': 'Серия',
-    'registrationCode': 'Код регистрации',
-    'model': 'Модель',
-    'color': 'Цвет',
-    'releaseYear': 'Год выпуска',
-    'movePrice': 'Цена в пути',
-    'idlePrice': 'Цена в простое',
-    'username': 'Имя пользователя',
-    'email': 'Email',
-    'name': 'Название',
-    'title': 'Заголовок',
-    'description': 'Описание',
-    'price': 'Цена',
-    'quantity': 'Количество',
-    'category': 'Ктегория',
-    'status': 'Статус',
-    'created_at': 'Дата создания',
-    'updated_at': 'Дата обновления',
-    'role': 'Роль',
-    'is_active': 'Активен',
-    'whoAdded': 'Кто добавил',
-    'whenAdded': 'Когда добавил',
-    'whoChanged': 'Кто изменил',
-    'whenChanged': 'Когда изменил',
-    'note': 'Примечание',
-    'isDeleted': 'Удален',
-    'customerName': 'Имя заказчика',
-    'orderDate': 'Дата заказа',
-    'routeName': 'Название маршрута',
-    'distance': 'Расстояние',
-    'rateValue': 'Значение тарифа',
-    'driverName': 'Имя водителя',
-    'vehicleModel': 'Модель транспорта'
-};
 
 // Загрузка данных в таблицу
 window.loadTableData = function loadTableData(useCache = true) {
@@ -318,6 +268,8 @@ export function displaySearchResults(results) {
                 editBtn.innerHTML = '✏️';
                 editBtn.title = 'Редактировать';
                 editBtn.onclick = () => TableModifying(record, TableAction.Edit);
+
+                actionsTd.appendChild(editBtn);
             }
              
             if (userRights === UserRights.Admin) {
@@ -326,10 +278,10 @@ export function displaySearchResults(results) {
                 deleteBtn.innerHTML = '🗑️';
                 deleteBtn.title = 'Удалить';
                 deleteBtn.onclick = () => confirmDeleteRecord(record);
+
+                actionsTd.appendChild(deleteBtn);
             }
             
-            actionsTd.appendChild(editBtn);
-            actionsTd.appendChild(deleteBtn);
             row.appendChild(actionsTd);
         }
         
