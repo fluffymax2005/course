@@ -1,7 +1,6 @@
-export const BASE_API_URL = 'http://localhost:5091/api';
-export const hoursTokenExpiresAt = 1;
-
 export class ApiService {
+
+    static BASE_API_URL = 'http://localhost:5091/api';
 
     /**
      * Универсальный метод для выполнения API запросов
@@ -27,7 +26,7 @@ export class ApiService {
         }
 
         try {
-            const response = await fetch(`${BASE_API_URL}/${path}`, config);
+            const response = await fetch(`${this.BASE_API_URL}/${path}`, config);
 
             console.log(response);
 
