@@ -34,10 +34,4 @@ export class TableCache {
             .filter(key => key.startsWith(this.cacheKey))
             .forEach(key => localStorage.removeItem(key));
     }
-
-     // Инвалидируем кэш при изменении данных
-    onDataChanged(tableName) {      
-        // Очищаем кэш измененной таблицы
-        this.clear(tableName);
-    }
 }

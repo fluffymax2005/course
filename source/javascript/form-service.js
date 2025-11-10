@@ -1,8 +1,6 @@
 import {getTableHash, getToken, setTableHash} from './cookie.js'
 import {ApiService} from './api.js';
-import { isFieldRequired, getMinValue, getMaxValue, changeTableData, changeCurrentDataPage, currentSearchId, allTableData, currentDataPage } from './table-service.js';
-import { displayTableData } from "./database-visuals.js";
-import { getCurrentPageData } from "./database-general-service.js";
+import { isFieldRequired, getMinValue, getMaxValue, TableVariables } from './table-service.js';
 import { DATA_PER_PAGE, dbCache, fieldNameMapping, TableAction } from './table-utils.js';
 import { MessageBox, TableFormConfirmButton } from './form-utils.js';
 
@@ -11,7 +9,7 @@ export function showAddRecordForm() {
     TableModifying(null, TableAction.Insert);
 }
 
-export async function fetchTableData(tableName, entityName, paginationId, useCache = true) {
+export async function fetchTableData(tableName, entityName, paginationID, useCache = true) {
 
     const token = getToken(); // токен сессии
 
@@ -19,7 +17,7 @@ export async function fetchTableData(tableName, entityName, paginationId, useCac
     let isGoingToFetch = false; // нужно ли выполнять вытягивание данных из БД - данные несвежие
     
     // Данных нет в памяти - вытягивание
-    if (tableHash === undefined || tableHash === null) {
+    if (!tableHash) {
         try {
             const data = await ApiService.post(`${entityName}/verify-table-state-hash`, "-", {
                 'Authorization': `Bearer ${token}`,
@@ -37,7 +35,7 @@ export async function fetchTableData(tableName, entityName, paginationId, useCac
                 'Authorization': `Bearer ${token}`,
             });
 
-            if (data.hash != tableHash) {
+            if (data.result === '0' || !dbCache.get(tableName)) {
                 isGoingToFetch = true;
                 setTableHash(tableName, data.hash);
             }
@@ -52,11 +50,8 @@ export async function fetchTableData(tableName, entityName, paginationId, useCac
     if (useCache && !isGoingToFetch) {
         const cachedData = dbCache.get(tableName);
         if (cachedData) {
-            changeTableData(cachedData);
-            changeCurrentDataPage(1);
-
-            displayTableData(getCurrentPageData());
-            setupPagination(paginationId);
+            TableVariables.tableData = cachedData;
+            TableVariables.dataPage = 1;
             return;
         }
     }
@@ -71,11 +66,8 @@ export async function fetchTableData(tableName, entityName, paginationId, useCac
             // Сохраняем в кэш
             dbCache.set(tableName, data);
             
-            changeTableData(data);
-            changeCurrentDataPage(1);
-
-            displayTableData(getCurrentPageData());
-            setupPagination(paginationId);
+            TableVariables.tableData = data;
+            TableVariables.dataPage = 1;
         } else {
             throw new Error('API returned non-array response');
         }
@@ -87,9 +79,9 @@ export async function fetchTableData(tableName, entityName, paginationId, useCac
 }
 
 // Настройка пагинации
-export function setupPagination(paginationId) {
-    const pagination = document.getElementById(paginationId);
-    const totalRecords = currentSearchId ? 1 : allTableData.length;
+export function setupPagination(paginationID) {
+    const pagination = document.getElementById(paginationID);
+    const totalRecords = TableVariables.searchId ? 1 : TableVariables.tableData.length;
     const totalPages = Math.ceil(totalRecords / DATA_PER_PAGE);
     
     if (totalPages <= 1) {
@@ -100,27 +92,49 @@ export function setupPagination(paginationId) {
     pagination.style.display = 'flex';
     
     let paginationHTML = '';
+
+    let tableID = '', tableHead = '', tableBodyID = '', tableInfoID = '';
+    switch (paginationID) {
+        case 'dataPagination':
+            tableID = 'dataTable';
+            tableHead = 'databaseTableHead';
+            tableBodyID = 'databaseTableBody';
+            tableInfoID = 'databaseInfo';
+            break;
+        case 'usersPagination':
+            tableID = 'usersTable';
+            tableHead = 'usersTableHead';
+            tableBodyID = 'usersTableBody';
+            tableInfoID = 'usersInfo';
+            break;
+        case 'rolesPagination':
+            tableID = 'rolesTable';
+            tableHead = 'rolesTableHead';
+            tableBodyID = 'rolesTableBody';
+            tableInfoID = 'rolesInfo';
+            break;
+    }
     
     // Кнопка "Назад"
-    if (currentDataPage > 1) {
-        paginationHTML += `<button onclick="changePage(${currentDataPage - 1})">‹ Назад</button>`;
+    if (TableVariables.dataPage > 1) {
+        paginationHTML += `<button onclick="changePage(${TableVariables.dataPage - 1}, '${paginationID}', '${tableID}', '${tableHead}', '${tableBodyID}, '${tableInfoID}')">Назад</button>`;
     }
     
     // Номера страниц
-    const startPage = Math.max(1, currentDataPage - 2);
-    const endPage = Math.min(totalPages, currentDataPage + 2);
+    const startPage = Math.max(1, TableVariables.dataPage - 2);
+    const endPage = Math.min(totalPages, TableVariables.dataPage + 2);
     
     for (let i = startPage; i <= endPage; i++) {
-        if (i === currentDataPage) {
+        if (i === TableVariables.dataPage) {
             paginationHTML += `<button class="active">${i}</button>`;
         } else {
-            paginationHTML += `<button onclick="changePage(${i})">${i}</button>`;
+            paginationHTML += `<button onclick="changePage(${i}, '${paginationID}', '${tableID}', '${tableHead}', '${tableBodyID}', '${tableInfoID}')">${i}</button>`;
         }
     }
     
     // Кнопка "Вперед"
-    if (currentDataPage < totalPages) {
-        paginationHTML += `<button onclick="changePage(${currentDataPage + 1})">Вперед ›</button>`;
+    if (TableVariables.dataPage < totalPages) {
+        paginationHTML += `<button onclick="changePage(${TableVariables.dataPage + 1}, '${paginationID}', '${tableID}', '${tableHead}', '${tableBodyID}', '${tableInfoID}')">Вперед</button>`;
     }
     
     pagination.innerHTML = paginationHTML;
@@ -172,7 +186,7 @@ export function populateEditForm(record, tableName, action) {
 
     // В случае, если добавляется новый набор, то дин. верстка будет по нулевому набору (он дб)
     if (action === TableAction.Insert) {
-        record = allTableData[0];
+        record = TableVariables.tableData[0];
     }
 
     // Производим дин. верстку

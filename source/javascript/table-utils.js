@@ -46,6 +46,7 @@ export const fieldNameMapping = {
     'note': 'Примечание',
     'isDeleted': 'Удален',
     'distance': 'Расстояние',
+    'transportVehicleId': 'ID транспортного средства'
 };
 
 
@@ -62,3 +63,32 @@ export class TableAction {
 }
 
 export const dbCache = new TableCache();
+
+// Двунаправленный словарь: наименование таблицы для пользователя <-> наименование в коде
+
+export class TableName {
+    static ORDER = ['Заказы', 'dataTable']
+    static CUSTOMER = ['Заказчики', 'dataTable']
+    static RATE = ['Тарифы', 'dataTable']
+    static ROUTE = ['Маршруты', 'dataTable']
+    static DRIVER = ['Водители', 'dataTable']
+    static TRANPSORT_VEHICLE = ['Транспортные средства', 'dataTable']
+    static CREDENTIAL = ['Учетные записи', 'users'];
+    static ROLE = ['Роли', 'roles'];
+
+    static getViewName(divTableID) {
+        const fields = Object.values(TableName); // константые поля класса
+
+        const foundField = fields.find(field => Array.isArray(field) && field[1] === divTableID);
+
+        return foundField ? foundField[0] : null;
+    }
+
+    static getCodeName(tableName) {
+        const fields = Object.values(TableName); // константые поля класса
+
+        const foundField = fields.find(field => Array.isArray(field) && field[0] === tableName);
+
+        return foundField ? foundField[1] : null;
+    }
+}

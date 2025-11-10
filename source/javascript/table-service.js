@@ -5,42 +5,67 @@ import { ApiService } from "./api.js";
 import { getCurrentPageData } from "./database-general-service.js";
 import { TableAction, tableMap } from "./table-utils.js";
 import { MessageBox, TableFormConfirmButton } from "./form-utils.js";
+import { showTableData } from "./workspace-visuals.js";
 
 window.recordAction = recordAction;
 
-export let currentSearchId = null; // текущая запись, подлежащая поиску
-export let currentRecord = null; // текущая запись, с коротой производятся действия
-export let currentRecordAction = null; // тип операции, применяемый к текущей записи
+// Класс, управляющий значениями переменных для текущей рассматриваемой таблицы
+export class TableVariables {
+    static _searchId = null; // текущая запись, подлежащая поиску
+    static _record = null; // текущая запись, с коротой производятся действия
+    static _recordAction = null; // тип операции, применяемый к текущей записи
 
-export let allTableData = []; // данные всех таблиц
+    static _tableData = []; // данные таблицы
+    static _tableRUName = ''; // название таблицы для пользователя
+    static _tableCodeName = ''; // идентификатор таблицы в коде
 
-export let currentDataPage = 1; // текущая отображаемая страницы - пагинация
+    static _dataPage = 1; // текущая отображаемая страницы - пагинация
 
-// Функции для изменения значений переменных
+    static get searchId() {return this._searchId;}
+    static set searchId(id) { 
+        if (id && id >= 0)
+            this._searchId = id;
+        else
+            this._searchId = null;
+    }
 
-export function changeCurrentSearchId(value) {
-    currentSearchId = value;
-}
+    static get record() {return this._record;}
+    static set record(value) {this._record = value;}
 
-export function changeCurrentDataPage(value) {
-    currentDataPage = value;
-}
+    static get recordAction() {return this._recordAction;}
+    static set recordAction(value) {
+        const actions = Object.values(TableAction);
 
-export function changeCurrentRecord(value, action) {
-    currentRecord = value;
-    currentRecordAction = action;
-}
+        const foundAction = actions.find(action => action === value);
 
-export function changeTableData(value) {
-    allTableData = value;
+        this._recordAction = foundAction !== null && foundAction !== undefined ? foundAction : null;
+    }
+
+    static get tableData() {return this._tableData;}
+    static set tableData(data) {
+        this._tableData = Array.isArray(data) ? data : null;
+    }
+
+    static get dataPage() {return this._dataPage;}
+    static set dataPage(page) {
+        this._dataPage = page && page > 0 ? page : null; 
+    }
+
+    static get tableRUName() {return this._tableRUName;}
+    static set tableRUName(name) {
+        this._tableRUName = name; 
+    }
+
+    static get tableCodeName() {return this._tableCodeName;}
+    static set tableCodeName(name) {
+        this._tableCodeName = name; 
+    }
 }
 
 // Обновление записи
-export async function recordAction(event) {
-    event.preventDefault();
-
+export async function recordAction() {
     // Задаем тип действия
-    let action = currentRecordAction;
+    let action = TableVariables.recordAction;
     
     const formData = new FormData(event.target);
     const body = {};
@@ -51,12 +76,12 @@ export async function recordAction(event) {
     // 3. Удаление записей - копирование ключей текущей записи
     let localRecord;
     if (action === TableAction.Insert) { // Добавление
-        localRecord = allTableData[0];
+        localRecord = TableVariables.tableData[0];
     } else {
-        localRecord = currentRecord;
+        localRecord = TableVariables.record;
     }
 
-    let recordIndex = allTableData.indexOf(localRecord); // индекс записи
+    let recordIndex = TableVariables.tableData.indexOf(localRecord); // индекс записи
     
     // Копируем ВСЕ поля из исходной записи
     Object.keys(localRecord).forEach(key => {
@@ -138,22 +163,22 @@ export async function recordAction(event) {
                     'Authorization': `Bearer ${token}`
                 });
 
-                allTableData.push(newSet);
+                TableVariables.tableData.push(newSet);
 
                 break;
             case TableAction.Edit: {
-                data = await ApiService.put(`${apiTableName}/${currentRecord.id}`, body, {
+                data = await ApiService.put(`${apiTableName}/${TableVariables.record.id}`, body, {
                     'Authorization': `Bearer ${token}`
                 });
 
                 hash = data.hash;
 
                 // Обновление текущей записи на актуальную
-                const updatedSet = await ApiService.get(`${apiTableName}/${currentRecord.id}`, {
+                const updatedSet = await ApiService.get(`${apiTableName}/${TableVariables.record.id}`, {
                     'Authorization': `Bearer ${token}`
                 });
 
-                allTableData[recordIndex] = updatedSet;
+                TableVariables.tableData[recordIndex] = updatedSet;
 
                 hash = updatedSet.hash;
 
@@ -161,21 +186,21 @@ export async function recordAction(event) {
             }
                 
             case TableAction.Delete: {
-                data = await ApiService.delete(`${apiTableName}/${currentRecord.id}`, {
+                data = await ApiService.delete(`${apiTableName}/${TableVariables.record.id}`, {
                     'Authorization': `Bearer ${token}`
                 });
 
                 // В случае, если пользователь не админ и произведено удаление, то надо удалить из памяти запись
                 const userRights = getUserRights();
                 if (userRights !== UserRights.Admin) {
-                    allTableData.splice(recordIndex);
+                    TableVariables.tableData.splice(recordIndex);
                 } else {
                     // Если пользователь админ, то нужно получить свежую запись
-                    const updatedSet = await ApiService.get(`${apiTableName}/${currentRecord.id}`, {
+                    const updatedSet = await ApiService.get(`${apiTableName}/${TableVariables.record.id}`, {
                         'Authorization': `Bearer ${token}`
                     });
 
-                    allTableData[recordIndex] = updatedSet;
+                    TableVariables.tableData[recordIndex] = updatedSet;
                 }
 
                 hash = data.hash;
@@ -184,18 +209,18 @@ export async function recordAction(event) {
             }
                 
             case TableAction.Recover:
-                data = await ApiService.patch(`${apiTableName}/${currentRecord.id}/recover`, {
+                data = await ApiService.patch(`${apiTableName}/${TableVariables.record.id}/recover`, {
                     'Authorization': `Bearer ${token}`
                 });
 
                 hash = data.hash;
 
                 // Обновление текущей записи на актуальную
-                const updatedSet = await ApiService.get(`${apiTableName}/${currentRecord.id}`, {
+                const updatedSet = await ApiService.get(`${apiTableName}/${TableVariables.record.id}`, {
                     'Authorization': `Bearer ${token}`
                 });
 
-                allTableData[recordIndex] = updatedSet;
+                TableVariables.tableData[recordIndex] = updatedSet;
 
                 hash = updatedSet.hash;
 
@@ -203,10 +228,19 @@ export async function recordAction(event) {
         }
 
         // Запись нового хэша состояния таблицы
-        const tableName = tableSelect.options[tableSelect.selectedIndex].text;
-        setTableHash(tableName, hash);
+        setTableHash(tableMap.get(TableVariables.tableRUName), hash);
 
-        messageBoxShowFromLeft('Операция успешна завершена', 'green', false, '40', 'translateY(50px)');
+        let paginationID = '';
+        if (document.getElementById('dataPagination').style.display !== 'none')
+            paginationID = 'dataPagination';
+        else if (document.getElementById('usersPagination').style.display !== 'none')
+            paginationID = 'usersPagination';
+        else 
+            paginationID = 'rolesPagination';
+
+        showTableData(paginationID);
+
+        MessageBox.ShowFromLeft('Операция успешна завершена', 'green', false, '40', 'translateY(50px)');
     } catch (error) {
         if (action === TableAction.Insert && error.status === 400) {
             MessageBox.ShowFromLeft(`Введены некорректные данные. Проверьте содержимое и повторите попытку снова.`, 'red', false, '40', 'translateY(50px)');
@@ -217,17 +251,12 @@ export async function recordAction(event) {
         console.error(error);
         return;
     }
-
-    displayTableData(getCurrentPageData()); // обновляем отображение страницы
 }
 
 // Функция редактирования записи
-export function TableModifying(record, action) {
-    changeCurrentRecord(record, action);
-    
-    // Получаем название таблицы
-    const tableSelect = document.getElementById('tableSelect');
-    const tableName = tableSelect.options[tableSelect.selectedIndex].text;
+export function TableModifying(record, action, tableName) {
+    TableVariables.record = record;
+    TableVariables.recordAction = action;
 
     let formHeader;
     switch (action) {
@@ -271,10 +300,10 @@ window.searchById = function searchById() {
         return;
     }
     
-    changeCurrentSearchId(searchId);
+    changesearchId(searchId);
     
     // Ищем запись по ID во всех данных
-    const foundRecord = allTableData.find(record => record.id === searchId);
+    const foundRecord = TableVariables.tableData.find(record => record.id === searchId);
     
     if (foundRecord) {
         // Показываем только найденную запись

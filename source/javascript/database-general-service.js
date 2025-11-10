@@ -1,5 +1,5 @@
 import { getUserRights, UserRights } from "./cookie.js";
-import { allTableData, currentDataPage } from "./table-service.js";
+import { TableVariables } from "./table-service.js";
 import { DATA_PER_PAGE } from "./table-utils.js";
 
 export function checkDatabaseAccess() {
@@ -18,11 +18,11 @@ export function checkDatabaseAccess() {
 
 // Получение данных для текущей страницы
 export function getCurrentPageData() {
-    if (!allTableData || allTableData.length === 0) return [];
+    if (!TableVariables.tableData || TableVariables.tableData.length === 0) return [];
     
-    const startIndex = (currentDataPage - 1) * DATA_PER_PAGE;
+    const startIndex = (TableVariables.dataPage - 1) * DATA_PER_PAGE;
     const endIndex = startIndex + DATA_PER_PAGE;
-    return allTableData.slice(startIndex, endIndex);
+    return TableVariables.tableData.slice(startIndex, endIndex);
 }
 
 export function formatValue(value, type) {

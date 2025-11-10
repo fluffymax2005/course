@@ -1,10 +1,37 @@
+import { TableAction } from "./table-utils.js";
+
+// Словарь: имя секции на русском -> её название в коде
+
+export class SectionName {
+    static MAIN = ['Главная', 'main'];
+    static DATABASE = ['База данных', 'database'];
+    static STATISTICS = ['Статистика', 'statistics'];
+    static ADMIN_PANEL = ['Панель администратора', 'admin-panel'];
+
+    static getViewName(divSectionName) {
+        const sections = Object.values(SectionName); // все поля данного класса
+
+        // Находим нужное поле
+        const foundSection = sections.find(section => Array.isArray(section) && section[1] === divSectionName);
+
+        return foundSection ? foundSection[0] : null;
+    }
+
+    static getCodeName(sectionName) {
+        const sections = Object.values(SectionName); // все поля данного класса
+
+        // Находим нужное поле
+        const foundSection = sections.find(section => Array.isArray(section) && section[0] === sectionName);
+
+        return foundSection ? foundSection[1] : null;
+    }
+}
+
 // Текстовое содержимое кнопок форм при подтверждении действия:
 // 1. Добавить набор.
 // 2. Редактировать набор.
 // 3. Удалить набор.
 // 4. Восстановить набор.
-
-import { TableAction } from "./table-utils.js";
 
 export class TableFormConfirmButton {
     static EDIT_BUTTON_TEXT = 'Сохранить';

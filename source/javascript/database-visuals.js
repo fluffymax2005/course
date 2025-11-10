@@ -1,13 +1,15 @@
 import { fetchTableData, setupPagination, detectFieldType} from "./form-service.js";
 import { formatValue, getCellClassName, getCurrentPageData, checkDatabaseAccess } from "./database-general-service.js";
-import { allTableData, changeCurrentDataPage, changeCurrentRecord, changeCurrentSearchId, currentDataPage, currentSearchId, TableModifying } from "./table-service.js";
+import { TableModifying, TableVariables } from "./table-service.js";
 import { getUserRights, UserRights } from "./cookie.js";
 import { DATA_PER_PAGE, fieldNameMapping, TableAction, tableMap } from "./table-utils.js";
+import { showTableData } from "./workspace-visuals.js";
 
 window.loadTableData = loadTableData;
+window.changePage = changePage;
 
 // Загрузка данных в таблицу
-export function loadTableData(useCache = true) {
+export async function loadTableData(useCache = true) {
     const tableSelect = document.getElementById('tableSelect');
     
     const currentTable = tableSelect.value;
@@ -15,36 +17,35 @@ export function loadTableData(useCache = true) {
     hideTableInterface();
     
     // Сбрасываем поиск при смене таблицы
-    clearSearch();
+    clearSearch('dataPagination', currentTable);
     
     // Проверяем права доступа
     checkDatabaseAccess();
 
+    TableVariables.tableRUName = currentTable;
+    TableVariables.tableCodeName = 'dataTable';
+
     // Загружаем данные таблицы
-    fetchTableData(currentTable, tableMap.get(currentTable), 'dataPagination', useCache);
+    await fetchTableData(TableVariables.tableRUName, tableMap.get(currentTable), useCache);
+
+    showTableData('dataPagination'); // обновляем отображение страницы
 }
 
 // Сокрытие интерфейса таблиц
 export function hideTableInterface() {
-    document.getElementById('tableInfo').style.display = 'none';
-    document.getElementById('dataTable').style.display = 'none';
-    document.getElementById('noDataMessage').style.display = 'none';
-    document.getElementById('noSearchResultsMessage').style.display = 'none';
-    document.getElementById('dataPagination').style.display = 'none';
-    document.getElementById('searchResultsInfo').style.display = 'none';
+    document.querySelectorAll('.table-info').forEach(e => e.style.display = 'none');  
+    document.querySelectorAll('.dataTable').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('.pagination').forEach(e => e.style.display = 'none');  
+    document.querySelectorAll('.search-results-info').forEach(e => e.style.display = 'none');  
 }
 
 // Отображение данных таблицы
-export function displayTableData(data) {
-    const paginationId = 'dataPagination';
-    
-    const tableHead = document.getElementById('dataTableHead');
-    const tableBody = document.getElementById('dataTableBody');
-    const tableInfo = document.getElementById('tableInfo');
-    const dataTable = document.getElementById('dataTable');
-    const noDataMessage = document.getElementById('noDataMessage');
-    const noSearchResultsMessage = document.getElementById('noSearchResultsMessage');
-    const pagination = document.getElementById(paginationId);
+export function displayTableData(data, paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, tableRUName, tableCodeName) {   
+    const tableHead = document.getElementById(tableHeadID);
+    const tableBody = document.getElementById(tableBodyID);
+    const tableInfo = document.getElementById(tableInfoID);
+    const dataTable = document.getElementById(tableID);
+    const pagination = document.getElementById(paginationID);
 
     const userRights = getUserRights();
     
@@ -56,34 +57,23 @@ export function displayTableData(data) {
         dataTable.style.display = 'none';
         pagination.style.display = 'none';
         
-        if (currentSearchId) {
-            noSearchResultsMessage.style.display = 'block';
-            noDataMessage.style.display = 'none';
-        } else {
-            noDataMessage.style.display = 'block';
-            noSearchResultsMessage.style.display = 'none';
-        }
-        
         tableInfo.style.display = 'none';
         return;
     }
     
     // Показываем элементы интерфейса
     dataTable.style.display = 'table';
-    noDataMessage.style.display = 'none';
-    noSearchResultsMessage.style.display = 'none';
     tableInfo.style.display = 'flex';
     
     // Заполняем информацию о таблице
-    const tableSelect = document.getElementById('tableSelect');
-    document.getElementById('tableName').textContent = tableSelect.options[tableSelect.selectedIndex].text;
+    document.querySelectorAll('.text-table-info').forEach(e => e.textContent = tableRUName);
     
     // ИСПРАВЛЕНИЕ: Всегда показываем общее количество записей и текущий диапазон
-    const totalRecords = allTableData.length;
-    const startRecord = (currentDataPage - 1) * DATA_PER_PAGE + 1;
-    const endRecord = Math.min(currentDataPage * DATA_PER_PAGE, totalRecords);
+    const totalRecords = TableVariables.tableData.length;
+    const startRecord = (TableVariables.dataPage - 1) * DATA_PER_PAGE + 1;
+    const endRecord = Math.min(TableVariables.dataPage * DATA_PER_PAGE, totalRecords);
     
-    if (currentSearchId) {
+    if (TableVariables.searchId) {
         // В режиме поиска показываем информацию о найденной записи
         document.getElementById('recordCount').textContent = `Найдена 1 запись из ${totalRecords}`;
     } else {
@@ -94,7 +84,6 @@ export function displayTableData(data) {
     // Создаем заголовки таблицы ДИНАМИЧЕСКИ из первого объекта массива
     const headerRow = document.createElement('tr');
     const dataKeys = Object.keys(data[0]);
-    console.log(dataKeys);
     
     // Создаем заголовки для каждого ключа данных
     dataKeys.forEach(key => {
@@ -135,7 +124,7 @@ export function displayTableData(data) {
     // Заполняем данные
     data.forEach((record, index) => {
         const row = document.createElement('tr');
-        if (currentSearchId && record.id === currentSearchId) {
+        if (TableVariables.searchId && record.id === TableVariables.searchId) {
             row.classList.add('search-highlight');
         }
         
@@ -172,7 +161,7 @@ export function displayTableData(data) {
                 editBtn.className = 'btn-edit-small';
                 editBtn.innerHTML = '✏️';
                 editBtn.title = 'Редактировать';
-                editBtn.onclick = () => TableModifying(record, TableAction.Edit);
+                editBtn.onclick = () => TableModifying(record, TableAction.Edit, tableRUName);
 
                 actionsTd.appendChild(editBtn);
             }
@@ -182,13 +171,13 @@ export function displayTableData(data) {
                 deleteBtn.className = 'btn-delete-small';
                 deleteBtn.innerHTML = '🗑️';
                 deleteBtn.title = 'Удалить';
-                deleteBtn.onclick = () => TableModifying(record, TableAction.Delete);
+                deleteBtn.onclick = () => TableModifying(record, TableAction.Delete, tableRUName);
 
                 const recoverBtn = document.createElement('button');
                 recoverBtn.className = 'btn-recover-small';
                 recoverBtn.innerHTML = '🔄';
                 recoverBtn.title = 'Восстановить';
-                recoverBtn.onclick = () => TableModifying(record, TableAction.Recover);      
+                recoverBtn.onclick = () => TableModifying(record, TableAction.Recover, tableRUName);      
 
                 actionsTd.appendChild(deleteBtn);
                 actionsTd.appendChild(recoverBtn);
@@ -201,7 +190,7 @@ export function displayTableData(data) {
     });
     
     // Настраиваем пагинацию
-    setupPagination(paginationId);
+    setupPagination(paginationID);
 }
 
 // Отображение результатов поиска
@@ -246,7 +235,7 @@ export function displaySearchResults(results) {
             td.setAttribute('data-field', key);
             
             // Особо выделяем ячейку с ID
-            if (key === 'id' && value === currentSearchId) {
+            if (key === 'id' && value === TableVariables.searchId) {
                 td.style.fontWeight = 'bold';
                 td.style.color = '#667eea';
             }
@@ -292,7 +281,7 @@ export function showSearchInfo() {
     const searchResultsInfo = document.getElementById('searchResultsInfo');
     const searchResultsText = document.getElementById('searchResultsText');
     
-    searchResultsText.textContent = `Найдена запись с ID: ${currentSearchId}`;
+    searchResultsText.textContent = `Найдена запись с ID: ${TableVariables.searchId}`;
     searchResultsInfo.style.display = 'block';
 }
 
@@ -308,17 +297,17 @@ export function showNoSearchResults() {
     noSearchResultsMessage.style.display = 'block';
     
     // Показываем информацию о поиске
-    searchResultsText.textContent = `Запись с ID: ${currentSearchId} не найдена`;
+    searchResultsText.textContent = `Запись с ID: ${TableVariables.searchId} не найдена`;
     searchResultsInfo.style.display = 'block';
     
     // ИСПРАВЛЕНИЕ: Показываем общее количество записей
-    const totalRecords = allTableData.length;
+    const totalRecords = TableVariables.tableData.length;
     document.getElementById('recordCount').textContent = `Записей: 0 из ${totalRecords}`;
 }
 
 // Очистка поиска
-export function clearSearch() {
-    changeCurrentSearchId(null);
+export function clearSearch(paginationID, tableName) {
+    TableVariables.searchId = null;
     
     // Сбрасываем поле поиска
     document.getElementById('searchById').value = '';
@@ -328,16 +317,17 @@ export function clearSearch() {
     document.getElementById('searchResultsInfo').style.display = 'none';
     
     // Сбрасываем на первую страницу и показываем все данные
-    changeCurrentDataPage(1);
-    if (allTableData && allTableData.length > 0) {
-        displayTableData(getCurrentPageData());
+    TableVariables.dataPage = 1;
+    if (TableVariables.tableData && TableVariables.tableData.length > 0) {
+        showTableData(paginationID);
     }
 }
 
 // Смена страницы
-window.changePage = function changePage(page) {
-    changeCurrentDataPage(page);
-    displayTableData(getCurrentPageData());
+function changePage(page, paginationID, tableID, tableHeadID, tableBodyID, tableInfoID) {
+    TableVariables.dataPage = page;
+    displayTableData(getCurrentPageData(), paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, 
+        TableVariables.tableRUName, TableVariables.tableCodeName);
     
     // Прокрутка к верху таблицы
     const tableContainer = document.querySelector('.table-container');
@@ -383,7 +373,7 @@ document.addEventListener('click', function(event) {
 // Закрытие модального окна
 window.closeEditRecordModal = function closeEditRecordModal() {
     document.getElementById('editRecordModal').style.display = 'none';
-    changeCurrentRecord(null, null);
+    TableVariables.record = null;
     
     // Разблокируем скролл body
     document.body.classList.remove('modal-open');

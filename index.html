@@ -183,9 +183,9 @@
             </div>
 
             <!-- Информация о таблице и результатах поиска -->
-            <div class="table-info" id="tableInfo" style="display: none;">
+            <div class="table-info" id="databaseInfo" style="display: none;">
                 <div class="table-info-left">
-                    <h3 id="tableName">Название таблицы</h3>
+                    <h3 class="text-table-info" id="databaseTableName">Название таблицы</h3>
                     <p id="recordCount">Записей: 0</p>
                 </div>
                 <div class="search-results-info" id="searchResultsInfo" style="display: none;">
@@ -196,24 +196,13 @@
             <!-- Таблица с данными -->
             <div class="table-container">
                 <table class="data-table" id="dataTable" style="display: none;">
-                    <thead id="dataTableHead">
+                    <thead class="table-head" id="databaseTableHead">
                         <!-- Заголовки будут заполнены через JavaScript -->
                     </thead>
-                    <tbody id="dataTableBody">
+                    <tbody class="table-body" id="databaseTableBody">
                         <!-- Данные будут загружены через JavaScript -->
                     </tbody>
                 </table>
-                
-                <!-- Сообщение при отсутствии данных -->
-                <div class="no-data" id="noDataMessage" style="display: none;">
-                    <p>Нет данных для отображения</p>
-                </div>
-
-                <!-- Сообщение когда ничего не найдено -->
-                <div class="no-data" id="noSearchResultsMessage" style="display: none;">
-                    <p>Запись с указанным ID не найдена</p>
-                    <button class="btn-secondary-db" onclick="clearSearch()" id="showAllSets">Показать все записи</button>
-                </div>
             </div>
 
             <!-- Пагинация -->
@@ -253,25 +242,23 @@
                     <input type="text" id="userSearch" placeholder="Поиск по имени пользователя или email..." onkeyup="searchUsers()">
                 </div>
 
+                <!-- Информация о таблице и результатах поиска -->
+                <div class="table-info" id="usersInfo" style="display: none;">
+                    <div class="table-info-left">
+                        <h3 id="adminTableName">Название таблицы</h3>
+                        <p id="recordCount">Записей: 0</p>
+                    </div>
+                    <div class="search-results-info" id="searchResultsInfo" style="display: none;">
+                        <span class="search-badge" id="searchResultsText"></span>
+                    </div>
+                </div>
+
                 <div class="table-container">
                     <table class="admin-table" id="usersTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>ID роли</th>
-                                <th>Имя пользователя</th>
-                                <th>Пароль</th>
-                                <th>Email</th>
-                                <th>Кто добавил</th>
-                                <th>Когда добавил</th>
-                                <th>Кто изменил</th>
-                                <th>Когда изменил</th>
-                                <th>Заметка</th>
-                                <th>Удален</th>
-                                <th>Действия</th>
-                            </tr>
+                        <thead class="table-head" id="usersTableHead">
+                            <!-- Заголовки будут заполнены через JavaScript -->
                         </thead>
-                        <tbody id="usersTableBody">
+                        <tbody class="table-body" id="usersTableBody">
                             <!-- Данные будут загружены через JavaScript -->
                         </tbody>
                     </table>
@@ -291,24 +278,9 @@
 
                 <div class="table-container">
                     <table class="admin-table" id="rolesTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Название</th>
-                                <th>Права</th>
-                                <th>GET</th>
-                                <th>POST</th>
-                                <th>UPDATE</th>
-                                <th>DELETE</th>
-                                <th>Кто добавил</th>
-                                <th>Когда добавил</th>
-                                <th>Кто изменил</th>
-                                <th>Когда изменил</th>
-                                <th>Удален</th>
-                                <th>Действия</th>
-                            </tr>
+                        <thead class="table-head" id="rolesTableHead">
                         </thead>
-                        <tbody id="rolesTableBody">
+                        <tbody class="table-body" id="rolesTableBody">
                             <!-- Данные будут загружены через JavaScript -->
                         </tbody>
                     </table>
@@ -361,7 +333,7 @@
                 </div>
             </form>
         </div>
-    </div>
+    </div>>
 
     <!-- Модальное окно для ролей -->
     <div id="roleModal" class="modal">

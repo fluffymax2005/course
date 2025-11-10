@@ -1,23 +1,21 @@
 import { fetchTableData } from "./form-service.js";
-import { changeCurrentDataPage, changeCurrentRecord, changeCurrentSearchId, changeTableData } from "./table-service.js";
-import { dbCache, tableMap } from "./table-utils.js";
+import { TableVariables } from "./table-service.js";
+import { tableMap, TableName } from "./table-utils.js";
+import { showTableData } from "./workspace-visuals.js";
+
+window.switchTab = switchTab;
 
 // Словарь: наименование сущности -> Имя компонента пагинации
 const paginationNameMap = new Map();
-paginationNameMap.set(tableMap['Пользователи'], 'usersPagination')
-    .set(tableMap['Пользователи'], 'rolesPagination');
-
-// Словарь: Имя компонента вкладки панели админа -> наименование сущности
-const tabsNameMap = new Map();
-tabsNameMap.set('Учетные записи', 'users')
-    .set('Роли', 'roles');
+paginationNameMap.set(tableMap.get('Учетные записи'), 'usersPagination')
+    .set(tableMap.get('Роли'), 'rolesPagination');
 
 // Функции для вкладок
 export async function switchTab(tabName) {
     // Загрузить данные для вкладки
-    switch (tabsNameMap[tabName]) {
-        case 'users': await loadUsers(); break;
-        case 'roles': await loadRoles(); break;
+    switch (tabName) {
+        case TableName.CREDENTIAL[0]: await loadUsers(); break;
+        case TableName.ROLE[0]: await loadRoles(); break;
     }
 
     // Скрыть все вкладки
@@ -30,8 +28,10 @@ export async function switchTab(tabName) {
         btn.classList.remove('active');
     });
     
+    console.log(`${TableName.getCodeName(tabName)}-tab`);
+
     // Показать выбранную вкладку
-    document.getElementById(`${tabName}-tab`).classList.add('active');
+    document.getElementById(`${TableName.getCodeName(tabName)}-tab`).classList.add('active');
     
     // Активировать кнопку (если event передан)
     if (event) {
@@ -45,22 +45,19 @@ export async function switchTab(tabName) {
             }
         });
     }
-
-    return true;
 }
 
 // Функции для пользователей
 async function loadUsers() {
     
     // Смена переменных состояния текущей таблицы
-    changeCurrentDataPage(1);
-    changeCurrentRecord(null, null);
-    changeCurrentSearchId(null);
+    TableVariables.dataPage = 1;
+    TableVariables.record = null;
+    TableVariables.searchId = null;
 
-    const tableName = 'Пользователи'; // Название таблицы
-    fetchTableData(tableName, tableMap.get(tableName), paginationNameMap.get(tableMap.get(tableName))); // Загрузка данных
-    
-    changeTableData(dbCache.get(tableName));
+    const tableName = TableName.CREDENTIAL[0]; // Название таблицы
+    await fetchTableData(tableName, tableMap.get(tableName), 'usersPagination'); // Загрузка данных
+    showTableData(paginationNameMap.get(tableMap.get(tableName)));
 }
 
 /*function displayUsers(users) {

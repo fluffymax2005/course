@@ -1,23 +1,33 @@
 import { switchTab } from "./admin-panel.js";
 import { getUserRights, UserRights } from "./cookie.js";
-import { clearSearch, hideTableInterface } from "./database-visuals.js";
+import { getCurrentPageData } from "./database-general-service.js";
+import { clearSearch, displayTableData, hideTableInterface } from "./database-visuals.js";
+import { setupPagination } from "./form-service.js";
+import { SectionName } from "./form-utils.js";
+import { TableVariables } from "./table-service.js";
+
+window.showNavigationMenu = showNavigationMenu;
+window.hideNavigationMenu = hideNavigationMenu;
+window.showSection = showSection;
+window.showAuthorizeForm = showAuthorizeForm;
+window.showRegisterForm = showRegisterForm;
 
 // Визуальные функции
 
-window.showNavigationMenu = function showNavigationMenu() {
+function showNavigationMenu() {
     const leftDropDown = document.querySelector('.left-dropdown');
     console.log('Opening menu');
     leftDropDown.classList.add('open');
 }
 
-window.hideNavigationMenu = function hideNavigationMenu() {
+function hideNavigationMenu() {
     const leftDropDown = document.querySelector('.left-dropdown');
     console.log('Closing menu');
     leftDropDown.classList.remove('open');
 }
 
 // Функция для переключения между разделами
-window.showSection = async function showSection(sectionName = null, isLoadListener = false) {
+async function showSection(sectionName = null, isLoadListener = false) {
     if (isLoadListener) {
         return;
     }
@@ -51,10 +61,9 @@ window.showSection = async function showSection(sectionName = null, isLoadListen
     // Показываем выбранный раздел
     if (sectionName === null) {
         const headerText = document.getElementById('header-text');
-        sectionName = headerText.textContent === 'Главная' ? 'main' : 
-            headerText.textContent === 'База данных' ? 'database' :
-            headerText.textContent === 'Статистика' ? 'statistics' : 'admin-panel';
+        sectionName = SectionName.getViewName(headerText.textContent);
     }
+
     const activeSection = document.querySelector(`.${sectionName}`);
     if (activeSection) {
         activeSection.style.display = 'block';
@@ -62,35 +71,25 @@ window.showSection = async function showSection(sectionName = null, isLoadListen
 
         // Сменяем название заголовка и его иконку рядом с панелью навигации
         const headerText = document.getElementById('header-text');
+        headerText.textContent = SectionName.getCodeName(sectionName);
+
         const headerIcon = document.getElementById('page-icon');
 
-        if (sectionName === 'main') {
-            headerText.textContent = 'Главная';
+        if (sectionName === SectionName.MAIN[1]) {
             headerIcon.src = 'assets/icons/main-page.svg';
-        } else if (sectionName === 'database') {
-            headerText.textContent = 'База данных';
+        } else if (sectionName === SectionName.DATABASE[1]) {
             headerIcon.src = 'assets/icons/database-page.svg';
 
             // Выпадающий список
             const tableSelect = document.getElementById('tableSelect');
             tableSelect.value = "";
-            clearSearch();
+            clearSearch('dataPagination', tableSelect.value);
             hideTableInterface();
-        } else if (sectionName === 'statistics') {
+        } else if (sectionName === SectionName.STATISTICS[1]) {
             headerIcon.src = 'assets/icons/statistics-page.svg';
-            headerText.textContent = 'Статистика';
-        } else if (sectionName === 'admin-panel') {
-            headerText.textContent = 'Панель администратора';
+        } else if (sectionName === SectionName.ADMIN_PANEL[1]) {
             headerIcon.src = 'assets/icons/admin-panel.svg';
-
-            // Инициализируем первую вкладку с проверкой авторизации
-            const success = await switchTab('users');
-            if (!success) {
-                // Если не удалось загрузить данные, скрываем панель администратора
-                activeSection.style.display = 'none';
-                activeSection.classList.remove('active-section');
-                return;
-            }
+            await switchTab('Учетные записи');
         }
     }
     
@@ -98,12 +97,19 @@ window.showSection = async function showSection(sectionName = null, isLoadListen
     hideNavigationMenu();
 }
 
+// Отображение таблиц при успешной загрузке
+export function showTableData(paginationID) {
+    displayTableData(getCurrentPageData(), 'dataPagination', 'dataTable', 'databaseTableHead', 
+        'databaseTableBody', 'databaseInfo', TableVariables.tableRUName, TableVariables.tableCodeName);
+    setupPagination(paginationID);
+}
+
 // Перемещение для входа в систему
-window.showAuthorizeForm = function showAuthorizeForm() {
+function showAuthorizeForm() {
     window.location.href = '/authorize-form/authorize.html#authorize';
 }
 
-window.showRegisterForm = function showRegisterForm() {
+function showRegisterForm() {
     setTimeout(() => {
         window.location.href = '/authorize-form/authorize.html#register';
     }, 1000);   
