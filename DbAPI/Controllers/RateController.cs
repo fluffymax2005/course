@@ -93,7 +93,7 @@ namespace db.Controllers {
                     $"Причина: {ex.Message}");
                 return BadRequest(new { message = ex.Message });
             }
-            
+
             _logger.LogInformation($"Запрос \"Rate.Delete({id})\" пользователя \"{User.Identity.Name}\" успешен");
             return Ok(new { hash = UpdateTableHash() });
         }
@@ -103,17 +103,17 @@ namespace db.Controllers {
         [Authorize(Roles = "Admin")]
         public override async Task<IActionResult> RecoverAsync(TypeId id) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Rate.RecoverAsync({id})\"");
-            
+
             try {
                 await _repository.RecoverAsync(id);
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Rate.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
-                    $"Причина: { ex.Message }");
+                    $"Причина: {ex.Message}");
                 return NotFound(new { message = ex.Message });
             }
 
             _logger.LogInformation($"Запрос \"Rate.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" успешен");
-            return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });           
+            return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
         }
 
         // api/{entity}/generate-table-state-hash

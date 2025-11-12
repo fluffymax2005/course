@@ -4,7 +4,6 @@ using DbAPI.Interfaces;
 using DbAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using static DbAPI.Interfaces.IInformation;
 using TypeId = int;
 
 namespace DbAPI.Repositories {

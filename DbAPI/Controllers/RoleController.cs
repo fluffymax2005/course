@@ -88,7 +88,7 @@ namespace DbAPI.Controllers {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Role.Delete({id})\"");
 
             try {
-                await _repository.RecoverAsync(id);
+                await _repository.SoftDeleteAsync(id);
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Role.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");
@@ -104,19 +104,17 @@ namespace DbAPI.Controllers {
         [Authorize(Roles = "Admin")]
         public override async Task<IActionResult> RecoverAsync(TypeId id) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Role.RecoverAsync({id})\"");
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity != null) {
-                entity.IsDeleted = null;
-                entity.WhenChanged = DateTime.Now;
-                await _repository.UpdateAsync(entity);
-
-                _logger.LogInformation($"Запрос \"Role.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" успешен");
-                return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
+            
+            try {
+                await _repository.RecoverAsync(id);
+            } catch (Exception ex) {
+                _logger.LogError($"Запрос \"Role.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
+                    $"Причина: ${ex.Message}");
+                return NotFound(new { message = ex.Message });
             }
 
-            _logger.LogError($"Запрос \"Role.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
-                    $"Причина: сущность не найдена или уже существует");
-            return NotFound(new { message = $"Сущность с ID = {id} не найдена или уже существует" });
+            _logger.LogInformation($"Запрос \"Role.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" успешен");
+            return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
         }
 
         // api/{entity}/generate-table-state-hash

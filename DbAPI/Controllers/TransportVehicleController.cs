@@ -86,7 +86,7 @@ namespace DbAPI.Controllers {
         [Authorize(Roles = "Admin")]
         public override async Task<IActionResult> DeleteAsync(TypeId id) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"TransportVehicle.Delete({id})\"");
-            
+
             try {
                 await _repository.SoftDeleteAsync(id);
             } catch (Exception ex) {
@@ -104,7 +104,7 @@ namespace DbAPI.Controllers {
         [Authorize(Roles = "Admin")]
         public override async Task<IActionResult> RecoverAsync(TypeId id) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"TransportVehicle.RecoverAsync({id})\"");
-            
+
             try {
                 await _repository.RecoverAsync(id);
             } catch (Exception ex) {

@@ -23,7 +23,7 @@ namespace DbAPI.Controllers {
         private readonly IPasswordRecoveryService _passwordRecoveryService;
         private readonly IMemoryCache _cache;
 
-        public CredentialController(CredentialRepository credentialRepository, RoleRepository roleRepository,
+        public CredentialController(IRepository<Credential, TypeId> credentialRepository, RoleRepository roleRepository,
             IJwtService jwtService, ILogger<CredentialController> logger, IEmailService emailService,
             IPasswordRecoveryService passwordRecoveryService, IMemoryCache cache) : base(credentialRepository) {
             _roleRepository = roleRepository;
@@ -295,6 +295,15 @@ namespace DbAPI.Controllers {
             var _credentialRepository = (CredentialRepository)_repository;
             var credentials = await _credentialRepository.GetAllAsync();
             return credentials?.Where(c => c.Email == email).FirstOrDefault();
+        }
+
+        // GET: api/{entity}/user?username={username}
+        [HttpGet("user")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Credential>> GetByUserName([FromQuery] string username) {
+            var credentials = await _repository.GetAllAsync();
+            var credential = credentials.Where(c => c.Username == username).FirstOrDefault();
+            return credential != null ? Ok(credential) : NotFound(credential);
         }
 
         // GET: api/{entity}/

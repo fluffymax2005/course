@@ -2,6 +2,7 @@
 #define SWAGGER
 
 using DbAPI.Contexts;
+using DbAPI.Controllers;
 using DbAPI.Interfaces;
 using DbAPI.Models;
 using DbAPI.Repositories;
@@ -114,8 +115,9 @@ builder.Services.AddScoped<IRepository<Rate, TypeId>, RateRepository>();
 builder.Services.AddScoped<IRepository<DbAPI.Models.Route, TypeId>, RouteRepository>();
 builder.Services.AddScoped<IRepository<TransportVehicle, TypeId>, TransportVehicleRepository>();
 
+builder.Services.AddScoped<IRepository<Role, TypeId>, RoleRepository>();
 builder.Services.AddScoped<RoleRepository>();
-builder.Services.AddScoped<CredentialRepository>();
+builder.Services.AddScoped<IRepository<Credential, TypeId>, CredentialRepository>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 

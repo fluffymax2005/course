@@ -21,7 +21,7 @@ namespace DbAPI.Repositories {
         }
 
         public async Task<TypeId?> AddAsync(Models.Route entity) {
-            
+
             entity.WhenAdded = DateTime.Now;
             entity.WhoChanged = null;
             entity.WhenChanged = null;
