@@ -202,6 +202,42 @@
     background: rgba(0,0,0,0.1);
 }
 
+#usersTableHead th {
+    background: rgba(0, 255, 255, 0.5);
+}
+ 
+#rolesTableHead th {
+    background: rgba(0, 255, 255, 0.5);
+}
+
+#table-container {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+#closeUserBtn {
+    background: red;
+}
+
+#usersInfo {
+    background: rgba(144, 144, 144, 0.2);
+}
+
+#rolesInfo {
+    background: rgba(144, 144, 144, 0.2);
+}
+
+#usersPagination {
+    background: rgba(144, 144, 144, 0.2);
+}
+
+#rolesPagination {
+    background: rgba(144, 144, 144, 0.2);
+}
+
+#rolesBtnCancel {
+    background: red;
+}
+
 /* Статус */
 .status-active {
     color: #28a745;

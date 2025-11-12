@@ -116,27 +116,27 @@
         </div>
     </div>
 
-    <!-- Блок database -->
-    <div class="database">
-        <!-- Модальное окно для операций над записями -->
-        <div id="editRecordModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="editRecordModalTitle">Редактировать запись</h3>
-                    <span class="close" onclick="closeRecordModalForm()">&times;</span>
-                </div>
-                <form id="editRecordForm" onsubmit="recordAction(event)">
-                    <div class="form-fields" id="editRecordFields">
-                        <!-- Поля формы будут заполнены динамически -->
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary-db" id="closeModalForm" onclick="closeRecordModalForm()">Отмена</button>
-                        <button type="submit" class="btn-primary-db" id="applyModalForm">Сохранить</button>
-                    </div>
-                </form>
+    <!-- Модальное окно для операций над записями -->
+    <div id="editRecordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="editRecordModalTitle">Редактировать запись</h3>
+                <span class="close" onclick="closeRecordModalForm()">&times;</span>
             </div>
+            <form id="editRecordForm" onsubmit="recordAction(event)">
+                <div class="form-fields" id="editRecordFields">
+                    <!-- Поля формы будут заполнены динамически -->
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary-db" id="closeModalForm" onclick="closeRecordModalForm()">Отмена</button>
+                    <button type="submit" class="btn-primary-db" id="applyModalForm">Сохранить</button>
+                </div>
+            </form>
         </div>
-        
+    </div>
+
+    <!-- Блок database -->
+    <div class="database">       
         <div class="section-header" id="databaseHeader">
             <h1>База данных</h1>
             <p>Управление данными системы</p>
@@ -186,7 +186,7 @@
             <div class="table-info" id="databaseInfo" style="display: none;">
                 <div class="table-info-left">
                     <h3 class="text-table-info" id="databaseTableName">Название таблицы</h3>
-                    <p id="recordCount">Записей: 0</p>
+                    <p class="record-count" id="databaseRecordCount">Записей: 0</p>
                 </div>
                 <div class="search-results-info" id="searchResultsInfo" style="display: none;">
                     <span class="search-badge" id="searchResultsText"></span>
@@ -245,8 +245,8 @@
                 <!-- Информация о таблице и результатах поиска -->
                 <div class="table-info" id="usersInfo" style="display: none;">
                     <div class="table-info-left">
-                        <h3 id="adminTableName">Название таблицы</h3>
-                        <p id="recordCount">Записей: 0</p>
+                        <h3 id="adminTableName">Учетные записи</h3>
+                        <p class="record-count" id="adminRecordCount">Записей: 0</p>
                     </div>
                     <div class="search-results-info" id="searchResultsInfo" style="display: none;">
                         <span class="search-badge" id="searchResultsText"></span>
@@ -274,6 +274,17 @@
                 <div class="admin-header">
                     <h2>Управление ролями</h2>
                     <button class="btn-primary" onclick="showRoleForm()" id="addRoleBtn">Добавить роль</button>
+                </div>
+
+                <!-- Информация о таблице и результатах поиска -->
+                <div class="table-info" id="rolesInfo" style="display: none;">
+                    <div class="table-info-left">
+                        <h3>Роли</h3>
+                        <p class="record-count">Записей: 0</p>
+                    </div>
+                    <div class="search-results-info" id="searchResultsInfo" style="display: none;">
+                        <span class="search-badge" id="searchResultsText"></span>
+                    </div>
                 </div>
 
                 <div class="table-container">
@@ -328,7 +339,7 @@
                     <textarea id="note" name="note" rows="3"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeUserModal()">Отмена</button>
+                    <button type="button" class="btn-secondary" onclick="closeUserModal()" id="closeUserBtn">Отмена</button>
                     <button type="submit" class="btn-primary" id="moduleAddBtn">Добавить</button>
                 </div>
             </form>
@@ -357,8 +368,8 @@
                     </select>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeRoleModal()">Отмена</button>
-                    <button type="submit" class="btn-primary" id="moduleSaveBtn">Сохранить</button>
+                    <button type="button" class="btn-secondary" onclick="closeRoleModal()" id="rolesBtnCancel">Отмена</button>
+                    <button type="submit" class="btn-primary" id="moduleSaveBtn">Добавить</button>
                 </div>
             </form>
         </div>

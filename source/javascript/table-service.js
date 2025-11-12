@@ -1,10 +1,9 @@
 import { getToken, getUserName, getUserRights, setTableHash, UserRights } from "./cookie.js";
 import { populateEditForm, detectFieldType} from "./form-service.js";
-import { closeRecordModalForm, displaySearchResults, displayTableData, showSearchInfo } from "./database-visuals.js";
+import { closeRecordModalForm, displaySearchResults, showSearchInfo } from "./database-visuals.js";
 import { ApiService } from "./api.js";
-import { getCurrentPageData } from "./database-general-service.js";
-import { TableAction, tableMap } from "./table-utils.js";
-import { MessageBox, TableFormConfirmButton } from "./form-utils.js";
+import { TableAction, tableMap, TableName } from "./table-utils.js";
+import { MessageBox, TableFormConfirmButton, TableFormConfirmHeader } from "./form-utils.js";
 import { showTableData } from "./workspace-visuals.js";
 
 window.recordAction = recordAction;
@@ -231,15 +230,16 @@ export async function recordAction(event) {
         // Запись нового хэша состояния таблицы
         setTableHash(tableMap.get(TableVariables.tableRUName), hash);
 
-        let paginationID = '';
-        if (document.getElementById('dataPagination').style.display !== 'none')
-            paginationID = 'dataPagination';
-        else if (document.getElementById('usersPagination').style.display !== 'none')
-            paginationID = 'usersPagination';
-        else 
-            paginationID = 'rolesPagination';
-
-        showTableData(paginationID);
+        const tableCodeName = `${TableName.getCodeName(TableVariables.tableRUName)}`; // кодовое имя таблицы
+        
+        // Получаем названия компонентов для отображения
+        const paginationID = `${tableCodeName}Pagination`;
+        const tableID = `${tableCodeName}Table`;
+        const tableHeadID = `${tableCodeName}TableHead`;
+        const tableBodyID = `${tableCodeName}TableBody`;
+        const tableInfoID = `${tableCodeName}Info`;
+        
+        showTableData(paginationID, tableID, tableHeadID, tableBodyID, tableInfoID);
 
         closeRecordModalForm();
 
@@ -257,7 +257,7 @@ export async function recordAction(event) {
 }
 
 // Функция редактирования записи
-export function TableModifying(record, action, tableName) {
+export async function TableModifying(record, action, tableName) {
     TableVariables.record = record;
     TableVariables.recordAction = action;
 
@@ -265,8 +265,8 @@ export function TableModifying(record, action, tableName) {
     switch (action) {
         case TableAction.Edit:
         case TableAction.Delete:
-        case TableAction.Recover: formHeader = `${TableFormConfirmButton.Text(action)} запись (ID: ${record.id}) - ${tableName}`; break;
-        case TableAction.Insert: formHeader = `${TableFormConfirmButton.Text(action)} запись - ${tableName}`; break;
+        case TableAction.Recover: formHeader = `${TableFormConfirmHeader.Text(action)} запись (ID: ${record.id}) - ${tableName}`; break;
+        case TableAction.Insert: formHeader = `${TableFormConfirmHeader.Text(action)} запись - ${tableName}`; break;
     }
     
     // Устанавливаем заголовок модального окна
@@ -276,8 +276,8 @@ export function TableModifying(record, action, tableName) {
     switch (action) {
         case TableAction.Edit: 
         case TableAction.Delete:
-        case TableAction.Recover: populateEditForm(record, tableName, action); break;
-        case TableAction.Insert: populateEditForm(null, tableName, action); break;   
+        case TableAction.Recover: await populateEditForm(record, tableName, action); break;
+        case TableAction.Insert: await populateEditForm(null, tableName, action); break;   
     }
     
     // Показываем модальное окно

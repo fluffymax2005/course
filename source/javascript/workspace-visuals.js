@@ -2,7 +2,6 @@ import { switchTab } from "./admin-panel.js";
 import { getUserRights, UserRights } from "./cookie.js";
 import { getCurrentPageData } from "./database-general-service.js";
 import { clearSearch, displayTableData, hideTableInterface } from "./database-visuals.js";
-import { setupPagination } from "./form-service.js";
 import { SectionName } from "./form-utils.js";
 import { TableVariables } from "./table-service.js";
 
@@ -83,6 +82,15 @@ async function showSection(sectionName = null, isLoadListener = false) {
             // Выпадающий список
             const tableSelect = document.getElementById('tableSelect');
             tableSelect.value = "";
+            
+            TableVariables.tableData = null;
+            TableVariables.tableCodeName = null;
+            TableVariables.tableRUName = null;
+            TableVariables.recordAction = null;
+            TableVariables.record = null;
+
+            document.getElementById('dataTable').style.display = 'none';
+
             clearSearch('dataPagination', 'dataTable', 'databaseTableHead', 'databaseTableHead', 'databaseInfo');
             hideTableInterface();
         } else if (sectionName === SectionName.STATISTICS[1]) {
@@ -90,6 +98,7 @@ async function showSection(sectionName = null, isLoadListener = false) {
         } else if (sectionName === SectionName.ADMIN_PANEL[1]) {
             headerIcon.src = 'assets/icons/admin-panel.svg';
             await switchTab('Учетные записи');
+            hideTableInterface();
         }
     }
     
@@ -101,7 +110,6 @@ async function showSection(sectionName = null, isLoadListener = false) {
 export function showTableData(paginationID, tableID, tableHeadID, tableBodyID, tableInfoID) {
     displayTableData(getCurrentPageData(), paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, 
         TableVariables.tableRUName, TableVariables.tableCodeName);
-    setupPagination(paginationID);
 }
 
 // Перемещение для входа в систему

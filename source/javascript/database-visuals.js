@@ -36,13 +36,13 @@ export async function loadTableData(useCache = true) {
 // Сокрытие интерфейса таблиц
 export function hideTableInterface() {
     document.querySelectorAll('.table-info').forEach(e => e.style.display = 'none');  
-    document.querySelectorAll('.dataTable').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('.-table').forEach(e => e.style.display = 'none');
     document.querySelectorAll('.pagination').forEach(e => e.style.display = 'none');  
     document.querySelectorAll('.search-results-info').forEach(e => e.style.display = 'none');  
 }
 
 // Отображение данных таблицы
-export function displayTableData(data, paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, tableRUName, tableCodeName) {   
+export async function displayTableData(data, paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, tableRUName, tableCodeName) {   
     const tableHead = document.getElementById(tableHeadID);
     const tableBody = document.getElementById(tableBodyID);
     const tableInfo = document.getElementById(tableInfoID);
@@ -77,10 +77,10 @@ export function displayTableData(data, paginationID, tableID, tableHeadID, table
     
     if (TableVariables.searchId) {
         // В режиме поиска показываем информацию о найденной записи
-        document.getElementById('recordCount').textContent = `Найдена 1 запись из ${totalRecords}`;
+        document.querySelectorAll('.record-count').forEach(e => e.textContent = `Найдена 1 запись из ${totalRecords}`);
     } else {
         // В обычном режиме показываем диапазон и общее количество
-        document.getElementById('recordCount').textContent = `Записи: ${startRecord}-${endRecord} из ${totalRecords}`;
+        document.querySelectorAll('.record-count').forEach(e => e.textContent = `Записи: ${startRecord}-${endRecord} из ${totalRecords}`);
     }
     
     // Создаем заголовки таблицы ДИНАМИЧЕСКИ из первого объекта массива
@@ -166,7 +166,7 @@ export function displayTableData(data, paginationID, tableID, tableHeadID, table
                 editBtn.className = 'btn-edit-small';
                 editBtn.innerHTML = '✏️';
                 editBtn.title = 'Редактировать';
-                editBtn.onclick = () => TableModifying(record, TableAction.Edit, tableRUName);
+                editBtn.onclick = async () => await TableModifying(record, TableAction.Edit, tableRUName);
 
                 actionsTd.appendChild(editBtn);
             }
@@ -176,13 +176,13 @@ export function displayTableData(data, paginationID, tableID, tableHeadID, table
                 deleteBtn.className = 'btn-delete-small';
                 deleteBtn.innerHTML = '🗑️';
                 deleteBtn.title = 'Удалить';
-                deleteBtn.onclick = () => TableModifying(record, TableAction.Delete, tableRUName);
+                deleteBtn.onclick = async () => await TableModifying(record, TableAction.Delete, tableRUName);
 
                 const recoverBtn = document.createElement('button');
                 recoverBtn.className = 'btn-recover-small';
                 recoverBtn.innerHTML = '🔄';
                 recoverBtn.title = 'Восстановить';
-                recoverBtn.onclick = () => TableModifying(record, TableAction.Recover, tableRUName);      
+                recoverBtn.onclick = async () => await TableModifying(record, TableAction.Recover, tableRUName);      
 
                 actionsTd.appendChild(deleteBtn);
                 actionsTd.appendChild(recoverBtn);
@@ -259,7 +259,7 @@ export function displaySearchResults(results) {
                 editBtn.className = 'btn-edit-small';
                 editBtn.innerHTML = '✏️';
                 editBtn.title = 'Редактировать';
-                editBtn.onclick = () => TableModifying(record, TableAction.Edit);
+                editBtn.onclick = async () => await TableModifying(record, TableAction.Edit);
 
                 actionsTd.appendChild(editBtn);
             }
@@ -329,9 +329,9 @@ export function clearSearch(paginationID, tableID, tableHeadID, tableBodyID, tab
 }
 
 // Смена страницы
-function changePage(page, paginationID, tableID, tableHeadID, tableBodyID, tableInfoID) {
+async function changePage(page, paginationID, tableID, tableHeadID, tableBodyID, tableInfoID) {
     TableVariables.dataPage = page;
-    displayTableData(getCurrentPageData(), paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, 
+    await displayTableData(getCurrentPageData(), paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, 
         TableVariables.tableRUName, TableVariables.tableCodeName);
     
     // Прокрутка к верху таблицы

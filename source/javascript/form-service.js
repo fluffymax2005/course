@@ -19,7 +19,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
     // Данных нет в памяти - вытягивание
     if (!tableHash) {
         try {
-            const data = await ApiService.post(`${entityName}/verify-table-state-hash`, "-", {
+            const data = await ApiService.get(`${entityName}/verify-table-state-hash?hash=default`, {
                 'Authorization': `Bearer ${token}`,
             });
 
@@ -31,7 +31,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
         }
     } else { // Данные есть, но не ясно, свежие ли?
         try {
-            const data = await ApiService.post(`${entityName}/verify-table-state-hash`, tableHash, {
+            const data = await ApiService.get(`${entityName}/verify-table-state-hash?hash=${tableHash}`, {
                 'Authorization': `Bearer ${token}`,
             });
 
@@ -84,11 +84,6 @@ export function setupPagination(paginationID) {
     const totalRecords = TableVariables.searchId ? 1 : TableVariables.tableData.length;
     const totalPages = Math.ceil(totalRecords / DATA_PER_PAGE);
     
-    if (totalPages <= 1) {
-        pagination.style.display = 'none';
-        return;
-    }
-    
     pagination.style.display = 'flex';
     
     let paginationHTML = '';
@@ -117,7 +112,7 @@ export function setupPagination(paginationID) {
     
     // Кнопка "Назад"
     if (TableVariables.dataPage > 1) {
-        paginationHTML += `<button onclick="changePage(${TableVariables.dataPage - 1}, '${paginationID}', '${tableID}', '${tableHead}', '${tableBodyID}, '${tableInfoID}')">Назад</button>`;
+        paginationHTML += `<button onclick="changePage(${TableVariables.dataPage - 1}, '${paginationID}', '${tableID}', '${tableHead}', '${tableBodyID}', '${tableInfoID}')">Назад</button>`;
     }
     
     // Номера страниц
@@ -144,6 +139,8 @@ export function setupPagination(paginationID) {
 export function detectFieldType(fieldName, value) {
     if (value === null || value === undefined) return 'text';
     
+    if (typeof value === 'boolean') return 'boolean';
+
     // Определяем по имени поля
     if (fieldName.includes('date') || fieldName.includes('Date') || 
         fieldName.includes('created') || fieldName.includes('updated') ||
@@ -166,7 +163,6 @@ export function detectFieldType(fieldName, value) {
     if (fieldName.includes('phone')) return 'phone';
     
     // Определяем по значению
-    if (typeof value === 'boolean') return 'boolean';
     if (typeof value === 'number') return 'number';
     if (!isNaN(Date.parse(value))) return 'date';
     
@@ -174,7 +170,7 @@ export function detectFieldType(fieldName, value) {
 }
 
 // Заполнение формы действия над таблицей
-export function populateEditForm(record, tableName, action) {
+export async function populateEditForm(record, tableName, action) {
     const formFields = document.getElementById('editRecordFields');
     formFields.innerHTML = '';
 
@@ -204,39 +200,49 @@ export function populateEditForm(record, tableName, action) {
         formFields.appendChild(formGroup);
     } else {
         // Создаем поля для каждого свойства записи
-        Object.keys(record).forEach(key => {
-            if (nonEditableFields.includes(key)) return;
+        for (const key of Object.keys(record)) {
+            if (nonEditableFields.includes(key) || key.includes('can')) continue;
             
             const formGroup = document.createElement('div');
             formGroup.className = 'form-field';
             
-            const label = document.createElement('label');
-            label.textContent = fieldNameMapping[key] || key;
-            label.htmlFor = `edit_${key}`;
+            if (detectFieldType(key, record[key]) !== 'boolean') {
+                const label = document.createElement('label');
+                label.textContent = fieldNameMapping[key] || key;
+                label.htmlFor = `edit_${key}`;
+                formGroup.appendChild(label);
+            }
             
+
             // Добавление нового элемента требует пустых начальных значений <input>
             let input;
             switch (action) {
-                case TableAction.Edit: input = createFormField(key, record[key], tableName); break;
-                case TableAction.Insert: input = createFormField(key, null, tableName); break;
+                case TableAction.Edit: input = await createFormField(key, record[key], tableName); break;
+                case TableAction.Insert: input = await createFormField(key, null, tableName); break;
+            }
+
+            // В процессе создания компонентов произошла ошибка
+            if (!input && !key.includes('can')) {
+                MessageBox.ShowFromLeft(`Внутренняя ошибка. Попробуйте позже`, 'red', false, '45', 'transformY(40px)');
+                console.error(key, record[key], tableName);
+                return;
             }
             
-            formGroup.appendChild(label);
             formGroup.appendChild(input);
             formFields.appendChild(formGroup);
-        });
+        }
     }
 }
 
 // Создание поля формы в зависимости от типа данных
-function createFormField(fieldName, value, tableName) {
+async function createFormField(fieldName, value, tableName) {
     const fieldType = detectFieldType(fieldName, value);
     
     switch (fieldType) {
         case 'boolean':
             return createCheckboxField(fieldName, value);
         case 'number':
-            return createNumberField(fieldName, value);
+            return await createNumberField(fieldName, value);
         case 'date':
             return createDateField(fieldName, value);
         case 'email':
@@ -266,21 +272,50 @@ function createTextField(fieldName, value, tableName) {
     return input;
 }
 
-function createNumberField(fieldName, value) {
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.id = `edit_${fieldName}`;
-    input.name = fieldName;
-    input.value = value || '';
-    input.min = getMinValue(fieldName);
-    input.max = getMaxValue(fieldName);
-    input.required = true;
-    return input;
+async function createNumberField(fieldName, value) {
+    let component = null;
+    if (fieldName === 'rights') {
+        try {
+            const token = getToken();
+            const data = await ApiService.get(`Role/`, {
+                'Authorization': `Bearer ${token}`
+            });
+
+            // Заполняем названия ролей
+            component = document.createElement('select');
+            component.innerHTML = '';
+            
+            const rights = [];
+            data.forEach(set => {
+                const newOption = document.createElement('option');
+                if (!rights.includes(set.rights)) {
+                    rights.push(set.rights);
+                    newOption.value = set.rights;
+                    newOption.textContent = set.rights;
+                    component.appendChild(newOption);
+                }
+            });
+        } catch (error) {
+            MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'trasformY(40px)');
+        }
+    } else {
+        component = document.createElement('input');
+        component.type = 'number';
+        component.id = `edit_${fieldName}`;
+        component.name = fieldName;
+        component.value = value || '';
+        component.min = getMinValue(fieldName);
+        component.max = getMaxValue(fieldName);
+        component.required = true;
+    }
+
+    return component;
 }
 
 function createCheckboxField(fieldName, value) {
     const container = document.createElement('div');
     container.className = 'checkbox-container';
+    container.style.display = 'flex';
     
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -291,6 +326,7 @@ function createCheckboxField(fieldName, value) {
     const label = document.createElement('label');
     label.htmlFor = `edit_${fieldName}`;
     label.textContent = fieldNameMapping[fieldName] || fieldName;
+    label.style.fontWeight = 'bold';
     
     container.appendChild(checkbox);
     container.appendChild(label);

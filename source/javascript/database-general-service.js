@@ -62,9 +62,9 @@ export function getCellClassName(type, value) {
         case 'boolean':
             return value ? 'status-active' : 'status-inactive';
         case 'number':
-            if (value < 0) return 'amount-negative';
-            if (value > 0) return 'amount-positive';
-            return '';
+            //if (value < 0) return 'amount-negative';
+            //if (value > 0) return 'amount-positive';
+            return 'text';
         case 'date':
             return 'date-cell';
         default:

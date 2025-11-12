@@ -48,7 +48,12 @@ export const fieldNameMapping = {
     'distance': 'Расстояние',
     'transportVehicleId': 'ID транспортного средства',
     'roleId': 'ID роли',
-    'password': 'Пароль'
+    'password': 'Пароль',
+    'rights': 'Права',
+    'canGet': 'GET',
+    'canPost': 'POST',
+    'canUpdate': 'UPDATE',
+    'canDelete': 'DELETE',
 };
 
 
@@ -69,12 +74,12 @@ export const dbCache = new TableCache();
 // Двунаправленный словарь: наименование таблицы для пользователя <-> наименование в коде
 
 export class TableName {
-    static ORDER = ['Заказы', 'dataTable']
-    static CUSTOMER = ['Заказчики', 'dataTable']
-    static RATE = ['Тарифы', 'dataTable']
-    static ROUTE = ['Маршруты', 'dataTable']
-    static DRIVER = ['Водители', 'dataTable']
-    static TRANPSORT_VEHICLE = ['Транспортные средства', 'dataTable']
+    static ORDER = ['Заказы', 'data']
+    static CUSTOMER = ['Заказчики', 'data']
+    static RATE = ['Тарифы', 'data']
+    static ROUTE = ['Маршруты', 'data']
+    static DRIVER = ['Водители', 'data']
+    static TRANPSORT_VEHICLE = ['Транспортные средства', 'data']
     static CREDENTIAL = ['Учетные записи', 'users'];
     static ROLE = ['Роли', 'roles'];
 
