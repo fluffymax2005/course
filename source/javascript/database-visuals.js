@@ -7,6 +7,7 @@ import { showTableData } from "./workspace-visuals.js";
 
 window.loadTableData = loadTableData;
 window.changePage = changePage;
+window.closeRecordModalForm = closeRecordModalForm;
 
 // Загрузка данных в таблицу
 export async function loadTableData(useCache = true) {
@@ -17,18 +18,19 @@ export async function loadTableData(useCache = true) {
     hideTableInterface();
     
     // Сбрасываем поиск при смене таблицы
-    clearSearch('dataPagination', currentTable);
+    clearSearch('dataPagination', 'dataTable', 'databaseTableHead', 'databaseTableHead', 'databaseInfo');
     
     // Проверяем права доступа
     checkDatabaseAccess();
 
     TableVariables.tableRUName = currentTable;
-    TableVariables.tableCodeName = 'dataTable';
+    TableVariables.tableCodeName = tableMap.get(currentTable);
 
     // Загружаем данные таблицы
-    await fetchTableData(TableVariables.tableRUName, tableMap.get(currentTable), useCache);
+    await fetchTableData(TableVariables.tableRUName, TableVariables.tableCodeName, useCache);
 
-    showTableData('dataPagination'); // обновляем отображение страницы
+    showTableData('dataPagination', 'dataTable', 'databaseTableHead', 'databaseTableBody',
+        'databaseInfo'); // обновляем отображение страницы
 }
 
 // Сокрытие интерфейса таблиц
@@ -89,7 +91,7 @@ export function displayTableData(data, paginationID, tableID, tableHeadID, table
     dataKeys.forEach(key => {
         
         // Не отображаем графу ID для базового пользователя
-        if (userRights === UserRights.Basic && key === 'id') {
+        if (userRights === UserRights.Basic && (key === 'id' || key === 'isDeleted')) {
             return;
         }
 
@@ -107,6 +109,7 @@ export function displayTableData(data, paginationID, tableID, tableHeadID, table
                 .trim();
         }
         
+        th.style.textAlign = 'center';
         th.setAttribute('data-field', key);
         headerRow.appendChild(th);
     });
@@ -115,6 +118,7 @@ export function displayTableData(data, paginationID, tableID, tableHeadID, table
     if (userRights != UserRights.Basic) {
         const actionsTh = document.createElement('th');
         actionsTh.textContent = 'Действия';
+        actionsTh.style.textAlign = 'center';
         actionsTh.setAttribute('data-field', 'actions');
         headerRow.appendChild(actionsTh);
     }
@@ -122,7 +126,7 @@ export function displayTableData(data, paginationID, tableID, tableHeadID, table
     tableHead.appendChild(headerRow);
     
     // Заполняем данные
-    data.forEach((record, index) => {
+    data.forEach((record) => {
         const row = document.createElement('tr');
         if (TableVariables.searchId && record.id === TableVariables.searchId) {
             row.classList.add('search-highlight');
@@ -132,7 +136,7 @@ export function displayTableData(data, paginationID, tableID, tableHeadID, table
         dataKeys.forEach(key => {
 
             // Не отображаем графу ID для базового пользователя
-            if (userRights === UserRights.Basic && key === 'id') {
+            if (userRights === UserRights.Basic && (key === 'id' || key === 'isDeleted')) {
                 return;
             }
 
@@ -142,8 +146,9 @@ export function displayTableData(data, paginationID, tableID, tableHeadID, table
             // Определяем тип поля для форматирования
             const fieldType = detectFieldType(key, value);
             
-            // Форматируем значение в зависимости от типа
+            // Форматируем значение
             td.textContent = formatValue(value, fieldType);
+            td.style.textAlign = 'center';
             td.className = getCellClassName(fieldType, value);
             td.setAttribute('data-field', key);
             
@@ -306,7 +311,7 @@ export function showNoSearchResults() {
 }
 
 // Очистка поиска
-export function clearSearch(paginationID, tableName) {
+export function clearSearch(paginationID, tableID, tableHeadID, tableBodyID, tableInfoID) {
     TableVariables.searchId = null;
     
     // Сбрасываем поле поиска
@@ -319,7 +324,7 @@ export function clearSearch(paginationID, tableName) {
     // Сбрасываем на первую страницу и показываем все данные
     TableVariables.dataPage = 1;
     if (TableVariables.tableData && TableVariables.tableData.length > 0) {
-        showTableData(paginationID);
+        showTableData(paginationID, tableID, tableHeadID, tableBodyID, tableInfoID);
     }
 }
 
@@ -356,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('click', function(event) {
     const editModal = document.getElementById('editRecordModal');
     if (event.target === editModal) {
-        closeEditRecordModal();
+        closeRecordModalForm();
     }
 });
 
@@ -371,7 +376,7 @@ document.addEventListener('click', function(event) {
 
 
 // Закрытие модального окна
-window.closeEditRecordModal = function closeEditRecordModal() {
+export function closeRecordModalForm() {
     document.getElementById('editRecordModal').style.display = 'none';
     TableVariables.record = null;
     

@@ -46,7 +46,9 @@ export const fieldNameMapping = {
     'note': 'Примечание',
     'isDeleted': 'Удален',
     'distance': 'Расстояние',
-    'transportVehicleId': 'ID транспортного средства'
+    'transportVehicleId': 'ID транспортного средства',
+    'roleId': 'ID роли',
+    'password': 'Пароль'
 };
 
 

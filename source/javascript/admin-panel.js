@@ -12,6 +12,9 @@ paginationNameMap.set(tableMap.get('Учетные записи'), 'usersPaginat
 
 // Функции для вкладок
 export async function switchTab(tabName) {
+    // Получаем кодовую часть имени таблицы
+    const tableCodeName = TableName.getCodeName(tabName);
+    
     // Загрузить данные для вкладки
     switch (tabName) {
         case TableName.CREDENTIAL[0]: await loadUsers(); break;
@@ -27,11 +30,9 @@ export async function switchTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    
-    console.log(`${TableName.getCodeName(tabName)}-tab`);
 
     // Показать выбранную вкладку
-    document.getElementById(`${TableName.getCodeName(tabName)}-tab`).classList.add('active');
+    document.getElementById(`${tableCodeName}-tab`).classList.add('active');
     
     // Активировать кнопку (если event передан)
     if (event) {
@@ -54,46 +55,15 @@ async function loadUsers() {
     TableVariables.dataPage = 1;
     TableVariables.record = null;
     TableVariables.searchId = null;
+    TableVariables.tableRUName = TableName.CREDENTIAL[0]; // Название таблицы - русское
+    TableVariables.tableCodeName =  tableMap.get(TableVariables.tableRUName); // доступ к api
 
-    const tableName = TableName.CREDENTIAL[0]; // Название таблицы
-    await fetchTableData(tableName, tableMap.get(tableName), 'usersPagination'); // Загрузка данных
-    showTableData(paginationNameMap.get(tableMap.get(tableName)));
+    const tableCodeName = TableName.getCodeName(TableVariables.tableRUName);
+
+    await fetchTableData(TableVariables.tableRUName, TableVariables.tableCodeName, 'usersPagination'); // Загрузка данных
+    showTableData(paginationNameMap.get(TableVariables.tableCodeName), `${tableCodeName}Table`, 
+        `${tableCodeName}TableHead`, `${tableCodeName}TableBody`, `${tableCodeName}Info`);
 }
-
-/*function displayUsers(users) {
-    const tbody = document.getElementById('usersTableBody');
-    tbody.innerHTML = '';
-    
-    // Добавьте проверку на массив
-    if (!Array.isArray(users)) {
-        console.error('Users is not an array:', users);
-        return;
-    }
-    
-    users.forEach(user => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${user.id}</td>
-            <td>${user.roleId}</td>
-            <td>${user.username}</td>
-            <td>${user.password}</td>
-            <td>${user.email}</td>
-            <td>${user.whoAdded}</td>
-            <td>${new Date(user.whenAdded).toLocaleDateString()}</td>
-            <td>${user.whoChanged === null ? 'null' : user.whoChanged}</td>
-            <td>${user.whenChanged === null ? 'null' : new Date(user.whenChanged).toLocaleDateString()}</td>
-            <td>${user.note === null ? 'null' : user.note}</td>
-            <td>${user.isDeleted === null ? 'null' : new Date(user.isDeleted).toLocaleDateString()}</td>
-            <td>
-                <button class="btn-edit" onclick="editUser(${user.Id})" ${user.IsDeleted ? 'disabled' : ''}>Редактировать</button>
-                <button class="btn-delete" onclick="confirmDeleteUser(${user.Id}, '${user.Username}')">
-                    ${user.IsDeleted ? 'Восстановить' : 'Удалить'}
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
-}*/
 
 function setupUsersPagination(totalCount, currentPage) {
     const pagination = document.getElementById('usersPagination');
@@ -122,31 +92,18 @@ function setupUsersPagination(totalCount, currentPage) {
 
 // Функции для ролей
 async function loadRoles(page = 1) {
-    try {
-        const token = getCookie('token');
-        const response = await fetch(`${BASE_API_URL}/Role`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!response.ok) throw new Error('Ошибка загрузки ролей');
-        
-        const roles = await response.json(); // Получаем массив напрямую
-        
-        // Исправьте здесь - передаём массив roles напрямую
-        displayRoles(roles);
-        //setupRolesPagination(roles.length, page); // Используем длину массива для пагинации
-        currentRolesPage = page;
-        
-    } catch (error) {
-        console.error('Error loading roles:', error);
-        messageBoxShow('Ошибка загрузки ролей', 'red', '20px', '45%', 'translateY(50px)');
-        return false;
-    }
-    return true;
+    // Смена переменных состояния текущей таблицы
+    TableVariables.dataPage = 1;
+    TableVariables.record = null;
+    TableVariables.searchId = null;
+    TableVariables.tableRUName = TableName.ROLE[0]; // Название таблицы - русское
+    TableVariables.tableCodeName =  tableMap.get(TableVariables.tableRUName); // доступ к api
+
+    const tableCodeName = TableName.getCodeName(TableVariables.tableRUName);
+
+    await fetchTableData(TableVariables.tableRUName, TableVariables.tableCodeName, 'usersPagination'); // Загрузка данных
+    showTableData(paginationNameMap.get(TableVariables.tableCodeName), `${tableCodeName}Table`, 
+        `${tableCodeName}TableHead`, `${tableCodeName}TableBody`, `${tableCodeName}Info`);
 }
 
 function displayRoles(roles) {

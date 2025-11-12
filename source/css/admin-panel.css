@@ -26,7 +26,7 @@
     flex: 1;
     padding: 15px 20px;
     border: none;
-    background: #f8f9fa;
+    background: rgba(144, 144, 144, 0.2);
     cursor: pointer;
     font-size: 16px;
     font-weight: 500;
@@ -65,6 +65,10 @@
 .admin-header h2 {
     margin: 0;
     color: #333;
+}
+
+#usersSwitchTab {
+    border-right: 2px solid rgba(0,0,0,0.1);
 }
 
 /* Кнопки */
@@ -195,7 +199,7 @@
 }
 
 .admin-table tr:hover {
-    background: #f8f9fa;
+    background: rgba(0,0,0,0.1);
 }
 
 /* Статус */

@@ -159,7 +159,7 @@ export function detectFieldType(fieldName, value) {
     
     if (fieldName.includes('is_') || fieldName.includes('has_') || 
         fieldName === 'isDeleted' || fieldName === 'is_active') {
-        return 'boolean';
+        return 'date';
     }
     
     if (fieldName.includes('email')) return 'email';

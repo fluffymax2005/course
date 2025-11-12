@@ -49,7 +49,7 @@
                 </div>
             </div>
             
-            <a onclick="showSection()" href="#">
+            <a href="#">
                 <img class="header-icon" id="page-icon" src="assets/icons/main-page.svg">
             </a>
             
@@ -123,14 +123,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="editRecordModalTitle">Редактировать запись</h3>
-                    <span class="close" onclick="closeEditRecordModal()">&times;</span>
+                    <span class="close" onclick="closeRecordModalForm()">&times;</span>
                 </div>
                 <form id="editRecordForm" onsubmit="recordAction(event)">
                     <div class="form-fields" id="editRecordFields">
                         <!-- Поля формы будут заполнены динамически -->
                     </div>
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary-db" id="closeModalForm" onclick="closeEditRecordModal()">Отмена</button>
+                        <button type="button" class="btn-secondary-db" id="closeModalForm" onclick="closeRecordModalForm()">Отмена</button>
                         <button type="submit" class="btn-primary-db" id="applyModalForm">Сохранить</button>
                     </div>
                 </form>
@@ -227,8 +227,8 @@
         <div class="admin-container">
             <!-- Вкладки -->
             <div class="admin-tabs">
-                <button class="tab-btn active" onclick="switchTab('Учетные записи')">Учетные записи</button>
-                <button class="tab-btn" onclick="switchTab('Роли')">Роли</button>
+                <button class="tab-btn active" onclick="switchTab('Учетные записи')" id="usersSwitchTab">Учетные записи</button>
+                <button class="tab-btn" onclick="switchTab('Роли')" id="rolesSwitchTab">Роли</button>
             </div>
 
             <!-- Содержимое вкладки пользователей -->
@@ -333,7 +333,7 @@
                 </div>
             </form>
         </div>
-    </div>>
+    </div>
 
     <!-- Модальное окно для ролей -->
     <div id="roleModal" class="modal">

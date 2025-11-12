@@ -232,7 +232,7 @@
     align-items: center;
     margin-bottom: 20px;
     padding: 20px;
-    background: white;
+    background: linear-gradient(135deg, #9df8ff, #00f2fe);
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
@@ -299,6 +299,7 @@
     border-bottom: 2px solid #e2e8f0;
     position: sticky;
     top: 0;
+    
 }
 
 .data-table td {
@@ -313,7 +314,7 @@
 }
 
 .data-table tr:hover {
-    background: #f7fafc;
+    background: rgba(0,0,0,0.1);
 }
 
 /* Search Highlight */

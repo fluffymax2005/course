@@ -1,6 +1,6 @@
 import { getToken, getUserName, getUserRights, setTableHash, UserRights } from "./cookie.js";
 import { populateEditForm, detectFieldType} from "./form-service.js";
-import { displaySearchResults, displayTableData, showSearchInfo } from "./database-visuals.js";
+import { closeRecordModalForm, displaySearchResults, displayTableData, showSearchInfo } from "./database-visuals.js";
 import { ApiService } from "./api.js";
 import { getCurrentPageData } from "./database-general-service.js";
 import { TableAction, tableMap } from "./table-utils.js";
@@ -63,7 +63,9 @@ export class TableVariables {
 }
 
 // Обновление записи
-export async function recordAction() {
+export async function recordAction(event) {
+    event.preventDefault();
+
     // Задаем тип действия
     let action = TableVariables.recordAction;
     
@@ -126,7 +128,7 @@ export async function recordAction() {
             break;
         case TableAction.Edit:
             body.whoChanged = getUserName();
-            body.whenChanged = new Date().toISOString();
+            body.whenChanged = new Date()/*.toISOString()*/;
             break;
         case TableAction.Delete: {
             body.whoChanged = getUserName();
@@ -146,8 +148,7 @@ export async function recordAction() {
     
     try {
         const token = getToken();
-        const tableSelect = document.getElementById('tableSelect');
-        const apiTableName = tableMap.get(tableSelect.options[tableSelect.selectedIndex].text);
+        const apiTableName = TableVariables.tableCodeName;
 
         let data;
         let hash;
@@ -193,7 +194,7 @@ export async function recordAction() {
                 // В случае, если пользователь не админ и произведено удаление, то надо удалить из памяти запись
                 const userRights = getUserRights();
                 if (userRights !== UserRights.Admin) {
-                    TableVariables.tableData.splice(recordIndex);
+                    TableVariables.tableData.splice(recordIndex, 1);
                 } else {
                     // Если пользователь админ, то нужно получить свежую запись
                     const updatedSet = await ApiService.get(`${apiTableName}/${TableVariables.record.id}`, {
@@ -239,6 +240,8 @@ export async function recordAction() {
             paginationID = 'rolesPagination';
 
         showTableData(paginationID);
+
+        closeRecordModalForm();
 
         MessageBox.ShowFromLeft('Операция успешна завершена', 'green', false, '40', 'translateY(50px)');
     } catch (error) {

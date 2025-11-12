@@ -83,7 +83,7 @@ async function showSection(sectionName = null, isLoadListener = false) {
             // Выпадающий список
             const tableSelect = document.getElementById('tableSelect');
             tableSelect.value = "";
-            clearSearch('dataPagination', tableSelect.value);
+            clearSearch('dataPagination', 'dataTable', 'databaseTableHead', 'databaseTableHead', 'databaseInfo');
             hideTableInterface();
         } else if (sectionName === SectionName.STATISTICS[1]) {
             headerIcon.src = 'assets/icons/statistics-page.svg';
@@ -98,9 +98,9 @@ async function showSection(sectionName = null, isLoadListener = false) {
 }
 
 // Отображение таблиц при успешной загрузке
-export function showTableData(paginationID) {
-    displayTableData(getCurrentPageData(), 'dataPagination', 'dataTable', 'databaseTableHead', 
-        'databaseTableBody', 'databaseInfo', TableVariables.tableRUName, TableVariables.tableCodeName);
+export function showTableData(paginationID, tableID, tableHeadID, tableBodyID, tableInfoID) {
+    displayTableData(getCurrentPageData(), paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, 
+        TableVariables.tableRUName, TableVariables.tableCodeName);
     setupPagination(paginationID);
 }
 

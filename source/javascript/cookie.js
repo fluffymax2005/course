@@ -29,7 +29,7 @@ export function deleteUserData() {
     const cookies = ['token', 'tokenExpireTime', 'userRights', 'userName'];
 
     cookies.forEach(cookie => {
-        localStorage.removeItem(cookie);
+        deleteCookie(cookie);
     });
 }
 
