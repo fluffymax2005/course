@@ -129,9 +129,9 @@ namespace DbAPI
         }
 
         // api/{entity}/verify-table-state-hash
-        [HttpPost("verify-table-state-hash")]
+        [HttpGet("verify-table-state-hash")]
         [Authorize]
-        public IActionResult VerifyTableStateHash([FromBody] string hash) {
+        public IActionResult VerifyTableStateHash([FromQuery] string hash) {
             var cacheKey = "Driver";
             var cacheHash = _cache.Get<string>(cacheKey);
 
