@@ -139,7 +139,7 @@ namespace db.Controllers {
                 var verifyResult = cacheHash.Equals(hash);
                 return Ok(new {
                     result = verifyResult ? "1" : "0",
-                    hash = hash,
+                    hash = verifyResult ? hash : cacheHash,
                 });
             }
         }
