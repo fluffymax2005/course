@@ -21,6 +21,12 @@ namespace DbAPI.Repositories {
         }
 
         public async Task<TypeId?> AddAsync(Models.Route entity) {
+            
+            entity.WhenAdded = DateTime.Now;
+            entity.WhoChanged = null;
+            entity.WhenChanged = null;
+            entity.IsDeleted = null;
+
             await EntityValidate(entity.BoardingAddress, entity.DropAddress, entity.WhoAdded,
                 entity.WhenAdded, entity.Id, entity.WhoChanged, entity.WhenChanged, entity.Note,
                 entity.IsDeleted);
@@ -29,28 +35,6 @@ namespace DbAPI.Repositories {
             await _context.SaveChangesAsync();
 
             return entity.Id;
-        }
-
-        public async Task AddAsync(string boardingAddress, string dropAddress, string whoAdded,
-            DateTime whenAdded, TypeId? id, string? whoChanged = null, DateTime? whenChanged = null,
-            string? note = null, DateTime? isDeleted = null) {
-
-            await EntityValidate(boardingAddress, dropAddress, whoAdded, whenAdded, id, whoChanged,
-                whenChanged, note, isDeleted);
-
-            var entity = new Models.Route {
-                BoardingAddress = boardingAddress,
-                DropAddress = dropAddress,
-                WhoAdded = whoAdded,
-                WhenAdded = whenAdded,
-                WhoChanged = whoChanged,
-                WhenChanged = whenChanged,
-                Note = note,
-                IsDeleted = isDeleted
-            };
-
-            await _context.Routes.AddAsync(entity);
-            await _context.SaveChangesAsync();
         }
 
         private async Task EntityValidate(string boardingAddress, string dropAddress, string whoAdded,
@@ -72,6 +56,8 @@ namespace DbAPI.Repositories {
         }
 
         public async Task UpdateAsync(Models.Route entity) {
+            entity.WhenChanged = DateTime.Now;
+
             _context.Routes.Update(entity);
             await _context.SaveChangesAsync();
         }
@@ -79,10 +65,15 @@ namespace DbAPI.Repositories {
         public async Task SoftDeleteAsync(TypeId id) {
             var entity = await GetByIdAsync(id);
             if (entity != null) {
+                if (entity.IsDeleted != null)
+                    throw new ArgumentException($"Запись с ID = {id} уже удалена");
+
                 entity.IsDeleted = DateTime.Now; // soft delete
                 entity.WhenChanged = DateTime.Now;
                 await _context.SaveChangesAsync();
+                return;
             }
+            throw new ArgumentException($"Сущность с ID = {id} не существует в БД.");
         }
 
         public async Task DeleteAsync(TypeId id) {
@@ -90,37 +81,23 @@ namespace DbAPI.Repositories {
             if (entity != null) {
                 _context.Routes.Remove(entity);
                 await _context.SaveChangesAsync();
+                return;
             }
+            throw new ArgumentException($"Сущность с ID = {id} не существует в БД.");
         }
 
-        public async Task<bool> RecoverAsync(TypeId id) {
+        public async Task RecoverAsync(TypeId id) {
             var entity = await GetByIdAsync(id);
-            if (entity?.Id != null) {
+            if (entity != null) {
+                if (entity.IsDeleted == null)
+                    throw new ArgumentException($"Сущность с ID = {id} существует в БД.");
+
                 entity.IsDeleted = null;
                 entity.WhenChanged = DateTime.Now;
                 await _context.SaveChangesAsync();
-
-                return true;
+                return;
             }
-            return false;
+            throw new ArgumentException($"Сущность с ID = {id} не существует в БД.");
         }
-
-        /*public async Task<TypeId> NewIdToAddAsync() {
-            var entities = await GetAllAsync();
-            if (entities == null)
-                return 0; // entities are not found so can use id = 0
-
-            // Get All deleted Ids in ascending order
-            var Ids = entities
-                .Where(e => e.IsDeleted != null || e.IsDeleted is null)
-                .Select(e => e.Id)
-                .OrderBy(id => id)
-                .ToList();
-            if (Ids.Last() == TypeId.MaxValue) {
-                return -1; // all seats are reserved
-            }
-
-            return Ids.Last() + 1; // maybe all seats are reserved
-        }*/
     }
 }

@@ -10,6 +10,6 @@ namespace DbAPI.Interfaces {
         Task UpdateAsync(TEntity entity);
         Task DeleteAsync(TKey id);
         Task SoftDeleteAsync(TKey id);
-        Task<bool> RecoverAsync(TKey key);
+        Task RecoverAsync(TKey key);
     }
 }

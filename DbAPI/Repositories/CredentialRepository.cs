@@ -24,6 +24,10 @@ namespace DbAPI.Repositories {
         }
 
         public async Task<TypeId?> AddAsync(Credential entity) {
+            entity.WhenAdded = DateTime.Now;
+            entity.WhoChanged = null;
+            entity.WhenChanged = null;
+            entity.IsDeleted = null;
 
             await EntityValidate(entity.RoleId, entity.Username, entity.Password, entity.WhoAdded,
                 entity.WhenAdded, entity.Id, entity.WhoChanged, entity.WhenChanged, entity.Note,
@@ -33,29 +37,6 @@ namespace DbAPI.Repositories {
             await _context.SaveChangesAsync();
 
             return entity.Id;
-        }
-
-        public async Task AddAsync(TypeId roleId, string username, string password, UserRights Rights, string whoAdded,
-            DateTime whenAdded, TypeId? id = null, string? whoChanged = null, DateTime? whenChanged = null,
-            string? note = null, DateTime? isDeleted = null) {
-
-            await EntityValidate(roleId, username, password, whoAdded, whenAdded, id, whoChanged,
-                whenChanged, note, isDeleted);
-
-            var entity = new Credential {
-                RoleId = roleId,
-                Username = username,
-                Password = password,
-                WhoAdded = whoAdded,
-                WhenAdded = whenAdded,
-                WhoChanged = whoChanged,
-                WhenChanged = whenChanged,
-                Note = note,
-                IsDeleted = isDeleted
-            };
-
-            await _context.Credentials.AddAsync(entity);
-            await _context.SaveChangesAsync();
         }
 
         private async Task EntityValidate(TypeId roleId, string username, string password, string whoAdded,
@@ -92,6 +73,7 @@ namespace DbAPI.Repositories {
                 throw new InvalidDataException($"Роль с ID = {entity.RoleId} не существует");
             }
 
+            entity.WhenChanged = DateTime.Now;
             _context.Credentials.Update(entity);
             await _context.SaveChangesAsync();
         }
@@ -99,10 +81,15 @@ namespace DbAPI.Repositories {
         public async Task SoftDeleteAsync(TypeId id) {
             var entity = await GetByIdAsync(id);
             if (entity != null) {
+                if (entity.IsDeleted != null)
+                    throw new ArgumentException($"Запись с ID = {id} уже удалена");
+
                 entity.IsDeleted = DateTime.Now; // soft delete
                 entity.WhenChanged = DateTime.Now;
                 await _context.SaveChangesAsync();
+                return;
             }
+            throw new ArgumentException($"Сущность с ID = {id} не существует в БД.");
         }
 
         public async Task DeleteAsync(TypeId id) {
@@ -110,19 +97,23 @@ namespace DbAPI.Repositories {
             if (entity != null) {
                 _context.Credentials.Remove(entity);
                 await _context.SaveChangesAsync();
+                return;
             }
+            throw new ArgumentException($"Сущность с ID = {id} не существует в БД.");
         }
 
-        public async Task<bool> RecoverAsync(TypeId id) {
+        public async Task RecoverAsync(TypeId id) {
             var entity = await GetByIdAsync(id);
             if (entity != null) {
+                if (entity.IsDeleted == null)
+                    throw new ArgumentException($"Сущность с ID = {id} существует в БД.");
+
                 entity.IsDeleted = null;
                 entity.WhenChanged = DateTime.Now;
                 await _context.SaveChangesAsync();
-
-                return true;
+                return;
             }
-            return false;
+            throw new ArgumentException($"Сущность с ID = {id} не существует в БД.");
         }
 
         public async Task<Credential?> GetByUserNameAsync(string username) {
