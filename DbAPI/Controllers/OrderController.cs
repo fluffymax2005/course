@@ -46,6 +46,7 @@ namespace DbAPI.Controllers {
         public override async Task<IActionResult> CreateAsync([FromBody] Order entity) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Order.Create()\"");
             TypeId? id;
+            entity.WhoAdded = User.Identity.Name;
             try {
                 id = await _repository.AddAsync(entity);
             } catch (Exception ex) {
@@ -68,12 +69,14 @@ namespace DbAPI.Controllers {
                 return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
             }
 
+            entity.WhoChanged = User.Identity.Name;
             try {
                 await _repository.UpdateAsync(entity);
             } catch (InvalidDataException ex) {
                 _logger.LogError($"Order:UpdateAsync({id}): {ex.Message}");
                 return BadRequest($"Ошибка сохранения: {ex.Message}");
             }
+
             _logger.LogInformation($"Запрос \"Order.Update({id})\" пользователя \"{User.Identity.Name}\" успешен");
             return Ok(new { hash = UpdateTableHash() });
         }
@@ -83,20 +86,17 @@ namespace DbAPI.Controllers {
         [Authorize(Roles = "Admin")]
         public override async Task<IActionResult> DeleteAsync(TypeId id) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Order.Delete({id})\"");
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null) {
-                _logger.LogError($"Запрос \"Order.Delete({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
-                    $"Причина: сущность не найдена");
-                return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
-            } else if (entity.IsDeleted != null) {
-                _logger.LogError($"Запрос \"Order.Delete({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
-                    $"Причина: сущность уже удалена");
-                return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
+
+            try {
+                await _repository.RecoverAsync(id);
+            } catch (Exception ex) {
+                _logger.LogError($"Запрос \"Order.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
+                    $"Причина: {ex.Message}");
+                return NotFound(new { message = ex.Message });
             }
 
-            await _repository.SoftDeleteAsync(id);
-            _logger.LogInformation($"Запрос \"Order.Delete({id})\" пользователя \"{User.Identity.Name}\" успешен");
-            return Ok(new { hash = UpdateTableHash() });
+            _logger.LogInformation($"Запрос \"Order.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" успешен");
+            return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
         }
 
         // Update: api/{entity}/{id}/recover

@@ -46,6 +46,7 @@ namespace DbAPI.Controllers {
         public override async Task<IActionResult> CreateAsync([FromBody] Models.Route entity) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Route.Create()\"");
             TypeId? id;
+            entity.WhoAdded = User.Identity.Name;
             try {
                 id = await _repository.AddAsync(entity);
             } catch (Exception ex) {
@@ -68,7 +69,14 @@ namespace DbAPI.Controllers {
                 return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
             }
 
-            await _repository.UpdateAsync(entity);
+            entity.WhoChanged = User.Identity.Name;
+            try {
+                await _repository.UpdateAsync(entity);
+            } catch (InvalidDataException ex) {
+                _logger.LogError($"Route:UpdateAsync({id}): {ex.Message}");
+                return BadRequest($"Ошибка сохранения: {ex.Message}");
+            }
+
             _logger.LogInformation($"Запрос \"Route.Update({id})\" пользователя \"{User.Identity.Name}\" успешен");
             return Ok(new { hash = UpdateTableHash() });
         }
@@ -78,17 +86,15 @@ namespace DbAPI.Controllers {
         [Authorize(Roles = "Admin")]
         public override async Task<IActionResult> DeleteAsync(TypeId id) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Route.Delete({id})\"");
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null) {
+
+            try {
+                await _repository.SoftDeleteAsync(id);
+            } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Route.Delete({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
-                    $"Причина: сущность не найдена");
-                return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
-            } else if (entity.IsDeleted != null) {
-                _logger.LogError($"Запрос \"Route.Delete({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
-                    $"Причина: сущность уже удалена");
-                return BadRequest(new { message = $"Сущность с ID = {id} не найдена" });
+                    $"Причина: {ex.Message}");
+                return BadRequest(new { message = ex.Message });
             }
-            await _repository.SoftDeleteAsync(id);
+
             _logger.LogInformation($"Запрос \"Route.Delete({id})\" пользователя \"{User.Identity.Name}\" успешен");
             return Ok(new { hash = UpdateTableHash() });
         }
@@ -98,19 +104,17 @@ namespace DbAPI.Controllers {
         [Authorize(Roles = "Admin")]
         public override async Task<IActionResult> RecoverAsync(TypeId id) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Route.RecoverAsync({id})\"");
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity != null) {
-                entity.IsDeleted = null;
-                entity.WhenChanged = DateTime.Now;
-                await _repository.UpdateAsync(entity);
 
-                _logger.LogInformation($"Запрос \"Route.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" успешен");
-                return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
+            try {
+                await _repository.RecoverAsync(id);
+            } catch (Exception ex) {
+                _logger.LogError($"Запрос \"Route.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
+                    $"Причина: {ex.Message}");
+                return NotFound(new { message = ex.Message });
             }
 
-            _logger.LogError($"Запрос \"Route.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
-                    $"Причина: сущность не найдена или уже существует");
-            return NotFound(new { message = $"Сущность с ID = {id} не найдена или уже существует" });
+            _logger.LogInformation($"Запрос \"Route.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" успешен");
+            return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
         }
 
         // api/{entity}/generate-table-state-hash
