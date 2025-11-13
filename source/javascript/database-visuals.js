@@ -23,9 +23,17 @@ export async function loadTableData(useCache = true) {
     // Проверяем права доступа
     checkDatabaseAccess();
 
-    TableVariables.tableRUName = currentTable;
-    TableVariables.tableCodeName = tableMap.get(currentTable);
+    TableVariables.tableRUName = currentTable !== 'default' ? currentTable : null;
+    TableVariables.tableCodeName = currentTable !== 'default' ? tableMap.get(currentTable) : null;
 
+    if (currentTable === '') {
+        tableSelect.selectedIndex = 0;
+        document.getElementById('dataTable').style.display = 'none';
+        document.getElementById('databaseInfo').style.display = 'none';
+        document.getElementById('dataPagination').style.display = 'none';
+        return;
+    }
+    
     // Загружаем данные таблицы
     await fetchTableData(TableVariables.tableRUName, TableVariables.tableCodeName, useCache);
 

@@ -35,7 +35,7 @@ export function formatValue(value, type) {
                 
                 let dateString = '';
                 dateString += date.getDate() <= 9 ? `0${date.getDate()}.` : `${date.getDate()}.`; // номер дня
-                dateString += date.getMonth() <= 8 ? `0${date.getMonth() + 1}.` : `${date.getMonth()}.`; // номер месяца
+                dateString += date.getMonth() <= 8 ? `0${date.getMonth() + 1}.` : `${date.getMonth() + 1}.`; // номер месяца
                 dateString += `${date.getFullYear()} `; // номер года
 
                 dateString += date.getHours() <= 9 ? `0${date.getHours()}:` : `${date.getHours()}:`; // номер часа

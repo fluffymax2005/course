@@ -81,7 +81,7 @@ async function showSection(sectionName = null, isLoadListener = false) {
 
             // Выпадающий список
             const tableSelect = document.getElementById('tableSelect');
-            tableSelect.value = "";
+            tableSelect.value = '';
             
             TableVariables.tableData = null;
             TableVariables.tableCodeName = null;

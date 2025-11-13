@@ -3,10 +3,11 @@ import { populateEditForm, detectFieldType} from "./form-service.js";
 import { closeRecordModalForm, displaySearchResults, showSearchInfo } from "./database-visuals.js";
 import { ApiService } from "./api.js";
 import { TableAction, tableMap, TableName } from "./table-utils.js";
-import { MessageBox, TableFormConfirmButton, TableFormConfirmHeader } from "./form-utils.js";
+import { MessageBox, TableFormConfirmHeader } from "./form-utils.js";
 import { showTableData } from "./workspace-visuals.js";
 
 window.recordAction = recordAction;
+window.searchById = searchById;
 
 // Класс, управляющий значениями переменных для текущей рассматриваемой таблицы
 export class TableVariables {
@@ -294,26 +295,30 @@ export async function TableModifying(record, action, tableName) {
 }
 
 // ПОИСК ПО ID
-window.searchById = function searchById() {
+function searchById() {
     const searchInput = document.getElementById('searchById');
     const searchId = parseInt(searchInput.value);
     
-    if (!searchId || searchId <= 0) {
-        messageBoxShow('Введите корректный ID', 'red');
+    if (!TableVariables.tableData) {
+        MessageBox.ShowFromLeft('Выберите таблицу для поиска', 'red', false, '36', 'transformY(50px)');
+        return;
+    } else if (searchId < 0) {
+        MessageBox.ShowFromLeft('Введите корректный ID', 'red', false, '36', 'transformY(50px)');
         return;
     }
     
     changesearchId(searchId);
     
     // Ищем запись по ID во всех данных
-    const foundRecord = TableVariables.tableData.find(record => record.id === searchId);
+    const foundRecords = TableVariables.tableData.find(record => record.id === searchId);
     
-    if (foundRecord) {
+    if (foundRecords) {
         // Показываем только найденную запись
-        displaySearchResults([foundRecord]);
+        displaySearchResults([foundRecords]);
         showSearchInfo();
     } else {
-        showNoSearchResults();
+        MessageBox.ShowFromLeft(`Искомая(-ые) сущность(-и) не найдена(-ы)`, 'red', false, '40', 'transformY(50px)');
+        return;
     }
     
     // Показываем кнопку очистки

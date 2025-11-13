@@ -1,8 +1,10 @@
 import {getTableHash, getToken, setTableHash} from './cookie.js'
 import {ApiService} from './api.js';
-import { isFieldRequired, getMinValue, getMaxValue, TableVariables } from './table-service.js';
+import { isFieldRequired, getMinValue, getMaxValue, TableVariables, TableModifying } from './table-service.js';
 import { DATA_PER_PAGE, dbCache, fieldNameMapping, TableAction } from './table-utils.js';
 import { MessageBox, TableFormConfirmButton } from './form-utils.js';
+
+window.showAddRecordForm = showAddRecordForm;
 
 // Отобразить форму добавления новой записи
 export function showAddRecordForm() {
