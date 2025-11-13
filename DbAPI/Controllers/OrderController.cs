@@ -147,7 +147,7 @@ namespace DbAPI.Controllers {
             }
         }
 
-        public string UpdateTableHash() {
+        private string UpdateTableHash() {
             var cacheKey = "Order";
             var hash = Hasher.CreateTableHash();
 

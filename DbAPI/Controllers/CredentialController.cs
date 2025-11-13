@@ -431,7 +431,7 @@ namespace DbAPI.Controllers {
             }
         }
 
-        public string UpdateTableHash() {
+        private string UpdateTableHash() {
             var cacheKey = "Credential";
             var hash = Hasher.CreateTableHash();
 

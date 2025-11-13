@@ -147,7 +147,7 @@ namespace DbAPI
             }
         }
 
-        public string UpdateTableHash() {
+        private string UpdateTableHash() {
             var cacheKey = "Driver";
             var hash = Hasher.CreateTableHash();
 

@@ -144,7 +144,7 @@ namespace db.Controllers {
             }
         }
 
-        public string UpdateTableHash() {
+        private string UpdateTableHash() {
             var cacheKey = "Rate";
             var hash = Hasher.CreateTableHash();
 
