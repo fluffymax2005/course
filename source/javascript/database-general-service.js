@@ -13,6 +13,9 @@ export function checkDatabaseAccess() {
             break;
         default:
             actionButtons.style.display = 'flex';
+            for (const e of document.getElementsByClassName('search-controls')) {
+                e.style.display = 'flex';
+            }
     }
 }
 

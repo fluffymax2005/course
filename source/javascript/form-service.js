@@ -29,7 +29,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
             isGoingToFetch = true;
         } catch (error) {
             messageBoxShowFromRight(`Ошибка: ${error.message}`, 'red', false, 0, 'translateY(50px)');
-            return;
+            throw error;
         }
     } else { // Данные есть, но не ясно, свежие ли?
         try {
@@ -44,7 +44,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
 
         } catch (error) {
             messageBoxShowFromRight(`Ошибка: ${error.message}`, 'red', false, 0, 'translateY(50px)');
-            return;
+            throw error;
         }
     }
 
@@ -77,6 +77,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
     } catch (error) {       
         MessageBox.ShowFromLeft('Внутренняя ошибка', 'red', false, '43', 'translateY(50px)');
         console.error(error);
+        throw error;
     }
 }
 
@@ -94,9 +95,9 @@ export function setupPagination(paginationID) {
     switch (paginationID) {
         case 'dataPagination':
             tableID = 'dataTable';
-            tableHead = 'databaseTableHead';
-            tableBodyID = 'databaseTableBody';
-            tableInfoID = 'databaseInfo';
+            tableHead = 'dataTableHead';
+            tableBodyID = 'dataTableBody';
+            tableInfoID = 'dataInfo';
             break;
         case 'usersPagination':
             tableID = 'usersTable';

@@ -82,6 +82,12 @@ async function showSection(sectionName = null, isLoadListener = false) {
             // Выпадающий список
             const tableSelect = document.getElementById('tableSelect');
             tableSelect.value = '';
+
+            // Скрываем пока что бесполезные компоненты
+            document.getElementById('dataTable').style.display = 'none';
+            for (const e of document.getElementsByClassName('search-controls')) {
+                e.style.display = 'none';
+            }
             
             TableVariables.tableData = null;
             TableVariables.tableCodeName = null;
@@ -89,9 +95,9 @@ async function showSection(sectionName = null, isLoadListener = false) {
             TableVariables.recordAction = null;
             TableVariables.record = null;
 
-            document.getElementById('dataTable').style.display = 'none';
+            
 
-            clearSearch('dataPagination', 'dataTable', 'databaseTableHead', 'databaseTableHead', 'databaseInfo');
+            clearSearch('dataPagination', 'dataTable', 'dataTableHead', 'dataTableHead', 'dataInfo');
             hideTableInterface();
         } else if (sectionName === SectionName.STATISTICS[1]) {
             headerIcon.src = 'assets/icons/statistics-page.svg';

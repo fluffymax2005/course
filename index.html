@@ -160,8 +160,9 @@
 
                 <div class="search-controls">
                     <div class="search-by-id">
-                        <label for="searchById">Поиск по ID:</label>
-                        <input type="number" id="searchById" placeholder="Введите ID" min="1">
+                        <label for="searchById">Поиск по:</label>
+                        <select id="searchSelect" onchange="searchSelectChange()"></select>
+                        <input id="searchById" placeholder="Введите" onkeypress="searchInputChange()">
                         <button class="btn-secondary-db" onclick="searchById()" id="searchByIdBtn">
                             <span class="btn-icon">🔍</span>
                             Найти
@@ -183,7 +184,7 @@
             </div>
 
             <!-- Информация о таблице и результатах поиска -->
-            <div class="table-info" id="databaseInfo" style="display: none;">
+            <div class="table-info" id="dataInfo" style="display: none;">
                 <div class="table-info-left">
                     <h3 class="text-table-info" id="databaseTableName">Название таблицы</h3>
                     <p class="record-count" id="databaseRecordCount">Записей: 0</p>
@@ -196,10 +197,10 @@
             <!-- Таблица с данными -->
             <div class="table-container">
                 <table class="data-table" id="dataTable" style="display: none;">
-                    <thead class="table-head" id="databaseTableHead">
+                    <thead class="table-head" id="dataTableHead">
                         <!-- Заголовки будут заполнены через JavaScript -->
                     </thead>
-                    <tbody class="table-body" id="databaseTableBody">
+                    <tbody class="table-body" id="dataTableBody">
                         <!-- Данные будут загружены через JavaScript -->
                     </tbody>
                 </table>
