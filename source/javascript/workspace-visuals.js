@@ -85,6 +85,7 @@ async function showSection(sectionName = null, isLoadListener = false) {
 
             // Скрываем пока что бесполезные компоненты
             document.getElementById('dataTable').style.display = 'none';
+            document.getElementById('addRecordBtn').style.display = 'none';
             for (const e of document.getElementsByClassName('search-controls')) {
                 e.style.display = 'none';
             }
@@ -113,8 +114,8 @@ async function showSection(sectionName = null, isLoadListener = false) {
 }
 
 // Отображение таблиц при успешной загрузке
-export function showTableData(paginationID, tableID, tableHeadID, tableBodyID, tableInfoID) {
-    displayTableData(getCurrentPageData(), paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, 
+export function showTableData(paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, data = null) {
+    displayTableData(getCurrentPageData(data), paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, 
         TableVariables.tableRUName, TableVariables.tableCodeName);
 }
 

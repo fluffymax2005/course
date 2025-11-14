@@ -162,12 +162,12 @@
                     <div class="search-by-id">
                         <label for="searchById">Поиск по:</label>
                         <select id="searchSelect" onchange="searchSelectChange()"></select>
-                        <input id="searchById" placeholder="Введите" onkeypress="searchInputChange()">
-                        <button class="btn-secondary-db" onclick="searchById()" id="searchByIdBtn">
+                        <input id="searchById" placeholder="Введите">
+                        <button class="btn-secondary-db" onclick="searchInputChange()" id="searchByIdBtn">
                             <span class="btn-icon">🔍</span>
                             Найти
                         </button>
-                        <button class="btn-tertiary-db" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">
+                        <button class="btn-tertiary-db" onclick="clearSearch('dataPagination', 'dataTable', 'dataTableHead', 'dataTableBody', 'dataInfo')" id="clearSearchBtn" style="display: none;">
                             <span class="btn-icon">❌</span>
                             Очистить
                         </button>
@@ -188,9 +188,6 @@
                 <div class="table-info-left">
                     <h3 class="text-table-info" id="databaseTableName">Название таблицы</h3>
                     <p class="record-count" id="databaseRecordCount">Записей: 0</p>
-                </div>
-                <div class="search-results-info" id="searchResultsInfo" style="display: none;">
-                    <span class="search-badge" id="searchResultsText"></span>
                 </div>
             </div>
 
@@ -249,9 +246,6 @@
                         <h3 id="adminTableName">Учетные записи</h3>
                         <p class="record-count" id="adminRecordCount">Записей: 0</p>
                     </div>
-                    <div class="search-results-info" id="searchResultsInfo" style="display: none;">
-                        <span class="search-badge" id="searchResultsText"></span>
-                    </div>
                 </div>
 
                 <div class="table-container">
@@ -282,9 +276,6 @@
                     <div class="table-info-left">
                         <h3>Роли</h3>
                         <p class="record-count">Записей: 0</p>
-                    </div>
-                    <div class="search-results-info" id="searchResultsInfo" style="display: none;">
-                        <span class="search-badge" id="searchResultsText"></span>
                     </div>
                 </div>
 

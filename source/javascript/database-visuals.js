@@ -4,13 +4,13 @@ import { TableModifying, TableVariables } from "./table-service.js";
 import { getUserRights, UserRights } from "./cookie.js";
 import { DATA_PER_PAGE, fieldNameMapping, TableAction, tableMap } from "./table-utils.js";
 import { showTableData } from "./workspace-visuals.js";
-import { MessageBox } from "./form-utils.js";
 
 window.loadTableData = loadTableData;
 window.changePage = changePage;
 window.closeRecordModalForm = closeRecordModalForm;
 window.searchSelectChange = searchSelectChange;
 window.searchInputChange = searchInputChange;
+window.clearSearch = clearSearch;
 
 // Загрузка данных в таблицу
 export async function loadTableData(useCache = true) {
@@ -21,7 +21,7 @@ export async function loadTableData(useCache = true) {
     hideTableInterface();
     
     // Сбрасываем поиск при смене таблицы
-    clearSearch('dataPagination', 'dataTable', 'databaseTableHead', 'databaseTableHead', 'databaseInfo');
+    clearSearch('dataPagination', 'dataTable', 'dataTableHead', 'dataTableHead', 'dataInfo');
 
     TableVariables.tableRUName = currentTable !== 'default' ? currentTable : null;
     TableVariables.tableCodeName = currentTable !== 'default' ? tableMap.get(currentTable) : null;
@@ -29,8 +29,9 @@ export async function loadTableData(useCache = true) {
     if (currentTable === '') {
         tableSelect.selectedIndex = 0;
         document.getElementById('dataTable').style.display = 'none';
-        document.getElementById('databaseInfo').style.display = 'none';
+        document.getElementById('dataInfo').style.display = 'none';
         document.getElementById('dataPagination').style.display = 'none';
+        document.getElementById('addRecordBtn').style.display = 'none';
         for (const e of document.getElementsByClassName('search-controls')) {
             e.style.display = 'none';
         }
@@ -67,6 +68,7 @@ export async function loadTableData(useCache = true) {
     });
 
     document.getElementById('searchById').setAttribute('placeholder', `Введите \"${searchSelect.options[searchSelect.selectedIndex].text}\"`);
+    document.getElementById('addRecordBtn').style.display = 'flex';
 }
 
 // Сокрытие интерфейса таблиц
@@ -254,8 +256,13 @@ export function displaySearchResults(results) {
     
     // Заполняем данными
     const dataKeys = Object.keys(results[0]);
+
+    const startRecord = (TableVariables.dataPage - 1) * DATA_PER_PAGE + 1;
+    const endRecord = Math.min(TableVariables.dataPage * DATA_PER_PAGE, TableVariables.searchResults.length);
+
+    const pageRecords = results.slice(startRecord, endRecord);
     
-    results.forEach((record) => {
+    pageRecords.forEach((record) => {
         const row = document.createElement('tr');
         row.classList.add('search-highlight');
         
@@ -308,15 +315,10 @@ export function displaySearchResults(results) {
         
         tableBody.appendChild(row);
     });
-}
 
-// Показать информацию о поиске
-export function showSearchInfo() {
-    const searchResultsInfo = document.getElementById('searchResultsInfo');
-    const searchResultsText = document.getElementById('searchResultsText');
-    
-    searchResultsText.textContent = `Найдена запись с ID: ${TableVariables.searchId}`;
-    searchResultsInfo.style.display = 'block';
+    TableVariables.searchResults = results;
+
+    setupPagination('dataPagination');
 }
 
 // Показать сообщение о ненайденных результатах
@@ -347,9 +349,6 @@ export function clearSearch(paginationID, tableID, tableHeadID, tableBodyID, tab
     document.getElementById('searchById').value = '';
     document.getElementById('clearSearchBtn').style.display = 'none';
     
-    // Скрываем информацию о поиске
-    document.getElementById('searchResultsInfo').style.display = 'none';
-    
     // Сбрасываем на первую страницу и показываем все данные
     TableVariables.dataPage = 1;
     if (TableVariables.tableData && TableVariables.tableData.length > 0) {
@@ -360,7 +359,7 @@ export function clearSearch(paginationID, tableID, tableHeadID, tableBodyID, tab
 // Смена страницы
 async function changePage(page, paginationID, tableID, tableHeadID, tableBodyID, tableInfoID) {
     TableVariables.dataPage = page;
-    await displayTableData(getCurrentPageData(), paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, 
+    await displayTableData(getCurrentPageData(TableVariables.searchResults), paginationID, tableID, tableHeadID, tableBodyID, tableInfoID, 
         TableVariables.tableRUName, TableVariables.tableCodeName);
     
     // Прокрутка к верху таблицы
@@ -380,25 +379,47 @@ function searchSelectChange() {
 }
 
 function searchInputChange() {
-    // Производим поиск по нужному полю
     const searchSelect = document.getElementById('searchSelect');
     const key = searchSelect.options[searchSelect.selectedIndex].value;
 
     const searchInput = document.getElementById('searchById');
-    const text = searchInput.textContent;
-        
-    // Ищем запись по ключу во всех данных
-    const foundRecords = TableVariables.tableData.find(record => record.key === text);
-    if (!foundRecords)
-        displaySearchResults(null);
-    else
-        displaySearchResults([foundRecords]);
+    const text = searchInput.value.trim();
     
-    showSearchInfo();
+    // Если поиск пустой, показываем все записи или сбрасываем поиск
+    if (text === '') {
+        TableVariables.searchResults = null;
+        TableVariables.dataPage = 1;
+        showTableData('dataPagination', 'dataTable', 'dataTableHead', 'dataTableBody', 'dataInfo');
+        return;
+    }
+    
+    // Ищем записи по подстроке в указанном поле
+    const foundRecords = [];
+    for (const record of TableVariables.tableData) {
+        // Преобразуем значение в строку и ищем подстроку (регистронезависимо)
+        const fieldValue = String(record[key] || '').toLowerCase();
+        const searchText = text.toLowerCase();
+        
+        if (fieldValue.includes(searchText)) {
+            foundRecords.push(record);
+        }
+    }
+
+    // Проверяем длину массива, а не сам массив
+    if (foundRecords.length === 0) {
+        TableVariables.searchResults = null;
+        displaySearchResults(null); // убрали лишние []
+        document.getElementById('dataPagination').style.display = 'none';
+    } else {
+        TableVariables.dataPage
+        TableVariables.searchResults = foundRecords;
+        displaySearchResults(foundRecords); // убрали лишние []
+        changePage(1, 'dataPagination', 'dataTable', 'dataTableHead', 'dataTableBody', 'dataInfo');
+    }
     
     // Показываем кнопку очистки
     document.getElementById('clearSearchBtn').style.display = 'inline-block';
-    document.getElementById('dataPagination').style.display = 'none';
+    document.getElementById('databaseRecordCount').style.display = 'none';
 }
 
 
@@ -409,7 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (searchInput) {
         searchInput.addEventListener('keypress', function (event) {
             if (event.key === 'Enter') {
-                searchById();
+                searchInputChange();
             }
     });
     }

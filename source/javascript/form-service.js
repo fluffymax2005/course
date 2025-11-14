@@ -84,7 +84,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
 // Настройка пагинации
 export function setupPagination(paginationID) {
     const pagination = document.getElementById(paginationID);
-    const totalRecords = TableVariables.searchId ? 1 : TableVariables.tableData.length;
+    const totalRecords = TableVariables.searchResults ? TableVariables.searchResults.length : TableVariables.tableData.length;
     const totalPages = Math.ceil(totalRecords / DATA_PER_PAGE);
     
     pagination.style.display = 'flex';

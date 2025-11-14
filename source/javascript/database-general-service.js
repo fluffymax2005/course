@@ -20,12 +20,18 @@ export function checkDatabaseAccess() {
 }
 
 // Получение данных для текущей страницы
-export function getCurrentPageData() {
-    if (!TableVariables.tableData || TableVariables.tableData.length === 0) return [];
+export function getCurrentPageData(data = null) {
+    let dataCopy = null;
+
+    if (!data && (!TableVariables.tableData || TableVariables.tableData.length === 0)) return [];
+    else if (data) dataCopy = data;
+    else dataCopy = TableVariables.tableData;
     
+
+
     const startIndex = (TableVariables.dataPage - 1) * DATA_PER_PAGE;
     const endIndex = startIndex + DATA_PER_PAGE;
-    return TableVariables.tableData.slice(startIndex, endIndex);
+    return dataCopy.slice(startIndex, endIndex);
 }
 
 export function formatValue(value, type) {

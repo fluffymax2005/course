@@ -1,6 +1,6 @@
 import { getToken, getUserName, getUserRights, setTableHash, UserRights } from "./cookie.js";
 import { populateEditForm, detectFieldType} from "./form-service.js";
-import { closeRecordModalForm, displaySearchResults, showSearchInfo } from "./database-visuals.js";
+import { closeRecordModalForm, displaySearchResults } from "./database-visuals.js";
 import { ApiService } from "./api.js";
 import { TableAction, tableMap, TableName } from "./table-utils.js";
 import { MessageBox, TableFormConfirmHeader } from "./form-utils.js";
@@ -12,6 +12,7 @@ window.searchById = searchById;
 // Класс, управляющий значениями переменных для текущей рассматриваемой таблицы
 export class TableVariables {
     static _searchId = null; // текущая запись, подлежащая поиску
+    static _searchResults = null; // все поисковые записи
     static _record = null; // текущая запись, с коротой производятся действия
     static _recordAction = null; // тип операции, применяемый к текущей записи
 
@@ -59,6 +60,11 @@ export class TableVariables {
     static get tableCodeName() {return this._tableCodeName;}
     static set tableCodeName(name) {
         this._tableCodeName = name; 
+    }
+
+    static get searchResults() {return this._searchResults;}
+    static set searchResults(results) {
+        this._searchResults = results; 
     }
 }
 
