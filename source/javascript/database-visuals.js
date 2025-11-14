@@ -353,6 +353,7 @@ export function clearSearch(paginationID, tableID, tableHeadID, tableBodyID, tab
     TableVariables.dataPage = 1;
     if (TableVariables.tableData && TableVariables.tableData.length > 0) {
         showTableData(paginationID, tableID, tableHeadID, tableBodyID, tableInfoID);
+        document.getElementById('databaseRecordCount').style.display = 'flex';
     }
 }
 
@@ -389,6 +390,7 @@ function searchInputChange() {
     if (text === '') {
         TableVariables.searchResults = null;
         TableVariables.dataPage = 1;
+        document.getElementById('databaseRecordCount').style.display = 'flex';
         showTableData('dataPagination', 'dataTable', 'dataTableHead', 'dataTableBody', 'dataInfo');
         return;
     }
