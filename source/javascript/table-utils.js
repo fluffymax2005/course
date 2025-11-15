@@ -5,14 +5,23 @@ export const DATA_PER_PAGE = 20; // Число строк на каждой ст
 // Словарь для доступа к API
 export var tableMap = new Map();
 
-tableMap.set('Заказы', 'Order')
-    .set('Заказчики', 'Customer')
-    .set('Маршруты', 'Route')
-    .set('Тарифы', 'Rate')
-    .set('Шоферы', 'Driver')
-    .set('Транспортные средства', 'TransportVehicle')
-    .set('Учетные записи', 'Credential')
-    .set('Роли', 'Role');
+const ORDER = 'Order';
+const CUSTOMER = 'Customer';
+const ROUTE = 'Route';
+const RATE = 'Rate';
+const DRIVER = 'Driver';
+const TRANSPORT_VEHICLE = 'TransportVehicle';
+const CREDENTIAL = 'Credential'
+const ROLE = 'Role';
+
+tableMap.set('Заказы', ORDER)
+    .set('Заказчики', CUSTOMER)
+    .set('Маршруты', ROUTE)
+    .set('Тарифы', RATE)
+    .set('Шоферы', DRIVER)
+    .set('Транспортные средства', TRANSPORT_VEHICLE)
+    .set('Учетные записи', CREDENTIAL)
+    .set('Роли', ROLE);
 
 // Маппинг русских названий для полей
 export const fieldNameMapping = {
@@ -97,5 +106,84 @@ export class TableName {
         const foundField = fields.find(field => Array.isArray(field) && field[0] === tableName);
 
         return foundField ? foundField[1] : null;
+    }
+}
+
+// Некоторые таблицы при запросе GetAll требуют отдельного пути к api. (Есть поля, ведующие в другие таблицы)
+export class TableGETSpecial {
+    static getAllApiString(table) {
+        switch (table) {
+            case ORDER:
+            case CREDENTIAL:
+            case TRANSPORT_VEHICLE:
+                return `${table}/merge`;
+            case CUSTOMER:
+            case ROUTE:
+            case RATE:
+            case DRIVER:
+            case ROLE:
+                return table;
+            default:
+                return '';
+        }
+    }
+}
+
+// Класс, управляющий значениями переменных для текущей рассматриваемой таблицы
+export class TableVariables {
+    static _searchId = null; // текущая запись, подлежащая поиску
+    static _searchResults = null; // все поисковые записи
+    static _record = null; // текущая запись, с коротой производятся действия
+    static _recordAction = null; // тип операции, применяемый к текущей записи
+
+    static _tableData = []; // данные таблицы
+    static _tableRUName = ''; // название таблицы для пользователя
+    static _tableCodeName = ''; // идентификатор таблицы в коде
+
+    static _dataPage = 1; // текущая отображаемая страницы - пагинация
+
+    static get searchId() {return this._searchId;}
+    static set searchId(id) { 
+        if (id && id >= 0)
+            this._searchId = id;
+        else
+            this._searchId = null;
+    }
+
+    static get record() {return this._record;}
+    static set record(value) {this._record = value;}
+
+    static get recordAction() {return this._recordAction;}
+    static set recordAction(value) {
+        const actions = Object.values(TableAction);
+
+        const foundAction = actions.find(action => action === value);
+
+        this._recordAction = foundAction !== null && foundAction !== undefined ? foundAction : null;
+    }
+
+    static get tableData() {return this._tableData;}
+    static set tableData(data) {
+        this._tableData = Array.isArray(data) ? data : null;
+    }
+
+    static get dataPage() {return this._dataPage;}
+    static set dataPage(page) {
+        this._dataPage = page && page > 0 ? page : null; 
+    }
+
+    static get tableRUName() {return this._tableRUName;}
+    static set tableRUName(name) {
+        this._tableRUName = name; 
+    }
+
+    static get tableCodeName() {return this._tableCodeName;}
+    static set tableCodeName(name) {
+        this._tableCodeName = name; 
+    }
+
+    static get searchResults() {return this._searchResults;}
+    static set searchResults(results) {
+        this._searchResults = results; 
     }
 }

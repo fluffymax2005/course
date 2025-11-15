@@ -3,7 +3,7 @@ import { getUserRights, UserRights } from "./cookie.js";
 import { getCurrentPageData } from "./database-general-service.js";
 import { clearSearch, displayTableData, hideTableInterface } from "./database-visuals.js";
 import { SectionName } from "./form-utils.js";
-import { TableVariables } from "./table-service.js";
+import { TableVariables } from "./table-utils.js";
 
 window.showNavigationMenu = showNavigationMenu;
 window.hideNavigationMenu = hideNavigationMenu;

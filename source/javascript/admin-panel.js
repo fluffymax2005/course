@@ -2,8 +2,7 @@ import { ApiService } from "./api.js";
 import { getToken, getUserName, UserRights } from "./cookie.js";
 import { fetchTableData } from "./form-service.js";
 import { MessageBox } from "./form-utils.js";
-import { TableVariables } from "./table-service.js";
-import { tableMap, TableName } from "./table-utils.js";
+import { tableMap, TableName, TableVariables } from "./table-utils.js";
 import { showTableData } from "./workspace-visuals.js";
 
 window.switchTab = switchTab;

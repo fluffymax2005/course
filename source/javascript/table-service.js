@@ -2,71 +2,12 @@ import { getToken, getUserName, getUserRights, setTableHash, UserRights } from "
 import { populateEditForm, detectFieldType} from "./form-service.js";
 import { closeRecordModalForm, displaySearchResults } from "./database-visuals.js";
 import { ApiService } from "./api.js";
-import { TableAction, tableMap, TableName } from "./table-utils.js";
+import { TableAction, tableMap, TableName, TableVariables } from "./table-utils.js";
 import { MessageBox, TableFormConfirmHeader } from "./form-utils.js";
 import { showTableData } from "./workspace-visuals.js";
 
 window.recordAction = recordAction;
 window.searchById = searchById;
-
-// Класс, управляющий значениями переменных для текущей рассматриваемой таблицы
-export class TableVariables {
-    static _searchId = null; // текущая запись, подлежащая поиску
-    static _searchResults = null; // все поисковые записи
-    static _record = null; // текущая запись, с коротой производятся действия
-    static _recordAction = null; // тип операции, применяемый к текущей записи
-
-    static _tableData = []; // данные таблицы
-    static _tableRUName = ''; // название таблицы для пользователя
-    static _tableCodeName = ''; // идентификатор таблицы в коде
-
-    static _dataPage = 1; // текущая отображаемая страницы - пагинация
-
-    static get searchId() {return this._searchId;}
-    static set searchId(id) { 
-        if (id && id >= 0)
-            this._searchId = id;
-        else
-            this._searchId = null;
-    }
-
-    static get record() {return this._record;}
-    static set record(value) {this._record = value;}
-
-    static get recordAction() {return this._recordAction;}
-    static set recordAction(value) {
-        const actions = Object.values(TableAction);
-
-        const foundAction = actions.find(action => action === value);
-
-        this._recordAction = foundAction !== null && foundAction !== undefined ? foundAction : null;
-    }
-
-    static get tableData() {return this._tableData;}
-    static set tableData(data) {
-        this._tableData = Array.isArray(data) ? data : null;
-    }
-
-    static get dataPage() {return this._dataPage;}
-    static set dataPage(page) {
-        this._dataPage = page && page > 0 ? page : null; 
-    }
-
-    static get tableRUName() {return this._tableRUName;}
-    static set tableRUName(name) {
-        this._tableRUName = name; 
-    }
-
-    static get tableCodeName() {return this._tableCodeName;}
-    static set tableCodeName(name) {
-        this._tableCodeName = name; 
-    }
-
-    static get searchResults() {return this._searchResults;}
-    static set searchResults(results) {
-        this._searchResults = results; 
-    }
-}
 
 // Обновление записи
 export async function recordAction(event) {

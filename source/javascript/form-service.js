@@ -1,7 +1,7 @@
 import {getTableHash, getToken, setTableHash} from './cookie.js'
 import {ApiService} from './api.js';
-import { isFieldRequired, getMinValue, getMaxValue, TableVariables, TableModifying } from './table-service.js';
-import { DATA_PER_PAGE, dbCache, fieldNameMapping, TableAction } from './table-utils.js';
+import { isFieldRequired, getMinValue, getMaxValue, TableModifying } from './table-service.js';
+import { DATA_PER_PAGE, dbCache, fieldNameMapping, TableAction, TableGETSpecial, TableVariables } from './table-utils.js';
 import { MessageBox, TableFormConfirmButton } from './form-utils.js';
 
 window.showAddRecordForm = showAddRecordForm;
@@ -25,7 +25,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
                 'Authorization': `Bearer ${token}`,
             });
 
-            setTableHash(tableName, data.hash);
+            setTableHash(tableName, encodeURIComponent(data.hash));
             isGoingToFetch = true;
         } catch (error) {
             messageBoxShowFromRight(`Ошибка: ${error.message}`, 'red', false, 0, 'translateY(50px)');
@@ -60,7 +60,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
 
     // Вытягиваем данные
     try {       
-        const data = await ApiService.get(`${entityName}`, {
+        const data = await ApiService.get(TableGETSpecial.getAllApiString(entityName), {
             'Authorization': `Bearer ${token}`
         });
 

@@ -1,6 +1,5 @@
 import { getUserRights, UserRights } from "./cookie.js";
-import { TableVariables } from "./table-service.js";
-import { DATA_PER_PAGE } from "./table-utils.js";
+import { DATA_PER_PAGE, TableVariables } from "./table-utils.js";
 
 export function checkDatabaseAccess() {
     const userRights = getUserRights(); // Функция должна быть реализована

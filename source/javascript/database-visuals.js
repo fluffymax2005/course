@@ -1,8 +1,8 @@
 import { fetchTableData, setupPagination, detectFieldType} from "./form-service.js";
 import { formatValue, getCellClassName, getCurrentPageData, checkDatabaseAccess } from "./database-general-service.js";
-import { TableModifying, TableVariables } from "./table-service.js";
+import { TableModifying } from "./table-service.js";
 import { getUserRights, UserRights } from "./cookie.js";
-import { DATA_PER_PAGE, fieldNameMapping, TableAction, tableMap } from "./table-utils.js";
+import { DATA_PER_PAGE, fieldNameMapping, TableAction, tableMap, TableVariables } from "./table-utils.js";
 import { showTableData } from "./workspace-visuals.js";
 
 window.loadTableData = loadTableData;
