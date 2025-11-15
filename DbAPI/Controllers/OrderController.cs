@@ -1,6 +1,7 @@
 using DbAPI.Classes;
 using DbAPI.Interfaces;
 using DbAPI.Models;
+using DbAPI.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -13,10 +14,20 @@ namespace DbAPI.Controllers {
     public class OrderController : BaseCrudController<Order, TypeId>, ITableState {
         private readonly ILogger<Order> _logger;
         private readonly IMemoryCache _cache;
+        private readonly IRepository<Customer, TypeId> _customerRepository;
+        private readonly IRepository<Models.Route, TypeId> _routeRepository;
+        private readonly IRepository<Rate, TypeId> _rateRepository;
+        private readonly IRepository<TransportVehicle, TypeId> _transportVehicleRepository;
 
-        public OrderController(IRepository<Order, TypeId> repository, ILogger<Order> logger, IMemoryCache cache) : base(repository) {
+        public OrderController(IRepository<Order, TypeId> repository, ILogger<Order> logger, IMemoryCache cache,
+            IRepository<Customer, TypeId> customerRepository, IRepository<Models.Route, TypeId> routeRepository,
+            IRepository<Rate, TypeId> rateRepository, IRepository<TransportVehicle, TypeId> transportVehicleRepository) : base(repository) {
             _logger = logger;
             _cache = cache;
+            _customerRepository = customerRepository;
+            _routeRepository = routeRepository;
+            _rateRepository = rateRepository;
+            _transportVehicleRepository = transportVehicleRepository;
         }
 
         protected TypeId GetEntityId(Order entity) {
@@ -29,6 +40,93 @@ namespace DbAPI.Controllers {
         public override async Task<ActionResult<IEnumerable<Order>>> GetAllAsync() {
             _logger.LogInformation($"\"{User.Identity.Name}\" сделал запрос \"Order.GetAll()\"");
             return Ok(await _repository.GetAllAsync());
+        }
+
+        // GET: api/{entity}/merge
+        [HttpGet("merge")]
+        [Authorize(Roles = "Basic, Editor, Admin")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetAllMergedAsync() {
+            _logger.LogInformation($"\"{User.Identity.Name}\" сделал запрос \"Order.GetAllMerged()\"");
+
+            var orders = await _repository.GetAllAsync();
+            var customers = await _customerRepository.GetAllAsync();
+            var routes = await _routeRepository.GetAllAsync();
+            var rates = await _rateRepository.GetAllAsync();
+            var vehicles = await _transportVehicleRepository.GetAllAsync();
+            
+            return Ok(orders.Join(
+                customers,
+                order => order.CustomerId,
+                customer => customer.Id,
+                (order, customer) => new {
+                    Id = order.Id,
+                    CustomerId = $"{customer.Surname} {customer.Forename[0]}. ({customer.Id})",
+                    RouteId = order.RouteId,
+                    RateId = order.RateId,
+                    TransportVehicleId = order.TransportVehicleId,
+                    Distance = order.Distance,
+                    WhoAdded = order.WhoAdded,
+                    WhenAdded = order.WhenAdded,
+                    WhoChanged = order.WhoChanged,
+                    WhenChanged = order.WhenChanged,
+                    Note = order.Note,
+                    IsDeleted = order.IsDeleted
+                }
+            ).Join(
+                routes,
+                order => order.RouteId,
+                route => route.Id,
+                (order, route) => new {
+                    Id = order.Id,
+                    CustomerId = order.CustomerId,
+                    RouteId = $"{route.BoardingAddress} ({route.Id})",
+                    RateId = order.RateId,
+                    TransportVehicleId = order.TransportVehicleId,
+                    Distance = order.Distance,
+                    WhoAdded = order.WhoAdded,
+                    WhenAdded = order.WhenAdded,
+                    WhoChanged = order.WhoChanged,
+                    WhenChanged = order.WhenChanged,
+                    Note = order.Note,
+                    IsDeleted = order.IsDeleted
+                }
+            ).Join(
+                rates,
+                order => order.RateId,
+                rate => rate.Id,
+                (order, rate) => new {
+                    Id = order.Id,
+                    CustomerId = order.CustomerId,
+                    RouteId = order.RouteId,
+                    RateId = $"{rate.Forename} ({rate.Id})",
+                    TransportVehicleId = order.TransportVehicleId,
+                    Distance = order.Distance,
+                    WhoAdded = order.WhoAdded,
+                    WhenAdded = order.WhenAdded,
+                    WhoChanged = order.WhoChanged,
+                    WhenChanged = order.WhenChanged,
+                    Note = order.Note,
+                    IsDeleted = order.IsDeleted
+                }
+            ).Join(
+                vehicles,
+                order => order.TransportVehicleId,
+                vehicle => vehicle.Id,
+                (order, vehicle) => new {
+                    Id = order.Id,
+                    CustomerId = order.CustomerId,
+                    RouteId = order.RouteId,
+                    RateId = order.RateId,
+                    TransportVehicleId = $"{vehicle.Model} ({vehicle.Id})",
+                    Distance = order.Distance,
+                    WhoAdded = order.WhoAdded,
+                    WhenAdded = order.WhenAdded,
+                    WhoChanged = order.WhoChanged,
+                    WhenChanged = order.WhenChanged,
+                    Note = order.Note,
+                    IsDeleted = order.IsDeleted
+                }
+            ));
         }
 
         // GET: api/{entity}/{id}
@@ -88,14 +186,14 @@ namespace DbAPI.Controllers {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Order.Delete({id})\"");
 
             try {
-                await _repository.RecoverAsync(id);
+                await _repository.SoftDeleteAsync(id);
             } catch (Exception ex) {
-                _logger.LogError($"Запрос \"Order.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
+                _logger.LogError($"Запрос \"Order.DeleteAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");
-                return NotFound(new { message = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
 
-            _logger.LogInformation($"Запрос \"Order.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" успешен");
+            _logger.LogInformation($"Запрос \"Order.DeleteAsync({id})\" администратора \"{User.Identity.Name}\" успешен");
             return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
         }
 
@@ -104,19 +202,17 @@ namespace DbAPI.Controllers {
         [Authorize(Roles = "Admin")]
         public override async Task<IActionResult> RecoverAsync(TypeId id) {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Order.RecoverAsync({id})\"");
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity != null) {
-                entity.IsDeleted = null;
-                entity.WhenChanged = DateTime.Now;
-                await _repository.UpdateAsync(entity);
-
-                _logger.LogInformation($"Запрос \"Order.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" успешен");
-                return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
+            
+            try {
+                await _repository.RecoverAsync(id);
+            } catch (Exception ex) {
+                _logger.LogError($"Запрос \"Order.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
+                    $"Причина: {ex.Message}");
+                return BadRequest(new { message = ex.Message });
             }
 
-            _logger.LogError($"Запрос \"Order.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
-                    $"Причина: сущность не найдена или уже существует");
-            return NotFound(new { message = $"Сущность с ID = {id} не найдена или уже существует" });
+            _logger.LogInformation($"Запрос \"Order.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" успешен");
+             return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });          
         }
 
         // api/{entity}/generate-table-state-hash

@@ -110,7 +110,7 @@ namespace DbAPI.Controllers {
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Customer.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");
-                return NotFound(new { message = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
 
             _logger.LogInformation($"Запрос \"Customer.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" успешен");

@@ -4,6 +4,8 @@ using DbAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System.Drawing;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using TypeId = int;
 
 namespace DbAPI.Controllers {
@@ -12,11 +14,13 @@ namespace DbAPI.Controllers {
     public class TransportVehicleController : BaseCrudController<TransportVehicle, TypeId>, ITableState {
         private readonly ILogger<TransportVehicleController> _logger;
         private readonly IMemoryCache _cache;
+        private readonly IRepository<Driver, TypeId> _driverRepository;
 
         public TransportVehicleController(IRepository<TransportVehicle, TypeId> repository,
-            ILogger<TransportVehicleController> logger, IMemoryCache cache) : base(repository) {
+            ILogger<TransportVehicleController> logger, IMemoryCache cache, IRepository<Driver, TypeId> driverRepository) : base(repository) {
             _logger = logger;
             _cache = cache;
+            _driverRepository = driverRepository;
         }
 
         protected int GetEntityId(TransportVehicle entity) {
@@ -29,6 +33,37 @@ namespace DbAPI.Controllers {
         public override async Task<ActionResult<IEnumerable<TransportVehicle>>> GetAllAsync() {
             _logger.LogInformation($"\"{User.Identity.Name}\" сделал запрос \"TransportVehicle.GetAll()\"");
             return Ok(await _repository.GetAllAsync());
+        }
+
+        // GET: api/{entity}/merge
+        [HttpGet("merge")]
+        [Authorize(Roles = "Basic, Editor, Admin")]
+        public async Task<ActionResult<IEnumerable<TransportVehicle>>> GetAllMergedAsync() {
+            _logger.LogInformation($"\"{User.Identity.Name}\" сделал запрос \"TransportVehicle.GetAllMerged()\"");
+
+            var vehicles = await _repository.GetAllAsync();
+            var drivers = await _driverRepository.GetAllAsync();
+            return Ok(vehicles.Join(
+                drivers,
+                vehicle => vehicle.DriverId,
+                driver => driver.Id,
+                (vehicle, driver) => new {
+                    Id = vehicle.Id,
+                    DriverId = $"{driver.Surname} {driver.Forename[0]}. ({driver.Id})",
+                    Number = vehicle.Number,
+                    Series = vehicle.Series,
+                    RegistrationCode = vehicle.RegistrationCode,
+                    Model = vehicle.Model,
+                    Color = vehicle.Color,
+                    ReleaseYear = vehicle.ReleaseYear,
+                    WhoAdded = vehicle.WhoAdded,
+                    WhenAdded = vehicle.WhenAdded,
+                    WhoChanged = vehicle.WhoChanged,
+                    WhenChanged = vehicle.WhenChanged,
+                    Note = vehicle.Note,
+                    IsDeleted = vehicle.IsDeleted
+                }
+            ));
         }
 
         // GET: api/{entity}/{id}

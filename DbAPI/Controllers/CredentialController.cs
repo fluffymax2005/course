@@ -314,6 +314,34 @@ namespace DbAPI.Controllers {
             return Ok(await _repository.GetAllAsync());
         }
 
+        // GET: api/{entity}/merge
+        [HttpGet("merge")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<Credential>>> GetAllMergedAsync() {
+            _logger.LogInformation($"\"{User.Identity.Name}\" сделал запрос \"Credential.GetAllMerged()\"");
+
+            var credentials = await _repository.GetAllAsync();
+            var roles = await _roleRepository.GetAllAsync();
+            return Ok(credentials.Join(
+                roles,
+                credential => credential.RoleId,
+                role => role.Id,
+                (credential, role) => new {
+                    Id = credential.Id,
+                    RoleId = $"{role.Forename} ({role.Id})",
+                    Username = credential.Username,
+                    Password = credential.Password,
+                    Email = credential.Email,
+                    WhoAdded = credential.WhoAdded,
+                    WhenAdded = credential.WhenAdded,
+                    WhoChanged = credential.WhoChanged,
+                    WhenChanged = credential.WhenChanged,
+                    Note = credential.Note,
+                    IsDeleted = credential.IsDeleted
+                }
+            ));
+        }
+
         // GET: api/{entity}/{id}
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]

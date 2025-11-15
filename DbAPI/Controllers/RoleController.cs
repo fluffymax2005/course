@@ -90,12 +90,12 @@ namespace DbAPI.Controllers {
             try {
                 await _repository.SoftDeleteAsync(id);
             } catch (Exception ex) {
-                _logger.LogError($"Запрос \"Role.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
+                _logger.LogError($"Запрос \"Role.DeleteAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");
                 return NotFound(new { message = ex.Message });
             }
 
-            _logger.LogInformation($"Запрос \"Role.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" успешен");
+            _logger.LogInformation($"Запрос \"Role.DeleteAsync({id})\" администратора \"{User.Identity.Name}\" успешен");
             return Ok(new { message = "Восстановление прошло успешно", hash = UpdateTableHash() });
         }
 

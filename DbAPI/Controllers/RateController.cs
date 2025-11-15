@@ -109,7 +109,7 @@ namespace db.Controllers {
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Rate.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");
-                return NotFound(new { message = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
 
             _logger.LogInformation($"Запрос \"Rate.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" успешен");
