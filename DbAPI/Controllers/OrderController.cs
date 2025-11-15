@@ -138,6 +138,42 @@ namespace DbAPI.Controllers {
             return entity is null ? NotFound(new { message = $"Сущность с ID = {id} не найдена" }) : Ok(entity);
         }
 
+        // GET: api/{entity}/merge
+        [HttpGet("{id}/merge")]
+        [Authorize(Roles = "Basic, Editor, Admin")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetMergedAsync(TypeId id) {
+            _logger.LogInformation($"\"{User.Identity.Name}\" сделал запрос \"Order.GetMerged({id})\"");
+
+            var order = await _repository.GetByIdAsync(id);
+
+            var customers = await _customerRepository.GetAllAsync();
+            var customer = customers.Where(c => c.Id == order.CustomerId).FirstOrDefault();
+
+            var routes = await _routeRepository.GetAllAsync();
+            var route = routes.Where(r => r.Id == order.RouteId).FirstOrDefault();
+
+            var rates = await _rateRepository.GetAllAsync();
+            var rate = rates.Where(r => r.Id == order.RateId).FirstOrDefault();
+
+            var vehicles = await _transportVehicleRepository.GetAllAsync();
+            var vehicle = vehicles.Where(v => v.Id == order.TransportVehicleId).FirstOrDefault();
+
+            return Ok(new {
+                Id = order.Id,
+                CustomerId = $"{customer.Surname} {customer.Forename[0]}. ({customer.Id})",
+                RouteId = $"{route.DropAddress} ({route.Id})",
+                RateId = $"{rate.Forename} ({rate.Id})",
+                TransportVehicleId = $"{vehicle.Model} ({vehicle.Id})",
+                Distance = order.Distance,
+                WhoAdded = order.WhoAdded,
+                WhenAdded = order.WhenAdded,
+                WhoChanged = order.WhoChanged,
+                WhenChanged = order.WhenChanged,
+                Note = order.Note,
+                IsDeleted = order.IsDeleted
+            });
+        }
+
         // POST: api/{entity}/
         [HttpPost]
         [Authorize(Roles = "Editor, Admin")]

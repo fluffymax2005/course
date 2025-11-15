@@ -75,6 +75,34 @@ namespace DbAPI.Controllers {
             return entity is null ? NotFound(new { message = $"Сущность с ID = {id} не найдена" }) : Ok(entity);
         }
 
+        // GET: api/{entity}/merge
+        [HttpGet("{id}/merge")]
+        [Authorize(Roles = "Basic, Editor, Admin")]
+        public async Task<ActionResult<IEnumerable<TransportVehicle>>> GetMergedAsync(TypeId id) {
+            _logger.LogInformation($"\"{User.Identity.Name}\" сделал запрос \"TransportVehicle.GetMerged({id})\"");
+
+            var vehicle = await _repository.GetByIdAsync(id);
+            var drivers = await _driverRepository.GetAllAsync();
+            var driver = drivers.Where(d => d.Id == vehicle.DriverId).FirstOrDefault();
+
+            return Ok(new {
+                Id = vehicle.Id,
+                DriverId = $"{driver.Surname} {driver.Forename[0]}. ({driver.Id})",
+                Number = vehicle.Number,
+                Series = vehicle.Series,
+                RegistrationCode = vehicle.RegistrationCode,
+                Model = vehicle.Model,
+                Color = vehicle.Color,
+                ReleaseYear = vehicle.ReleaseYear,
+                WhoAdded = vehicle.WhoAdded,
+                WhenAdded = vehicle.WhenAdded,
+                WhoChanged = vehicle.WhoChanged,
+                WhenChanged = vehicle.WhenChanged,
+                Note = vehicle.Note,
+                IsDeleted = vehicle.IsDeleted
+            });
+        }
+
         // POST: api/{entity}/
         [HttpPost]
         [Authorize(Roles = "Editor, Admin")]
