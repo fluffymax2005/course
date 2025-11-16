@@ -1,9 +1,13 @@
-/* Сервис авторизации */
 
-class AuthService {
+import { MessageBox } from "../../../workspace-form/source/javascript/form-utils.js";
+
+/* Сервис авторизации */
+export class AuthService {
     static API_BASE_URL = 'http://localhost:5091/api/Credential';
 
     static async login() {
+        MessageBox.ShowAwait();
+        
         const loginInput = document.getElementById('loginAuthorize');
         const passwordInput = document.getElementById('passwordAuthorize');
         
@@ -50,7 +54,10 @@ class AuthService {
             
             const data = await response.json();
 
-            this.setTextMessage(outputText, false, 'Авторизация прошла успешно');
+            setTimeout(() => {
+                this.setTextMessage(outputText, false, 'Авторизация прошла успешно');
+            }, 1000);  
+            
 
             // Замена старых куки на новые
             const cookies = ['token', 'tokenExpireTime', 'userRights', 'userName'];
@@ -62,16 +69,22 @@ class AuthService {
             });
         } catch (error) {
             this.setTextMessage(outputText, true, 'Внутреняя ошибка. Попробуйте позже');
+            MessageBox.RemoveAwait();
             return;
         }
+
+        setTimeout(() => {
+            MessageBox.RemoveAwait();
+        }, 500);
 
         // Успешный переход в рабочую область
         setTimeout(() => {
             window.location.href = '../../workspace-form/index.html';
-        }, 1000);
+        }, 2000);        
     }
 
     static async register() {
+        
         const loginInput = document.getElementById('loginRegister');
         const emailInput = document.getElementById('emailRegister');
         const passwordInput = document.getElementById('passwordRegister');
@@ -100,6 +113,7 @@ class AuthService {
             return;
         }
 
+        MessageBox.ShowAwait();
         try {
             const response = await fetch(`${this.API_BASE_URL}/register`, {
                 method: 'POST',
@@ -130,6 +144,8 @@ class AuthService {
             console.error('Ошибка регистрации', error);
             this.setTextMessage(outputText, true, 'Внутренняя ошибка. Попробуйте позже');
         }
+
+        MessageBox.RemoveAwait();
     }
 
     static async recover() {

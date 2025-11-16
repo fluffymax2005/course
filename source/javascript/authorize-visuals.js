@@ -1,4 +1,11 @@
+import { AuthService } from "./authorize.js";
+
 /* Обработчики для компонентов */
+
+window.showAuthorizeForm = showAuthorizeForm;
+window.showRegisterForm = showRegisterForm;
+window.showForgotPasswordForm = showForgotPasswordForm;
+window.AuthService = AuthService;
 
 function showAuthorizeForm() {
     // Скрываем все формы
@@ -137,4 +144,4 @@ document.addEventListener('DOMContentLoaded', function() {
     if (hash === '#register') {
         showRegisterForm();
     }
-})
+});
