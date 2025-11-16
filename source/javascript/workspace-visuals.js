@@ -3,6 +3,7 @@ import { getUserRights, UserRights } from "./cookie.js";
 import { getCurrentPageData } from "./database-general-service.js";
 import { clearSearch, displayTableData, hideTableInterface } from "./database-visuals.js";
 import { SectionName } from "./form-utils.js";
+import { initStatisticsSection } from "./statistics.js";
 import { TableVariables } from "./table-utils.js";
 
 window.showNavigationMenu = showNavigationMenu;
@@ -102,6 +103,7 @@ async function showSection(sectionName = null, isLoadListener = false) {
             hideTableInterface();
         } else if (sectionName === SectionName.STATISTICS[1]) {
             headerIcon.src = 'assets/icons/statistics-page.svg';
+            initStatisticsSection();
         } else if (sectionName === SectionName.ADMIN_PANEL[1]) {
             headerIcon.src = 'assets/icons/admin-panel.svg';
             await switchTab('Учетные записи');

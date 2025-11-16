@@ -339,6 +339,7 @@ header {
 
 .section-header p {
     font-size: 1.2rem;
+    font-weight: 500;
     opacity: 0.9;
 }
 
