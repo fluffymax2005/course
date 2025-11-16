@@ -117,6 +117,12 @@ async function showUserForm() {
             roleSelect.appendChild(newOption);
         });
     } catch (error) {
+        if (error.status === 401) {
+            deleteUserData();
+            window.location.href = '../../authorize-form/authorize.html';
+            return;
+        }
+        
         MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(40px)');
         return;
     }
@@ -185,6 +191,12 @@ async function addUser(event) {
         showTableData(paginationNameMap.get(TableVariables.tableCodeName), `${tableCodeName}Table`, 
             `${tableCodeName}TableHead`, `${tableCodeName}TableBody`, `${tableCodeName}Info`);
     } catch (error) {
+        if (error.status === 401) {
+            deleteUserData();
+            window.location.href = '../../authorize-form/authorize.html';
+            return;
+        }
+        
         await MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(50px)');
         MessageBox.RemoveAwait();
         return;
@@ -238,6 +250,12 @@ async function saveRole(event) {
             `${tableCodeName}TableHead`, `${tableCodeName}TableBody`, `${tableCodeName}Info`);
         
     } catch (error) {
+        if (error.status === 401) {
+            deleteUserData();
+            window.location.href = '../../authorize-form/authorize.html';
+            return;
+        }
+
         MessageBox.ShowFromLeft('Ошибка сохранения роли', 'red', false, '40', 'translateY(50px)');
     }
 }

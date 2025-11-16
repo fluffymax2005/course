@@ -204,7 +204,11 @@ export async function recordAction(event) {
         
         if ((action === TableAction.Edit || action === TableAction.Insert) && error.status === 400) {
             MessageBox.ShowFromLeft(`${error.data.message}`, 'red', false, '40', 'translateY(50px)');
-        } else {
+        } else if (error.status === 401) {
+            deleteUserData();
+            window.location.href = '../../authorize-form/authorize.html';
+            return;
+        }  else {
             MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(50px)');
         }
         

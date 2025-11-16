@@ -43,6 +43,12 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
             }
 
         } catch (error) {
+            if (error.status === 401) {
+                deleteUserData();
+                window.location.href = '../../authorize-form/authorize.html';
+                return;
+            }   
+            
             messageBoxShowFromRight(`Ошибка: ${error.message}`, 'red', false, 0, 'translateY(50px)');
             throw error;
         }
@@ -75,6 +81,12 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
         }
 
     } catch (error) {       
+        if (error.status === 401) {
+                deleteUserData();
+                window.location.href = '../../authorize-form/authorize.html';
+                return;
+        } 
+        
         MessageBox.ShowFromLeft('Внутренняя ошибка', 'red', false, '43', 'translateY(50px)');
         console.error(error);
         throw error;
@@ -308,6 +320,12 @@ async function createNumberField(fieldName, value) {
                 }
             });
         } catch (error) {
+            if (error.status === 401) {
+                deleteUserData();
+                window.location.href = '../../authorize-form/authorize.html';
+                return;
+            } 
+            
             MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'trasformY(40px)');
         }
     } else {
