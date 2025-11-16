@@ -87,7 +87,7 @@ namespace db.Controllers {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Rate.Delete({id})\"");
 
             try {
-                await _repository.SoftDeleteAsync(id);
+                await _repository.SoftDeleteAsync(id, User.Identity.Name);
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Rate.Delete({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");
@@ -105,7 +105,7 @@ namespace db.Controllers {
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Rate.RecoverAsync({id})\"");
 
             try {
-                await _repository.RecoverAsync(id);
+                await _repository.RecoverAsync(id, User.Identity.Name);
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Rate.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");

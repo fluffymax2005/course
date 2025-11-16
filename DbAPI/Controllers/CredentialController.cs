@@ -427,7 +427,7 @@ namespace DbAPI.Controllers {
             _logger.LogWarning($"Администратор {User.Identity.Name} пытается удалить учетную запись с ID = {id}");
 
             try {
-                await _repository.SoftDeleteAsync(id);
+                await _repository.SoftDeleteAsync(id, User.Identity.Name);
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Credential.Delete({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");
@@ -445,7 +445,7 @@ namespace DbAPI.Controllers {
             _logger.LogWarning($"Администратор {User.Identity.Name} пытается восстановить учетную запись с ID = {id}");
 
             try {
-                await _repository.RecoverAsync(id);
+                await _repository.RecoverAsync(id, User.Identity.Name);
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Credential.RecoverAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");

@@ -88,7 +88,7 @@ namespace DbAPI
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Driver.Delete({id})\"");
 
             try {
-                await _repository.SoftDeleteAsync(id);
+                await _repository.SoftDeleteAsync(id, User.Identity.Name);
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Driver.DeleteAsync({id})\" администратора \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");
@@ -106,7 +106,7 @@ namespace DbAPI
             _logger.LogWarning($"\"{User.Identity.Name}\" сделал запрос \"Driver.RecoverAsync({id})\"");
 
             try {
-                await _repository.RecoverAsync(id);
+                await _repository.RecoverAsync(id, User.Identity.Name);
             } catch (Exception ex) {
                 _logger.LogError($"Запрос \"Driver.RecoverAsync({id})\" пользователя \"{User.Identity.Name}\" завершился ошибкой. " +
                     $"Причина: {ex.Message}");

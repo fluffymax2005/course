@@ -92,12 +92,13 @@ namespace DbAPI.Repositories {
             throw new ArgumentException($"Сущность с ID = {id} не существует в БД.");
         }
 
-        public async Task RecoverAsync(TypeId id) {
+        public async Task RecoverAsync(TypeId id, string userName) {
             var entity = await GetByIdAsync(id);
             if (entity != null) {
                 if (entity.IsDeleted == null)
                     throw new ArgumentException($"Сущность с ID = {id} существует в БД.");
 
+                entity.WhoChanged = userName;
                 entity.IsDeleted = null;
                 entity.WhenChanged = DateTime.Now;
                 await _context.SaveChangesAsync();
@@ -106,12 +107,13 @@ namespace DbAPI.Repositories {
             throw new ArgumentException($"Сущность с ID = {id} не существует в БД.");
         }
 
-        public async Task SoftDeleteAsync(TypeId id) {
+        public async Task SoftDeleteAsync(TypeId id, string userName) {
             var entity = await GetByIdAsync(id);
             if (entity != null) {
                 if (entity.IsDeleted != null)
                     throw new ArgumentException($"Запись с ID = {id} уже удалена");
 
+                entity.WhoChanged = userName;
                 entity.IsDeleted = DateTime.Now; // soft delete
                 entity.WhenChanged = DateTime.Now;
                 await _context.SaveChangesAsync();

@@ -9,7 +9,7 @@ namespace DbAPI.Interfaces {
         Task<TypeId?> AddAsync(TEntity entity);
         Task UpdateAsync(TEntity entity);
         Task DeleteAsync(TKey id);
-        Task SoftDeleteAsync(TKey id);
-        Task RecoverAsync(TKey key);
+        Task SoftDeleteAsync(TKey id, string userName);
+        Task RecoverAsync(TKey key, string userName);
     }
 }
