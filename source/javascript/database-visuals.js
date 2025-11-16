@@ -4,6 +4,7 @@ import { TableModifying } from "./table-service.js";
 import { getUserRights, UserRights } from "./cookie.js";
 import { DATA_PER_PAGE, fieldNameMapping, TableAction, tableMap, TableVariables } from "./table-utils.js";
 import { showTableData } from "./workspace-visuals.js";
+import { MessageBox } from "./form-utils.js";
 
 window.loadTableData = loadTableData;
 window.changePage = changePage;
@@ -14,6 +15,8 @@ window.clearSearch = clearSearch;
 
 // Загрузка данных в таблицу
 export async function loadTableData(useCache = true) {
+    MessageBox.ShowAwait();
+    
     const tableSelect = document.getElementById('tableSelect');
     
     const currentTable = tableSelect.value;
@@ -35,6 +38,8 @@ export async function loadTableData(useCache = true) {
         for (const e of document.getElementsByClassName('search-controls')) {
             e.style.display = 'none';
         }
+
+        MessageBox.RemoveAwait();
         return;
     }
     
@@ -42,6 +47,7 @@ export async function loadTableData(useCache = true) {
     try {
         await fetchTableData(TableVariables.tableRUName, TableVariables.tableCodeName, useCache);
     } catch (error) {
+        MessageBox.RemoveAwait();
         return;
     }
 
@@ -69,6 +75,8 @@ export async function loadTableData(useCache = true) {
 
     document.getElementById('searchById').setAttribute('placeholder', `Введите \"${searchSelect.options[searchSelect.selectedIndex].text}\"`);
     document.getElementById('addRecordBtn').style.display = 'flex';
+
+    MessageBox.RemoveAwait();
 }
 
 // Сокрытие интерфейса таблиц
@@ -380,7 +388,7 @@ function searchSelectChange() {
     document.getElementById('searchById').setAttribute('placeholder', `Введите \"${searchSelect.options[searchSelect.selectedIndex].text}\"`);searchByIdBtn
 }
 
-export function searchInputChange() {
+export function searchInputChange() {    
     const searchSelect = document.getElementById('searchSelect');
     const key = searchSelect.options[searchSelect.selectedIndex].value;
 
@@ -395,12 +403,14 @@ export function searchInputChange() {
         showTableData('dataPagination', 'dataTable', 'dataTableHead', 'dataTableBody', 'dataInfo');
         return;
     }
+
+    MessageBox.ShowAwait();
     
     // Ищем записи по подстроке в указанном поле
     updateSearchResults(key, text);
 
     // Проверяем длину массива, а не сам массив
-    if (TableVariables.searchResults === 0) {
+    if (!TableVariables.searchResults || TableVariables.searchResults.length === 0) {
         displaySearchResults(TableVariables.searchResults); // убрали лишние []
         document.getElementById('dataPagination').style.display = 'none';
     } else {
@@ -411,6 +421,8 @@ export function searchInputChange() {
     // Показываем кнопку очистки
     document.getElementById('clearSearchBtn').style.display = 'inline-block';
     document.getElementById('databaseRecordCount').style.display = 'none';
+
+    MessageBox.RemoveAwait();
 }
 
 export function updateSearchResults(key, text) {

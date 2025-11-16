@@ -121,8 +121,8 @@ header {
 }
 
 .menu-nav-item img {
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
 }
 
 #menu-nav-cancel-icon {
@@ -392,4 +392,27 @@ footer {
 
 .footer-text a:hover {
     text-decoration: underline;
+}
+
+.animation-circle {
+    position: absolute;
+    top: 2%;
+    width: 65px;
+    height: 65px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease-in-out;
+}
+
+.animation-circle img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
 }

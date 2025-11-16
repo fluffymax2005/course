@@ -138,35 +138,37 @@ document.addEventListener('DOMContentLoaded', function() {
         const authorizeItem = this.document.getElementById('authorizeItem');
         const registerItem = this.document.getElementById('registerItem');
         const quitItem = this.document.getElementById('quitItem');
+         
+        if (authorizeItem && registerItem && quitItem) {
+            authorizeItem.style.display = 'none';
+            registerItem.style.display = 'none';
+            quitItem.style.display = 'block';
+        }
         
-        authorizeItem.style.display = 'none';
-        registerItem.style.display = 'none';
-        quitItem.style.display = 'block';
     });
 });
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Page loaded');
-
     // По умолчанию отображаем главную страницу
     showSection('main', true);
     
     // Обработчик для кнопки меню
     const menuButton = document.getElementById('menu-nav-image');
-    menuButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log('Menu button clicked');
-        showNavigationMenu();
-    });
+    if (menuButton)
+        menuButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            showNavigationMenu();
+        });
     
     // Обработчик для кнопки закрытия
     const closeButton = document.getElementById('menu-nav-cancel-icon');
-    closeButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log('Close button clicked');
-        hideNavigationMenu();
-    });
+    if (closeButton)
+        closeButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Close button clicked');
+            hideNavigationMenu();
+        });
     
     // Закрытие меню при клике вне его
     document.addEventListener('click', function(event) {

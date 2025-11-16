@@ -2,7 +2,7 @@ import { ApiService } from "./api.js";
 import { getToken, getUserName, UserRights } from "./cookie.js";
 import { fetchTableData } from "./form-service.js";
 import { MessageBox } from "./form-utils.js";
-import { tableMap, TableName, TableVariables } from "./table-utils.js";
+import { TableGETSpecial, tableMap, TableName, TableVariables } from "./table-utils.js";
 import { showTableData } from "./workspace-visuals.js";
 
 window.switchTab = switchTab;
@@ -161,6 +161,8 @@ async function addUser(event) {
         registerRights: parseInt(roleInput.options[roleInput.selectedIndex].value)
     };
     
+    MessageBox.ShowAwait();
+
     // Отправляем данные пользоваетеля
     try {
         const token = getToken();
@@ -168,13 +170,15 @@ async function addUser(event) {
             'Authorization': `Bearer ${token}`
         });
 
-        closeUserModal();
-        await MessageBox.ShowFromLeft('Пользователь успешно добавлен', 'green', false, '43', 'translateY(50px)');
-
-        const newUser = await ApiService.get(`Credential/user?username=${data.userName}`, {
+        const newUser = await ApiService.get(TableGETSpecial.getByIdApiString(TableVariables.tableCodeName, data.id), {
             'Authorization': `Bearer ${token}`
         });
 
+        MessageBox.RemoveAwait()
+
+        closeUserModal();
+        await MessageBox.ShowFromLeft('Пользователь успешно добавлен', 'green', false, '43', 'translateY(50px)');
+        
         TableVariables.tableData.push(newUser);
 
         const tableCodeName = TableName.CREDENTIAL[1];
@@ -182,6 +186,7 @@ async function addUser(event) {
             `${tableCodeName}TableHead`, `${tableCodeName}TableBody`, `${tableCodeName}Info`);
     } catch (error) {
         await MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(50px)');
+        MessageBox.RemoveAwait();
         return;
     }
 }

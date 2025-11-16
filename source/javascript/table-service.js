@@ -99,6 +99,7 @@ export async function recordAction(event) {
         }
     }
     
+    MessageBox.ShowAwait();
     try {
         const token = getToken();
         const apiTableName = TableVariables.tableCodeName;
@@ -199,15 +200,20 @@ export async function recordAction(event) {
 
         MessageBox.ShowFromLeft('Операция успешна завершена', 'green', false, '40', 'translateY(50px)');
     } catch (error) {
-        if (action === TableAction.Insert && error.status === 400) {
-            MessageBox.ShowFromLeft(`Введены некорректные данные. Проверьте содержимое и повторите попытку снова.`, 'red', false, '40', 'translateY(50px)');
+        MessageBox.RemoveAwait();
+        
+        if ((action === TableAction.Edit || action === TableAction.Insert) && error.status === 400) {
+            MessageBox.ShowFromLeft(`${error.data.message}`, 'red', false, '40', 'translateY(50px)');
         } else {
             MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(50px)');
         }
         
+        
         console.error(error);
         return;
     }
+
+    MessageBox.RemoveAwait();
 }
 
 // Функция редактирования записи

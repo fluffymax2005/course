@@ -86,7 +86,8 @@ const TOAST_MARGIN = 10; // отступ между тостами
 const activeToasts = new Map(); // храним активные тосты
 
 export class MessageBox {
-
+    static ANIMATION_PATH = '/workspace-form/assets/gifs/linux.gif';
+    
     static async ShowFromLeft(message, background_color, isUsingPixels, left_pos, transform, duration = 3000) {
         if (activeToasts.size >= 10)
             return;
@@ -148,7 +149,7 @@ export class MessageBox {
         return toastId;
     }
 
-    static async messageBoxShowFromRight(message, background_color, isUsingPixels, right_pos, transform, duration = 3000) {
+    static async ShowFromRight(message, background_color, isUsingPixels, right_pos, transform, duration = 3000) {
         if (activeToasts.size >= 10)
             return;
         
@@ -250,6 +251,68 @@ export class MessageBox {
         
         // Обновляем глобальный offset
         MESSAGE_BOX_HEIGHT_OFFSET = currentOffset;
+    }
+
+    static ShowAwait() {
+        if (document.getElementById('waitContainer')) {
+            return;
+        }
+        
+        const waitContainer = document.createElement('div');
+        waitContainer.id = 'waitContainer';
+        
+        waitContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 100000;
+        `;
+        
+        const animationContainer = document.createElement('div');
+        animationContainer.className = 'animation-circle';
+        
+        const animation = document.createElement('img');
+        animation.src = this.ANIMATION_PATH;
+        animation.alt = 'Loading...';
+        
+        animationContainer.appendChild(animation);
+        waitContainer.appendChild(animationContainer);
+        document.body.appendChild(waitContainer);
+        
+        document.body.style.overflow = 'hidden';
+        
+        // Плавное появление
+        setTimeout(() => {
+            animationContainer.style.opacity = '1';
+            animationContainer.style.transform = 'translateY(0)';
+        }, 10);
+        
+        return waitContainer;
+    }
+
+    static RemoveAwait() {
+        const waitContainer = document.getElementById('waitContainer');
+        
+        if (waitContainer) {
+            const animationContainer = waitContainer.querySelector('.animation-circle');
+            if (animationContainer) {
+                animationContainer.style.opacity = '0';
+                animationContainer.style.transform = 'translateY(-20px)';
+            }
+            
+            setTimeout(() => {
+                if (waitContainer.parentNode) {
+                    waitContainer.remove();
+                }
+                document.body.style.overflow = '';
+            }, 300);
+        }
     }
 }
 
@@ -533,9 +596,5 @@ export class InputWithTips {
         });
 
         return input;
-    }
-
-    static createIdIndependentField() {
-
     }
 }
