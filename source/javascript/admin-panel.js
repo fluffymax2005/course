@@ -108,6 +108,8 @@ async function showUserForm() {
         roleSelect.innerHTML = '';
         
         data.forEach(set => {
+            if (set.isDeleted !== null) return;
+
             const newOption = document.createElement('option');
             newOption.value = set.rights;
             newOption.textContent = set.forename;

@@ -1,4 +1,5 @@
-import { TableAction } from "./table-utils.js";
+import { isFieldRequired } from "./table-service.js";
+import { TableAction, TableVariables } from "./table-utils.js";
 
 // Словарь: имя секции на русском -> её название в коде
 
@@ -249,5 +250,292 @@ export class MessageBox {
         
         // Обновляем глобальный offset
         MESSAGE_BOX_HEIGHT_OFFSET = currentOffset;
+    }
+}
+
+export class InputWithTips {
+    static createIdDependentField(fieldName, value) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `edit_${fieldName}`;
+        input.name = fieldName;
+        input.value = value;
+        input.required = isFieldRequired(fieldName);
+
+        input.setAttribute('correct-value', value);
+        input.setAttribute('valid', 'false');
+
+        // Добавляем базовые стили для лучшего UX
+        input.style.width = '100%';
+        input.style.padding = '12px 16px';
+        input.style.border = '2px solid rgba(226, 232, 240, 1)';
+        input.style.borderRadius = '8px';
+        input.style.boxSizing = 'border-box';
+        input.style.fontSize = '14px';
+        input.style.background = 'white';
+        input.style.transition = 'all 0.3s ease';
+
+        let currentDropdown = null;
+
+        // Функция для получения подходящих элементов
+        function getSimilarSets(inputValue) {
+            if (!inputValue) return [];
+
+            const similarSets = TableVariables.tableData.filter(item => {
+                if (!item || item[fieldName] === undefined || item[fieldName] === null) 
+                    return false;
+                
+                const itemValue = item[fieldName].toString().toLowerCase();
+                return itemValue.includes(inputValue.toLowerCase());
+            });
+
+            return removeDuplicateObjects(similarSets, fieldName);
+        }
+
+        // Функция для жесткого получения элементов
+        function getExactSets(inputValue) {
+            if (!inputValue) return [];
+
+            const exactSets = TableVariables.tableData.filter(item => inputValue === item[fieldName]);
+
+            return removeDuplicateObjects(exactSets, fieldName);
+        }
+
+        // Удаление дубликатов в массиве
+        function removeDuplicateObjects(array, key) {
+            const seen = new Set();
+            return array.filter(item => {
+                const value = item[key];
+                if (seen.has(value)) {
+                    return false;
+                }
+                seen.add(value);
+                return true;
+            });
+        }
+
+        // Функция проверки валидности значения
+        function validateInput() {
+            const inputValue = input.value.trim();
+            const similarSets = getExactSets(inputValue);
+            const isValid = similarSets.length > 0;
+            
+            input.setAttribute('valid', isValid.toString());
+            return isValid;
+        }
+
+        // Функция обновления стилей на основе валидности
+        function updateStyles() {
+            const isValid = input.getAttribute('valid') === 'true';
+            const hasFocus = document.activeElement === input;
+            
+            if (hasFocus) {
+                // Стили при фокусе - показываем цвет валидации даже при фокусе
+                input.style.outline = 'none';
+                input.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                
+                if (isValid) {
+                    input.style.borderColor = 'green';
+                } else {
+                    input.style.borderColor = 'red';
+                }
+            } else {
+                // Стили при потере фокуса
+                input.style.boxShadow = '';
+                if (isValid) {
+                    input.style.borderColor = 'rgba(226, 232, 240, 1)';
+                } else {
+                    input.style.borderColor = 'red';
+                }
+            }
+        }
+
+        // Функция создания и отображения dropdown
+        function showDropdown() {
+            removeDropdown();
+
+            const inputValue = input.value.trim();
+            const similarSets = getSimilarSets(inputValue);
+
+            // Обновляем валидность и стили ПЕРЕД созданием dropdown
+            validateInput();
+            updateStyles();
+
+            // Создаем dropdown контейнер
+            const dropdown = document.createElement('div');
+            dropdown.className = 'dropdown-list';
+            dropdown.style.position = 'absolute';
+            dropdown.style.zIndex = '10000';
+            dropdown.style.background = 'white';
+            dropdown.style.border = '1px solid #ccc';
+            dropdown.style.borderTop = 'none';
+            dropdown.style.maxHeight = '200px';
+            dropdown.style.overflowY = 'auto';
+            dropdown.style.width = '100%';
+            dropdown.style.boxSizing = 'border-box';
+            dropdown.style.borderRadius = '0 0 4px 4px';
+            dropdown.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+
+            if (similarSets.length === 0 && inputValue !== '') {
+                const noResults = document.createElement('div');
+                noResults.textContent = 'Ничего не найдено';
+                noResults.style.padding = '8px 12px';
+                noResults.style.color = '#999';
+                noResults.style.fontStyle = 'italic';
+                dropdown.appendChild(noResults);
+            } else if (similarSets.length > 0) {
+                similarSets.forEach(set => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'dropdown-item';
+                    itemElement.style.padding = '8px 12px';
+                    itemElement.style.cursor = 'pointer';
+                    itemElement.style.borderBottom = '1px solid #f0f0f0';
+                    itemElement.style.transition = 'background-color 0.2s';
+
+                    // Hover эффект
+                    itemElement.addEventListener('mouseenter', function() {
+                        this.style.background = '#f5f5f5';
+                    });
+                    itemElement.addEventListener('mouseleave', function() {
+                        this.style.background = 'white';
+                    });
+
+                    // Обработка клика
+                    itemElement.addEventListener('click', function() {
+                        input.value = set[fieldName];
+                        input.setAttribute('valid', 'true');
+                        input.setAttribute('correct-value', set[fieldName]);
+                        removeDropdown();
+                        updateStyles();
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+
+                    // Формируем текст элемента
+                    const itemText = document.createElement('span');
+                    let displayText = set[fieldName];
+                    if (set.name && fieldName !== 'name') {
+                        displayText += ` - ${set.name}`;
+                    }
+                    itemText.textContent = displayText;
+                    
+                    itemElement.appendChild(itemText);
+                    dropdown.appendChild(itemElement);
+                });
+            }
+
+            // Позиционируем dropdown
+            dropdown.style.top = '100%';
+            dropdown.style.left = '0';
+
+            // Добавляем dropdown в контейнер input'а
+            if (input.parentNode) {
+                input.parentNode.style.position = 'relative';
+                input.parentNode.appendChild(dropdown);
+                currentDropdown = dropdown;
+                setupKeyboardNavigation(dropdown);
+            }
+        }
+
+        // Функция удаления dropdown
+        function removeDropdown() {
+            if (currentDropdown && currentDropdown.parentNode) {
+                currentDropdown.parentNode.removeChild(currentDropdown);
+                currentDropdown = null;
+            }
+        }
+
+        // Функция для навигации с клавиатуры
+        function setupKeyboardNavigation(dropdown) {
+            let currentIndex = -1;
+
+            function setActiveItem(index) {
+                const allItems = dropdown.querySelectorAll('.dropdown-item');
+                allItems.forEach(item => {
+                    item.style.background = 'white';
+                    item.style.color = '';
+                });
+                
+                if (index >= 0 && index < allItems.length) {
+                    allItems[index].style.background = '#007bff';
+                    allItems[index].style.color = 'white';
+                    currentIndex = index;
+                }
+            }
+
+            function handleKeyDown(e) {
+                const items = dropdown.querySelectorAll('.dropdown-item');
+                if (items.length === 0) return;
+
+                switch(e.key) {
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        currentIndex = (currentIndex + 1) % items.length;
+                        setActiveItem(currentIndex);
+                        break;
+                        
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        currentIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
+                        setActiveItem(currentIndex);
+                        break;
+                        
+                    case 'Enter':
+                        e.preventDefault();
+                        if (currentIndex >= 0 && currentIndex < items.length) {
+                            items[currentIndex].click();
+                        }
+                        break;
+                        
+                    case 'Escape':
+                        removeDropdown();
+                        break;
+                        
+                    case 'Tab':
+                        removeDropdown();
+                        break;
+                }
+            }
+
+            input.addEventListener('keydown', handleKeyDown);
+        }
+
+        // Обработчики событий
+        input.addEventListener('focus', function() {
+            input.setAttribute('correct-value', input.value);
+            updateStyles();
+            showDropdown();
+        });
+
+        input.addEventListener('input', function() {
+            // При каждом вводе обновляем стили
+            validateInput();
+            updateStyles();
+            showDropdown();
+        });
+
+        // Закрытие dropdown при потере фокуса
+        input.addEventListener('blur', function() {
+            // Сначала проверяем валидность
+            validateInput();
+            // Затем обновляем стили
+            updateStyles();
+            // И только потом закрываем dropdown
+            setTimeout(removeDropdown, 150);
+        });
+
+        // Обработчик для закрытия при клике вне области
+        document.addEventListener('click', function(e) {
+            if (currentDropdown && !input.contains(e.target) && !currentDropdown.contains(e.target)) {
+                removeDropdown();
+                validateInput();
+                updateStyles();
+            }
+        });
+
+        return input;
+    }
+
+    static createIdIndependentField() {
+
     }
 }

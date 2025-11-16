@@ -344,6 +344,7 @@ export function showNoSearchResults() {
 // Очистка поиска
 export function clearSearch(paginationID, tableID, tableHeadID, tableBodyID, tableInfoID) {
     TableVariables.searchId = null;
+    TableVariables.searchResults = null;
     
     // Сбрасываем поле поиска
     document.getElementById('searchById').value = '';
@@ -376,10 +377,10 @@ async function changePage(page, paginationID, tableID, tableHeadID, tableBodyID,
 function searchSelectChange() {
     // Заполняем поле для поиска
     const searchSelect = document.getElementById('searchSelect');
-    document.getElementById('searchById').setAttribute('placeholder', `Введите \"${searchSelect.options[searchSelect.selectedIndex].text}\"`);
+    document.getElementById('searchById').setAttribute('placeholder', `Введите \"${searchSelect.options[searchSelect.selectedIndex].text}\"`);searchByIdBtn
 }
 
-function searchInputChange() {
+export function searchInputChange() {
     const searchSelect = document.getElementById('searchSelect');
     const key = searchSelect.options[searchSelect.selectedIndex].value;
 
@@ -396,6 +397,23 @@ function searchInputChange() {
     }
     
     // Ищем записи по подстроке в указанном поле
+    updateSearchResults(key, text);
+
+    // Проверяем длину массива, а не сам массив
+    if (TableVariables.searchResults === 0) {
+        displaySearchResults(TableVariables.searchResults); // убрали лишние []
+        document.getElementById('dataPagination').style.display = 'none';
+    } else {
+        displaySearchResults(TableVariables.searchResults); // убрали лишние []
+        changePage(1, 'dataPagination', 'dataTable', 'dataTableHead', 'dataTableBody', 'dataInfo');
+    }
+    
+    // Показываем кнопку очистки
+    document.getElementById('clearSearchBtn').style.display = 'inline-block';
+    document.getElementById('databaseRecordCount').style.display = 'none';
+}
+
+export function updateSearchResults(key, text) {
     const foundRecords = [];
     for (const record of TableVariables.tableData) {
         // Преобразуем значение в строку и ищем подстроку (регистронезависимо)
@@ -407,21 +425,8 @@ function searchInputChange() {
         }
     }
 
-    // Проверяем длину массива, а не сам массив
-    if (foundRecords.length === 0) {
-        TableVariables.searchResults = null;
-        displaySearchResults(null); // убрали лишние []
-        document.getElementById('dataPagination').style.display = 'none';
-    } else {
-        TableVariables.dataPage
-        TableVariables.searchResults = foundRecords;
-        displaySearchResults(foundRecords); // убрали лишние []
-        changePage(1, 'dataPagination', 'dataTable', 'dataTableHead', 'dataTableBody', 'dataInfo');
-    }
-    
-    // Показываем кнопку очистки
-    document.getElementById('clearSearchBtn').style.display = 'inline-block';
-    document.getElementById('databaseRecordCount').style.display = 'none';
+    TableVariables.searchResults = foundRecords.length === 0 ? null : foundRecords;
+    return TableVariables.searchResults;
 }
 
 

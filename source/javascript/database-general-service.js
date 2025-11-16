@@ -1,4 +1,5 @@
 import { getUserRights, UserRights } from "./cookie.js";
+import { searchInputChange, updateSearchResults } from "./database-visuals.js";
 import { DATA_PER_PAGE, TableVariables } from "./table-utils.js";
 
 export function checkDatabaseAccess() {
@@ -19,14 +20,24 @@ export function checkDatabaseAccess() {
 }
 
 // Получение данных для текущей страницы
-export function getCurrentPageData(data = null) {
+export function getCurrentPageData(data = null) {    
     let dataCopy = null;
 
     if (!data && (!TableVariables.tableData || TableVariables.tableData.length === 0)) return [];
-    else if (data) dataCopy = data;
-    else dataCopy = TableVariables.tableData;
-    
+    else if (!dataCopy) {
+        if (TableVariables.searchResults) {
+            const searchSelect = document.getElementById('searchSelect');
+            const key = searchSelect.options[searchSelect.selectedIndex].value;
 
+            const searchInput = document.getElementById('searchById');
+            const text = searchInput.value.trim();
+
+            dataCopy = updateSearchResults(key, text);
+        } else if (data)
+            dataCopy = data;
+        else
+            dataCopy = TableVariables.tableData;
+    }
 
     const startIndex = (TableVariables.dataPage - 1) * DATA_PER_PAGE;
     const endIndex = startIndex + DATA_PER_PAGE;

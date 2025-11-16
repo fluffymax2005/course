@@ -2,13 +2,13 @@ import {getTableHash, getToken, setTableHash} from './cookie.js'
 import {ApiService} from './api.js';
 import { isFieldRequired, getMinValue, getMaxValue, TableModifying } from './table-service.js';
 import { DATA_PER_PAGE, dbCache, fieldNameMapping, TableAction, TableGETSpecial, TableVariables } from './table-utils.js';
-import { MessageBox, TableFormConfirmButton } from './form-utils.js';
+import { InputWithTips, MessageBox, TableFormConfirmButton } from './form-utils.js';
 
 window.showAddRecordForm = showAddRecordForm;
 
 // Отобразить форму добавления новой записи
 export function showAddRecordForm() {
-    TableModifying(null, TableAction.Insert);
+    TableModifying(null, TableAction.Insert, TableVariables.tableRUName);
 }
 
 export async function fetchTableData(tableName, entityName, paginationID, useCache = true) {
@@ -140,10 +140,11 @@ export function setupPagination(paginationID) {
 
 // Вспомогательные функции
 export function detectFieldType(fieldName, value) {
+    if (fieldName.includes('Id')) return 'id'
     if (value === null || value === undefined) return 'text';
     
     if (typeof value === 'boolean') return 'boolean';
-
+    
     // Определяем по имени поля
     if (fieldName.includes('date') || fieldName.includes('Date') || 
         fieldName.includes('created') || fieldName.includes('updated') ||
@@ -167,7 +168,6 @@ export function detectFieldType(fieldName, value) {
     
     // Определяем по значению
     if (typeof value === 'number') return 'number';
-    if (!isNaN(Date.parse(value))) return 'date';
     
     return 'text';
 }
@@ -213,14 +213,17 @@ export async function populateEditForm(record, tableName, action) {
                 const label = document.createElement('label');
                 label.textContent = fieldNameMapping[key] || key;
                 label.htmlFor = `edit_${key}`;
+                label.id = `label_${key}`;
                 formGroup.appendChild(label);
             }
             
+            // В случае, если обрабатывается поле ключа к внешней таблице БД, то надо заполнить корректным значением
+            let localRecord = record[key];
 
             // Добавление нового элемента требует пустых начальных значений <input>
             let input;
             switch (action) {
-                case TableAction.Edit: input = await createFormField(key, record[key], tableName); break;
+                case TableAction.Edit: input = await createFormField(key, localRecord, tableName); break;
                 case TableAction.Insert: input = await createFormField(key, null, tableName); break;
             }
 
@@ -252,6 +255,8 @@ async function createFormField(fieldName, value, tableName) {
             return createEmailField(fieldName, value);
         case 'phone':
             return createPhoneField(fieldName, value);
+        case 'id':
+            return createIdField(fieldName, value);
         default:
             return createTextField(fieldName, value, tableName);
     }
@@ -273,6 +278,10 @@ function createTextField(fieldName, value, tableName) {
     }
     
     return input;
+}
+
+function createIdField(fieldName, value) {
+    return InputWithTips.createIdDependentField(fieldName, value);
 }
 
 async function createNumberField(fieldName, value) {

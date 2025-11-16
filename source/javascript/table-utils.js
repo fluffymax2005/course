@@ -127,6 +127,23 @@ export class TableGETSpecial {
                 return '';
         }
     }
+
+    static getByIdApiString(table, id) {
+        switch (table) {
+            case ORDER:
+            case CREDENTIAL:
+            case TRANSPORT_VEHICLE:
+                return `${table}/${id}/merge`;
+            case CUSTOMER:
+            case ROUTE:
+            case RATE:
+            case DRIVER:
+            case ROLE:
+                return `${table}/${id}`;
+            default:
+                return '';
+        }
+    }
 }
 
 // Класс, управляющий значениями переменных для текущей рассматриваемой таблицы

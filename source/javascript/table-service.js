@@ -2,7 +2,7 @@ import { getToken, getUserName, getUserRights, setTableHash, UserRights } from "
 import { populateEditForm, detectFieldType} from "./form-service.js";
 import { closeRecordModalForm, displaySearchResults } from "./database-visuals.js";
 import { ApiService } from "./api.js";
-import { TableAction, tableMap, TableName, TableVariables } from "./table-utils.js";
+import { TableAction, TableGETSpecial, tableMap, TableName, TableVariables } from "./table-utils.js";
 import { MessageBox, TableFormConfirmHeader } from "./form-utils.js";
 import { showTableData } from "./workspace-visuals.js";
 
@@ -63,7 +63,13 @@ export async function recordAction(event) {
         
         // Преобразуем типы данных и обновляем значение
         const fieldType = detectFieldType(key, localRecord[key]);
-        body[key] = convertValueType(value, fieldType);
+        try {
+            body[key] = convertValueType(value, fieldType, key);
+        } catch (error) {
+            MessageBox.ShowFromLeft(error.message, 'red', false, '40', 'translateY(50px)');
+            return;
+        }
+        
     }
     
     // Обновляем служебные поля
@@ -71,23 +77,23 @@ export async function recordAction(event) {
         case TableAction.Insert:
             body.id = '0';
             body.whoAdded = getUserName();
-            body.whenAdded = new Date().toISOString();
+            body.whenAdded = new Date();
             break;
         case TableAction.Edit:
             body.whoChanged = getUserName();
-            body.whenChanged = new Date()/*.toISOString()*/;
+            body.whenChanged = new Date();
             break;
         case TableAction.Delete: {
             body.whoChanged = getUserName();
 
-            const time = new Date().toISOString();
+            const time = new Date();
             body.whenChanged = time;
             body.isDeleted = time;
             break;
         }
         case TableAction.Recover: {
             body.whoChanged = getUserName();
-            body.whenChanged = new Date().toISOString();
+            body.whenChanged = new Date();
             body.isDeleted = null;
             break;
         }
@@ -107,7 +113,7 @@ export async function recordAction(event) {
                 });
 
                 // Добавление в конец новой записи
-                const newSet = await ApiService.get(`${apiTableName}`, {
+                const newSet = await ApiService.get(TableGETSpecial.getByIdApiString(apiTableName, data.id), {
                     'Authorization': `Bearer ${token}`
                 });
 
@@ -122,7 +128,7 @@ export async function recordAction(event) {
                 hash = data.hash;
 
                 // Обновление текущей записи на актуальную
-                const updatedSet = await ApiService.get(`${apiTableName}/${TableVariables.record.id}`, {
+                const updatedSet = await ApiService.get(TableGETSpecial.getByIdApiString(apiTableName, TableVariables.record.id), {
                     'Authorization': `Bearer ${token}`
                 });
 
@@ -144,7 +150,7 @@ export async function recordAction(event) {
                     TableVariables.tableData.splice(recordIndex, 1);
                 } else {
                     // Если пользователь админ, то нужно получить свежую запись
-                    const updatedSet = await ApiService.get(`${apiTableName}/${TableVariables.record.id}`, {
+                    const updatedSet = await ApiService.get(TableGETSpecial.getByIdApiString(apiTableName, TableVariables.record.id), {
                         'Authorization': `Bearer ${token}`
                     });
 
@@ -164,7 +170,7 @@ export async function recordAction(event) {
                 hash = data.hash;
 
                 // Обновление текущей записи на актуальную
-                const updatedSet = await ApiService.get(`${apiTableName}/${TableVariables.record.id}`, {
+                const updatedSet = await ApiService.get(TableGETSpecial.getByIdApiString(apiTableName, TableVariables.record.id), {
                     'Authorization': `Bearer ${token}`
                 });
 
@@ -338,7 +344,7 @@ export function getMaxValue(fieldName) {
 }
 
 // Преобразование типов данных
-function convertValueType(value, fieldType) {
+function convertValueType(value, fieldType, key = null) {
     if (value === '' || value === null) return null;
     
     switch (fieldType) {
@@ -348,6 +354,15 @@ function convertValueType(value, fieldType) {
             return Boolean(value);
         case 'date':
             return new Date(value).toISOString();
+        case 'id':
+            const input = document.getElementById(`edit_${key}`);
+            if (input.getAttribute('valid') === 'false') {
+                throw new Error(`Введено некорректное значение в поле \"${document.getElementById(`label_${key}`).textContent}\"`);
+            }
+
+            const firstBrace = value.indexOf('(');
+            const secondBrace = value.indexOf(')');
+            return Number(value.substring(firstBrace + 1, secondBrace));
         default:
             return String(value);
     }
