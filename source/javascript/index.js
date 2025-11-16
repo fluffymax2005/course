@@ -1,6 +1,7 @@
 import { deleteUserData, getToken } from "./cookie.js";
 import { ApiService} from "./api.js";
 import { dbCache } from "./table-utils.js";
+import { InputWithTips } from "./form-utils.js";
 
 // Выход из системы
 window.quitSystem = function quitSystem() {       
@@ -21,10 +22,6 @@ window.quitSystem = function quitSystem() {
 
 // При загрузке формы проверяется актуальность сессии
 document.addEventListener('DOMContentLoaded', async function() {
-    
-    // Стираем старые кэшированные данные таблиц
-    dbCache.clearAll();
-
     // При загрузке главной формы проверяем актуальность сохраненного токена
     const token = getToken();
     try {
