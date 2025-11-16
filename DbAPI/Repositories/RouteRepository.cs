@@ -56,6 +56,10 @@ namespace DbAPI.Repositories {
         }
 
         public async Task UpdateAsync(Models.Route entity) {
+            await EntityValidate(entity.BoardingAddress, entity.DropAddress, entity.WhoAdded,
+                entity.WhenAdded, entity.Id, entity.WhoChanged, entity.WhenChanged, entity.Note,
+                entity.IsDeleted);
+
             entity.WhenChanged = DateTime.Now;
 
             _context.Routes.Update(entity);

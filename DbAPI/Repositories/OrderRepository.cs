@@ -63,13 +63,9 @@ namespace DbAPI.Repositories {
         }
 
         public async Task UpdateAsync(Order entity) {
-            if (await _context.Customers.Where(d => d.Id == entity.CustomerId).AnyAsync() == false) {
-                throw new InvalidDataException($"Заказчик с ID = {entity.CustomerId} не существует");
-            } else if (await _context.Routes.Where(d => d.Id == entity.RouteId).AnyAsync() == false) {
-                throw new InvalidDataException($"Маршрут с ID = {entity.RouteId} не существует");
-            } else if (await _context.Rates.Where(d => d.Id == entity.RateId).AnyAsync() == false) {
-                throw new InvalidDataException($"Тариф с ID = {entity.RateId} не существует");
-            }
+            await EntityValidate(entity.CustomerId, entity.RouteId, entity.RateId, entity.Distance,
+                entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged, entity.WhenChanged,
+                entity.Note, entity.IsDeleted);
 
             entity.WhenChanged = DateTime.Now;
             _context.Orders.Update(entity);

@@ -72,6 +72,10 @@ namespace DbAPI.Repositories {
         }
 
         public async Task UpdateAsync(Driver entity) {
+            await EntityValidate(entity.Forename, entity.Surname, entity.PhoneNumber, entity.DriverLicenceSeries,
+                entity.DriverLicenceNumber, entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged,
+                entity.WhenChanged, entity.Note, entity.IsDeleted);
+
             entity.WhenChanged = DateTime.Now;
 
             _context.Drivers.Update(entity);

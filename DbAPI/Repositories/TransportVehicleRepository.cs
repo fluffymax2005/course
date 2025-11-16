@@ -73,9 +73,10 @@ namespace DbAPI.Repositories {
         }
 
         public async Task UpdateAsync(TransportVehicle entity) {
-            if (await _context.Drivers.Where(d => d.Id == entity.DriverId).AnyAsync() == false) {
-                throw new InvalidDataException($"Водитель с ID = {entity.DriverId} не существует");
-            }
+            await EntityValidate(entity.DriverId, entity.Number, entity.Series, entity.RegistrationCode,
+                entity.Model, entity.Color, entity.ReleaseYear, entity.WhoAdded, entity.WhenAdded,
+                entity.Id, entity.WhoChanged, entity.WhenChanged, entity.Note, entity.IsDeleted);
+
             entity.WhenChanged = DateTime.Now;
 
             _context.TransportVehicles.Update(entity);

@@ -60,6 +60,10 @@ namespace DbAPI.Repositories {
         }
 
         public async Task UpdateAsync(Rate entity) {
+            await EntityValidate(entity.Forename, entity.MovePrice,
+                entity.IdlePrice, entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged,
+                entity.WhenChanged, entity.Note, entity.IsDeleted);
+
             entity.WhenChanged = DateTime.Now;
 
             _context.Rates.Update(entity);

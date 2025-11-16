@@ -72,9 +72,9 @@ namespace DbAPI
             entity.WhoChanged = User.Identity.Name;
             try {
                 await _repository.UpdateAsync(entity);
-            } catch (InvalidDataException ex) {
+            } catch (Exception ex) {
                 _logger.LogError($"Driver:UpdateAsync({id}): {ex.Message}");
-                return BadRequest($"Ошибка сохранения: {ex.Message}");
+                return BadRequest(new { message = $"Ошибка сохранения: {ex.Message}" });
             }
 
             _logger.LogInformation($"Запрос \"Driver.Update({id})\" пользователя \"{User.Identity.Name}\" успешен");

@@ -410,9 +410,9 @@ namespace DbAPI.Controllers {
             entity.WhoChanged = User.Identity.Name;
             try {
                 await _repository.UpdateAsync(entity);
-            } catch (InvalidDataException ex) {
+            } catch (Exception ex) {
                 _logger.LogError($"Credential:UpdateAsync({id}): {ex.Message}");
-                return BadRequest($"Ошибка сохранения: {ex.Message}");
+                return BadRequest(new { message = $"Ошибка сохранения: {ex.Message}" });
             }
 
             _logger.LogInformation($"Администратор {User.Identity.Name} обновил учетную запись с ID = {entity.Id}");
