@@ -75,6 +75,14 @@ export class ApiService {
     static async patch(path, additionalHeaders = {}) {
         return this.apiCall(path, 'PATCH', null, additionalHeaders);
     }
+
+    static getStatisticsPath(structValue, categoryValue, timeIntervalParam, yearStartValue, yearEndValue, boolParam = null, boolValue = null) {
+        let url = 
+        `Statistics/${structValue}/${categoryValue}/${timeIntervalParam}?yearStart=${yearStartValue}&yearEnd=${yearEndValue}`;
+        if (boolParam)
+            url += `&${boolParam}=${boolValue}`;
+        return url;       
+    }
 }
 
 // Внутренний класс (не экспортируется)

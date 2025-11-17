@@ -17,6 +17,7 @@
     <script type="module" src="source/javascript/table-service.js"></script>
 
     <script type="module" src="source/javascript/statistics.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script type="module" src="source/javascript/admin-panel.js"></script>
 </head>
@@ -232,11 +233,11 @@
             </div>
 
             <div class="order struct" id="orderStruct">
-                <div class="order dashboard">
+                <form class="order dashboard" onsubmit="initAnalys(event)">
                     <div class="category-container">
                         <label>Категория</label>
                         <select id="order-select-category">
-                            <option value="Доход">Доход</option>
+                            <option value="profit">Доход</option>
                         </select>
                     </div>
                     <div class="time-interval-container">
@@ -262,11 +263,11 @@
                             <input id="order-input-year-end" min="0" type="number"></input>
                         </div>
 
-                        <button class="calc-button">Анализ</button>
+                        <button class="calc-button" type="submit">Анализ</button>
                     </div>
-                </div>
+                </form>
                 
-                <div class="order display">
+                <div class="order display" id="orderDisplay">
                     <!-- Диаграммы будут динамически заполнены через Js -->
                 </div>
             </div>
