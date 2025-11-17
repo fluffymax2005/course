@@ -68,8 +68,9 @@ namespace DbAPI.Controllers {
                     .ToList();
 
                 return Ok(new {
+                    type = "quarter",
                     period = $"{yearStart}-{yearEnd}",
-                    profit = profitByQuarters
+                    profit = profitByQuarters,
                 });
             } catch (Exception ex) {
                 _logger.LogError(ex, $"Расчет капитализации по кварталам закончился ошибкой: {ex.Message}");
@@ -110,6 +111,7 @@ namespace DbAPI.Controllers {
                     .ToList();
 
                 return Ok(new {
+                    type = "year",
                     period = $"{yearStart}-{yearEnd}",
                     profit = profitByYears
                 });
