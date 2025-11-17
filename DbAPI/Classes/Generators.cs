@@ -259,7 +259,7 @@ namespace DbAPI.Classes {
                     RateId = rate.Id,
                     TransportVehicleId = vehicle.Id,
                     Distance = distance,
-                    WhenAdded = new DateTime(2023, 1, 1).AddDays(i),
+                    WhenAdded = new DateTime(2020, 1, 1).AddHours(i * 2),
                     WhoAdded = "system",
                     WhoChanged = null,
                     WhenChanged = null,
