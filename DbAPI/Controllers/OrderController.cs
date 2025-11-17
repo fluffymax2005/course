@@ -141,7 +141,7 @@ namespace DbAPI.Controllers {
         // GET: api/{entity}/merge
         [HttpGet("{id}/merge")]
         [Authorize(Roles = "Basic, Editor, Admin")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetMergedAsync(TypeId id) {
+        public async Task<ActionResult<Order>> GetMergedAsync(TypeId id) {
             _logger.LogInformation($"\"{User.Identity.Name}\" сделал запрос \"Order.GetMerged({id})\"");
 
             var order = await _repository.GetByIdAsync(id);
