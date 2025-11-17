@@ -6,20 +6,23 @@
 }
 
 .struct {
-    align-items: end;
+    align-items: start;
     display: flex;
     background: #FFCF94;
     border-radius: 12px;
+    min-height: 500px;
 }
 
 .struct:not(.active) {
     opacity: 0;
+    display: none;
     pointer-events: none;
 }
 
 .struct.active {
     opacity: 1;
     pointer-events: all;
+    display: flex;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -63,21 +66,14 @@
 }
 
 .dashboard {
-    max-width: 15%;
     background: #FFCF94;
-    border-right: 2px outset rgba(0, 0, 0, 0.5);
-
-    margin: 10px;
-
-    padding-bottom: 10px;
-    margin-left: 20px;
-    padding-right: 10px;
-    display: grid;
-    justify-content: center;
-
-    font-weight: 600;
-    color: #2d3748;
-    font-size: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-self: flex-start;
+    height: auto;
+    border-radius: 12px;
 }
 
 .category-container {
@@ -176,6 +172,27 @@
 
 .time-type-container select {
     margin-bottom: 8px;
+}
+
+.display {
+    position: relative;
+    width: 100%;
+    min-height: 100px;
+    height: auto;
+    padding: 20px;
+    font-size: 16px;
+    border-left: none;
+    align-self: stretch;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 2px solid rgba(0, 0, 0, 0.3);
+}
+
+.display canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 #statisticsSectionHeader {

@@ -33,6 +33,8 @@ export class ChartParseData {
     static QUARTER_PARSE_TYPE = 'quarter';
     static YEAR_PARSE_TYPE = 'year';
 
+    static MAX_CHARTS_PER_CONTAINER = 2;
+
     /**
      * Метод парсинга Object[] в данные, пригодные для графиков
      * @param {string} data - данные, подлежащие парсингу
@@ -47,19 +49,75 @@ export class ChartParseData {
 
         switch (parseType) {
             case this.QUARTER_PARSE_TYPE:
+                // Создаем labels для кварталов
+                for (let i = 1; i <= 4; i++)    
+                    chartData.labels.push(`${i}-ый квартал`);
+
+                // Группируем данные по годам
+                const years = [...new Set(data.profit.map(item => item.year))].sort();
+                
+                years.forEach(year => {
+                    const yearData = data.profit.filter(item => item.year === year);
+                    const dataset = [];
+                    
+                    // Заполняем данные для всех 4 кварталов
+                    for (let quarter = 1; quarter <= 4; quarter++) {
+                        const quarterData = yearData.find(item => item.quarter === quarter);
+                        dataset.push(quarterData ? quarterData.totalCapitalization : null);
+                    }
+                    
+                    chartData.data.push({
+                        label: `${year}`,
+                        data: dataset,
+                        borderWidth: 2,
+                    });
+                });
+                break;
+                
+            case this.YEAR_PARSE_TYPE:
+                // Для годовой статистики показываем общую капитализацию за каждый год
+                const yearGroups = {};
+                data.profit.forEach(item => {
+                    // Для годовой статистики используем общую капитализацию за год
+                    // Если в данных есть прямая годовая статистика, используем её
+                    // Иначе показываем сообщение, что нужны годовые данные
+                    yearGroups[item.year] = item.totalCapitalization;
+                });
+                
+                // Создаем labels и datasets
+                Object.keys(yearGroups).sort().forEach(year => {
+                    chartData.labels.push(`Год ${year}`);
+                    chartData.data.push({
+                        label: `Год ${year}`,
+                        data: [yearGroups[year]],
+                        borderWidth: 2,
+                    });
+                });
+                break;
+        }
+        
+        /*switch (parseType) {
+            case this.QUARTER_PARSE_TYPE:
             
                 for (let i = 1; i < 5; i++)    
                     chartData.labels.push(`${i}-ый квартал`);
 
                 for (let i = 0; i < data.profit.length; i += 4) {
+                    const dataset = [];
+                    if (i < data.profit.length)
+                        dataset.push(data.profit[i].totalCapitalization);
+                    if (i + 1 < data.profit.length)
+                        dataset.push(data.profit[i + 1].totalCapitalization);
+                    if (i + 2 < data.profit.length)
+                        dataset.push(data.profit[i + 2].totalCapitalization);
+                    if (i + 3 < data.profit.length)
+                        dataset.push(data.profit[i + 3].totalCapitalization);
+                    
+                    
                     chartData.data.push({
                         label: `${data.profit[i].year}`,
-                        data: [
-                            data.profit[i].totalCapitalization,
-                            data.profit[i + 1].totalCapitalization,
-                            data.profit[i + 2].totalCapitalization,
-                            data.profit[i + 3].totalCapitalization,
-                        ]
+                        data: dataset,
+                        borderWidth: 2,
                     })
                 }
                 break;
@@ -67,10 +125,13 @@ export class ChartParseData {
                 for (let i = 0; i < data.profit.length; i++) {
                     chartData.data.push({
                         label: `${data.profit[i].year}`,
-                        data: [data.profit[i].totalCapitalization]
+                        data: [data.profit[i].totalCapitalization],
+                        borderWidth: 2,
                     });
                 }
-        }
+        }*/
+
+        console.log(chartData)
 
         return chartData;
     }
@@ -94,8 +155,8 @@ export class ChartCreation {
         const canvasID = `${selectValue}Canvas_${ChartVariables.chartIDCounter}`
         ChartVariables.appendChartID(canvasID);
         canvas.id = canvasID;
-        canvas.style.width = '50%'
-        canvas.style.height = '400px';
+        canvas.style.width = '100%'
+        canvas.style.height = '100%';
 
         try {
             const ctx = canvas.getContext('2d');
@@ -107,11 +168,21 @@ export class ChartCreation {
                     datasets: datasets
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         y: {
                             beginAtZero: true
                         }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            color: 'rgb(255, 99, 132)'
+                        }
                     }
+                
                 }
             });
         } catch (error) {
