@@ -1,5 +1,8 @@
-﻿namespace DbAPI.DTO {
+﻿using TypeId = int;
+
+namespace DbAPI.DTO {
     public class RegisterResponse {
+        public required TypeId? Id { get; set; }
         public required string UserName { get; set; }
 
         public required bool CanGet { get; set; }

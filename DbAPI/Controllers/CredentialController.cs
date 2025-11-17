@@ -160,16 +160,7 @@ namespace DbAPI.Controllers {
                 return BadRequest(new { message = "Введенные права пользователя не существуют" });
             }
 
-
-            var response = new RegisterResponse {
-                UserName = request.UserName,
-                CanGet = true,
-                CanPost = request.RegisterRights != UserRights.Basic,
-                CanUpdate = request.RegisterRights != UserRights.Basic,
-                CanDelete = request.RegisterRights == UserRights.Admin
-            };
-
-            await _credentialRepository.AddAsync(new Credential {
+            var id = await _credentialRepository.AddAsync(new Credential {
                 RoleId = role.Id,
                 Username = request.UserName,
                 Password = Hasher.HashPassword(request.Password),
@@ -177,6 +168,15 @@ namespace DbAPI.Controllers {
                 WhoAdded = request.WhoRegister.IsNullOrEmpty() ? request.UserName : request.WhoRegister,
                 WhenAdded = DateTime.Now,
             });
+
+            var response = new RegisterResponse {
+                Id = id,
+                UserName = request.UserName,
+                CanGet = true,
+                CanPost = request.RegisterRights != UserRights.Basic,
+                CanUpdate = request.RegisterRights != UserRights.Basic,
+                CanDelete = request.RegisterRights == UserRights.Admin
+            };
 
             _logger.LogInformation($"Регистрация пользователя \"{request.UserName}\" прошла успешно");
 
