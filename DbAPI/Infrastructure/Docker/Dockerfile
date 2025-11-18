@@ -9,7 +9,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["DbAPI/DbAPI.csproj", "DbAPI/"]
+COPY ["../../DbAPI.csproj", "DbAPI/"]
 RUN dotnet restore "DbAPI/DbAPI.csproj"
 COPY . .
 WORKDIR "/src/."
@@ -24,6 +24,7 @@ RUN dotnet publish "DbAPI/DbAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
 # Копируем файлы данных в финальный образ
-COPY DbAPI/Person_Data/ ./Person_Data/
+COPY ["../../Core/Person_Data/", "./Person_Data/"]
 ENTRYPOINT ["dotnet", "DbAPI.dll"]
