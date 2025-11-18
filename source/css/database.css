@@ -27,14 +27,14 @@
 }
 
 #dbSectionHeader {
-    background: linear-gradient(135deg, #fac181, #A4733D);
+    background: rgba(250, 193, 129, 0.7) ;
 }
 
 .table-selector {
     display: flex;
     flex-direction: column;
     gap: 8px;
-}
+}   
 
 .table-selector label {
     font-weight: 600;

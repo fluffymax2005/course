@@ -305,7 +305,7 @@ header {
 }
 
 .action-btn.secondary {
-    background: linear-gradient(135deg, #f093fb, #f5576c);
+    background: rgb(135, 135, 135, 0.5);
     color: white;
 }
 

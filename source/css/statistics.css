@@ -1,3 +1,7 @@
+.statistics {
+    background: #D8DDFE;
+}
+
 .statistics-container {
     box-sizing: border-box;
     max-width: 95%;
@@ -8,7 +12,7 @@
 .struct {
     align-items: start;
     display: flex;
-    background: #FFCF94;
+    background: #b9c2fb;
     border-radius: 12px;
     min-height: 500px;
 }
@@ -66,7 +70,6 @@
 }
 
 .dashboard {
-    background: #FFCF94;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -141,7 +144,7 @@
 
 .time-interval-container button {
     width: 100%;
-    color: white;
+    color: black;
     border: none;
     padding: 12px 20px;
     border-radius: 8px;
@@ -155,7 +158,7 @@
     white-space: nowrap;
     position: relative;
     overflow: hidden;
-    background: rgb(50, 183, 108);
+    background: #C3FDE4;
     justify-content: center;
     margin-top: 5px;
 }
@@ -196,6 +199,7 @@
 }
 
 #statisticsSectionHeader {
-    background: linear-gradient(135deg, #f093fb, #f5576c);
+    background: #E0F3FE;
+    color: black;
 }
 
