@@ -1,0 +1,141 @@
+﻿using DbAPI.Core.Entities;
+using DbAPI.Infrastructure.Classes;
+using Microsoft.EntityFrameworkCore;
+
+namespace DbAPI.Infrastructure.Contexts {
+
+    public class OrderDbContext : DbContext {
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Rate> Rates { get; set; }
+        public DbSet<Core.Entities.Route> Routes { get; set; }
+        public DbSet<TransportVehicle> TransportVehicles { get; set; }
+        public DbSet<Driver> Drivers { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+
+        public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options) {
+            Database.EnsureCreated();
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            optionsBuilder.EnableSensitiveDataLogging();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Customer>(entity => {
+                entity.Property(e => e.Id).IsRequired().ValueGeneratedOnAdd().HasColumnOrder(1);
+                entity.Property(e => e.Forename).IsRequired().HasColumnOrder(2);
+                entity.Property(e => e.Surname).IsRequired().HasColumnOrder(3);
+                entity.Property(e => e.PhoneNumber).IsRequired().HasColumnOrder(4);
+                entity.Property(e => e.Email).IsRequired().HasColumnOrder(5);
+                entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(6);
+                entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(7);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(9);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(10);
+                entity.Property(e => e.Note).HasColumnOrder(11);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(12);
+            });
+
+            var customers = Generators.GenerateCustomers(5000);
+            modelBuilder.Entity<Customer>().HasData(customers);
+
+            ///////////////////////////
+
+            modelBuilder.Entity<Driver>(entity => {
+                entity.Property(e => e.Id).IsRequired().ValueGeneratedOnAdd().HasColumnOrder(1);
+                entity.Property(e => e.Forename).IsRequired().HasColumnOrder(2);
+                entity.Property(e => e.Surname).IsRequired().HasColumnOrder(3);
+                entity.Property(e => e.PhoneNumber).IsRequired().HasColumnOrder(4);
+                entity.Property(e => e.DriverLicenceSeries).IsRequired().HasColumnOrder(5);
+                entity.Property(e => e.DriverLicenceNumber).IsRequired().HasColumnOrder(6);
+                entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(7);
+                entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(8);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(10);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(11);
+                entity.Property(e => e.Note).HasColumnOrder(12);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(13);
+            });
+
+            var drivers = Generators.GenerateDrivers(500);
+            modelBuilder.Entity<Driver>().HasData(drivers);
+
+            ///////////////////////////
+
+            modelBuilder.Entity<Core.Entities.Route>(entity => {
+                entity.Property(e => e.Id).IsRequired().ValueGeneratedOnAdd().HasColumnOrder(1);
+                entity.Property(e => e.BoardingAddress).IsRequired().HasColumnOrder(2);
+                entity.Property(e => e.DropAddress).IsRequired().HasColumnOrder(3);
+                entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(4);
+                entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(5);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(6);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(7);
+                entity.Property(e => e.Note).HasColumnOrder(8);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(9);
+            });
+
+            var routes = Generators.GenerateRoutes(500);
+            modelBuilder.Entity<Core.Entities.Route>().HasData(routes);
+
+            ///////////////////////////
+
+            modelBuilder.Entity<TransportVehicle>(entity => {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd().IsRequired().HasColumnOrder(1);
+                entity.Property(e => e.DriverId).IsRequired().HasColumnOrder(2);
+                entity.Property(e => e.Number).IsRequired().HasColumnOrder(3);
+                entity.Property(e => e.Series).IsRequired().HasColumnOrder(4);
+                entity.Property(e => e.RegistrationCode).IsRequired().HasColumnOrder(5);
+                entity.Property(e => e.Model).IsRequired().HasColumnOrder(6);
+                entity.Property(e => e.Color).IsRequired().HasColumnOrder(7);
+                entity.Property(e => e.ReleaseYear).IsRequired().HasColumnOrder(8);
+                entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(9);
+                entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(10);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(11);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(12);
+                entity.Property(e => e.Note).HasColumnOrder(13);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(14);
+            });
+
+            var vehicles = Generators.GenerateTransportVehicles(drivers, 250);
+            modelBuilder.Entity<TransportVehicle>().HasData(vehicles);
+
+            ///////////////////////////
+
+            modelBuilder.Entity<Rate>(entity => {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd().IsRequired().HasColumnOrder(1);
+                entity.Property(e => e.Forename).IsRequired().HasColumnOrder(2);
+                entity.Property(e => e.MovePrice).IsRequired().HasColumnOrder(3);
+                entity.Property(e => e.IdlePrice).IsRequired().HasColumnOrder(4);
+                entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(5);
+                entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(6);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(7);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(8);
+                entity.Property(e => e.Note).HasColumnOrder(9);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(10);
+            });
+
+            var rates = Generators.GenerateRates(drivers, vehicles);
+            modelBuilder.Entity<Rate>().HasData(rates);
+
+            ///////////////////////////
+
+            modelBuilder.Entity<Order>(entity => {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd().IsRequired().HasColumnOrder(1);
+                entity.Property(e => e.CustomerId).IsRequired().HasColumnOrder(2);
+                entity.Property(e => e.RouteId).IsRequired().HasColumnOrder(3);
+                entity.Property(e => e.RateId).IsRequired().HasColumnOrder(4);
+                entity.Property(e => e.TransportVehicleId).IsRequired().HasColumnOrder(5);
+                entity.Property(e => e.Distance).IsRequired().HasColumnOrder(6);
+                entity.Property(e => e.WhoAdded).IsRequired().HasColumnOrder(7);
+                entity.Property(e => e.WhenAdded).IsRequired().HasColumnOrder(8);
+                entity.Property(e => e.WhoChanged).HasColumnOrder(9);
+                entity.Property(e => e.WhenChanged).HasColumnOrder(10);
+                entity.Property(e => e.Note).HasColumnOrder(11);
+                entity.Property(e => e.IsDeleted).HasColumnOrder(12);
+            });
+
+            var orders = Generators.GenerateOrders(customers, routes, rates, vehicles, 10000);
+            modelBuilder.Entity<Order>().HasData(orders);
+        }
+    }
+}

@@ -6,16 +6,13 @@ DbAPi.sln
 
 # Ignore project folder files
 
-DbAPI/bin/
-DbAPI/obj/
-DbAPI/Migrations/
+*.vs*
+*bin*
+*obj*
+*Migrations*
 DbAPI/Properties/
-DbAPI/logs/
+*logs*
 
 DbAPI/DbAPI.csproj
 DbAPI/DbAPI.csproj.user
 DbAPI/appsettings.json
-
-DockerCompose/.vs
-DockerCompose/bin
-DockerCompose/obj

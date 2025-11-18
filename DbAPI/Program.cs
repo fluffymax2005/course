@@ -1,24 +1,20 @@
 ﻿//#define DOCKER
 #define SWAGGER
 
-using DbAPI.Contexts;
-using DbAPI.Controllers;
-using DbAPI.Interfaces;
-using DbAPI.Models;
-using DbAPI.Repositories;
-using DbAPI.Services;
+using DbAPI.Infrastructure.Contexts;
+using DbAPI.Infrastructure.Interfaces;
+using DbAPI.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Threading.RateLimiting;
-using TypeId = int;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add logging
-builder.Logging.AddFile(Path.Combine(Directory.GetCurrentDirectory(), "logs"));
+builder.Logging.AddFile(Path.Combine(Directory.GetCurrentDirectory(), "Infrastructure", "logs"));
 
 // Disable system debug requests
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None); // SQL requests
@@ -42,7 +38,7 @@ builder.Logging.AddFilter("db.Controllers", LogLevel.Information);
 
 // Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
@@ -108,21 +104,10 @@ builder.Services.AddDbContext<CredentialDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultCredentialConnection")));
 #endif
 
-builder.Services.AddScoped<IRepository<Order, TypeId>, OrderRepository>();
-builder.Services.AddScoped<IRepository<Customer, TypeId>, CustomerRepository>();
-builder.Services.AddScoped<IRepository<Driver, TypeId>, DriverRepository>();
-builder.Services.AddScoped<IRepository<Rate, TypeId>, RateRepository>();
-builder.Services.AddScoped<IRepository<DbAPI.Models.Route, TypeId>, RouteRepository>();
-builder.Services.AddScoped<IRepository<TransportVehicle, TypeId>, TransportVehicleRepository>();
-
-builder.Services.AddScoped<IRepository<Role, TypeId>, RoleRepository>();
-builder.Services.AddScoped<RoleRepository>();
-builder.Services.AddScoped<IRepository<Credential, TypeId>, CredentialRepository>();
-
-builder.Services.AddScoped<IEmailService, EmailService>();
-
-builder.Services.AddMemoryCache();
-builder.Services.AddScoped<IPasswordRecoveryService, PasswordRecoveryService>();
+// Dependency injection
+builder.Services.AddReposes();
+builder.Services.AddEmailServices();
+builder.Services.AddPasswordRecoveryServices();
 
 // JWT
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
