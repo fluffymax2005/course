@@ -208,6 +208,7 @@ namespace DbAPI.Infrastructure.Controllers {
                 _logger.LogInformation($"Ссылка восстановления отправлена для пользователя \"{credential.Username}\" на почту \"{request.Email}\"");
 
                 return Ok(new { message = "Если email зарегистрирован, инструкции будут отправлены" });
+
             } catch (Exception ex) {
                 _logger.LogError($"Ошибка при обработке запроса восстановления: {ex.Message}");
                 return StatusCode(500, new { message = "Произошла ошибка при обработке запроса" });
@@ -218,9 +219,15 @@ namespace DbAPI.Infrastructure.Controllers {
         [HttpGet("reset/form")]
         public IActionResult GetResetHTMLForm(string token) {
             _logger.LogInformation($"Запрос на сброс пароля создан для токена {token}");
-            return PhysicalFile(
-                Path.Combine(Directory.GetCurrentDirectory(), "..", "DbAPI", "Presentation", "wwwroot", "reset-password.html"),
-                "text/html");
+
+            #if SWAGGER
+                string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "DbAPI", "Presentation", "wwwroot", "reset-password.html");
+            #endif
+            #if DOCKER
+                string path = Path.Combine(Directory.GetCurrentDirectory(), "Presentation", "wwwroot", "reset-password.html");
+            #endif
+
+            return PhysicalFile(path, "text/html");
         }
 
 

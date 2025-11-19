@@ -1,7 +1,4 @@
-﻿//#define DOCKER
-#define SWAGGER
-
-using DbAPI.Infrastructure.Contexts;
+﻿using DbAPI.Infrastructure.Contexts;
 using DbAPI.Infrastructure.Interfaces;
 using DbAPI.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,7 +11,14 @@ using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add logging
-builder.Logging.AddFile(Path.Combine(Directory.GetCurrentDirectory(), "Infrastructure", "logs"));
+#if SWAGGER
+string logPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "Infrastructure", "logs"));
+#endif
+#if DOCKER
+string logPath = Path.Combine(Directory.GetCurrentDirectory(), Environment.GetEnvironmentVariable("LOG_PATH"));
+#endif
+
+builder.Logging.AddFile(logPath);
 
 // Disable system debug requests
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None); // SQL requests
