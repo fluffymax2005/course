@@ -59,7 +59,30 @@ Configure "appsettings.json" file. Obligating prerequestes are showed below:
 }
 </small></pre>
 
-<h2>5. Required packages.</h2>
+<h2>5. Update DbAPI.csproj</h2>
+
+If you are going to use ONLY Docker Desktop add following code:
+
+```xml
+<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <DefineConstants>$(DefineConstants);DOCKER</DefineConstants>
+</PropertyGroup>
+<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <DefineConstants>$(DefineConstants);DOCKER</DefineConstants>
+</PropertyGroup>
+```
+If you are going to use ONLY Swagger add following code:
+
+```xml
+<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <DefineConstants>$(DefineConstants);SWAGGER</DefineConstants>
+</PropertyGroup>
+<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <DefineConstants>$(DefineConstants);SWAGGER</DefineConstants>
+</PropertyGroup>
+```
+
+<h2>6. Required packages.</h2>
 
 Install packages:
 
@@ -71,7 +94,7 @@ dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.0<br>
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 8.0.20
 </code>
 
-<h2>6. Cloning repository</h2>
+<h2>7. Cloning repository</h2>
 
 Clone repository in any place where "course" directory does not exist (or it is empty)<br><br>
 <code>
@@ -80,7 +103,7 @@ cd course
 git switch DBAPI
 </code>
 
-<h1>7. Cut and paste all files from repos to &lt;your_project_folder_name&gt; folder. Accept rewriting case neccessary.</h1>
+<h1>8. Cut and paste all files from repos to &lt;your_project_folder_name&gt; folder. Accept rewriting case neccessary.</h1>
 
 </body>
 </html>
