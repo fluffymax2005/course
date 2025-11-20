@@ -18,4 +18,5 @@ DbAPI/DbAPI.csproj.user
 DbAPI/appsettings.json
 
 # Ignore secrets directory
-DbAPI/Infrastructure/Secrets/
+DbAPI/Infrastructure/Secrets/EmailSettings.json
+DbAPI/Infrastructure/Secrets/JwtSettings.json

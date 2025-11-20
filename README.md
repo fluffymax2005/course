@@ -35,22 +35,6 @@ Configure "appsettings.json" file. Obligating prerequestes are showed below:
     }
   },
 
-  "JwtSettings": {
-    "SecretKey": "&lt;Your_secret_key&gt;",
-    "Issuer": "&lt;Your_issuer&gt;",
-    "Audience": "&lt;Your_audience&gt;",
-    "ExpiryInMinutes": &lt;Token_expiry_time_in_minutes&gt;
-  },
-
-  "Email": {
-    "Host": "&lt;Your_email_host&gt;",
-    "Port": &lt;Your_port&gt;,
-    "Username": "&lt;Your_email_address&gt;",
-    "Password": "&lt;Your_external_apps_email_password&gt;",
-    "From": "&lt;Your_email_address&gt;",
-    "DisplayName": "&lt;Email_title&gt;"
-  },
-
   "ConnectionStrings": {
     "DefaultDataConnection": "Server=&lt;Your_server_IP_or_name&gt;;Database=&lt;Your_DB_name&gt;;User ID=&lt;Your_DB_login&gt;;Password=&lt;Your_DB_password&gt;;Trusted_Connection=True;TrustServerCertificate=True;", // Main Db
     "DefaultCredentialConnection": "Server=&lt;Your_server_IP_or_name&gt;;Database=&lt;Your_DB_name&gt;;User ID=&lt;Your_DB_login&gt;;Password=&lt;Your_DB_password&gt;;Trusted_Connection=True;TrustServerCertificate=True;", // User data Db
@@ -82,7 +66,40 @@ If you are going to use ONLY Swagger add following code:
 </PropertyGroup>
 ```
 
-<h2>6. Required packages.</h2>
+<h2>6. Secrets files</h2>
+
+Create directory "Secrets" for secrets in "Infrastructure" directory. Append "EmailSettings.json" and "JwtSettings.json" there.
+
+<h3>Configure "EmailSettings.json"</h3>
+
+<pre><small>
+{
+  "Email": {
+    "Host": "&lt;Your_email_host&gt;",
+    "Port": &lt;Your_port&gt;,
+    "Username": "&lt;Your_email_address&gt;",
+    "Password": "&lt;Your_external_apps_email_password&gt;",
+    "From": "&lt;Your_email_address&gt;",
+    "DisplayName": "&lt;Email_title&gt;"
+  }
+}
+</small></pre>
+
+<h3>Configure "JwtSettings.json"</h3>
+
+<pre><small>
+{
+  "JwtSettings": {
+    "SecretKey": "&lt;Your_secret_key&gt;",
+    "Issuer": "&lt;Your_issuer&gt;",
+    "Audience": "&lt;Your_audience&gt;",
+    "ExpiryInMinutes": &lt;Token_expiry_time_in_minutes&gt;
+  }
+}
+</small></pre>
+
+
+<h2>7. Required packages.</h2>
 
 Install packages:
 
@@ -94,7 +111,7 @@ dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.0<br>
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 8.0.20
 </code>
 
-<h2>7. Cloning repository</h2>
+<h2>8. Cloning repository</h2>
 
 Clone repository in any place where "course" directory does not exist (or it is empty)<br><br>
 <code>
@@ -103,7 +120,7 @@ cd course
 git switch DBAPI
 </code>
 
-<h1>8. Cut and paste all files from repos to &lt;your_project_folder_name&gt; folder. Accept rewriting case neccessary.</h1>
+<h1>9. Cut and paste all files from repos to &lt;your_project_folder_name&gt; folder. Accept rewriting case neccessary.</h1>
 
 </body>
 </html>
