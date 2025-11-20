@@ -49,6 +49,7 @@ export class AuthService {
                     console.log('Ошибка парсинга message -> string: ', response.status);
                     this.setTextMessage(outputText, true, 'Внутренняя ошибка. Попробуйте позже');
                 }
+                MessageBox.RemoveAwait();
                 return;
             }
             
