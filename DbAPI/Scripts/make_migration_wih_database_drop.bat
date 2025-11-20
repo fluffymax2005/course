@@ -1,3 +1,5 @@
+cd ../
+
 dotnet ef database drop --force -c OrderDbContext
 dotnet ef database drop --force -c CredentialDbContext
 
