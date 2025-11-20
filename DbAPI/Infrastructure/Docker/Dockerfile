@@ -10,7 +10,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["./", "DbAPI/"]
-#COPY [""]
 RUN dotnet restore "DbAPI/DbAPI.csproj"
 COPY . .
 WORKDIR "/src/."
@@ -28,6 +27,7 @@ COPY --from=publish /app/publish .
 
 # Копируем файлы данных в финальный образ
 COPY ["Core/Person_Data/", "./Person_Data/"]
-COPY ["Presentation/", "./Presentation"]
+COPY ["Presentation/", "./Presentation/"]
+COPY ["Infrastructure/Secrets/", "./Infrastructure/Secrets/"]
 
 ENTRYPOINT ["dotnet", "DbAPI.dll"]

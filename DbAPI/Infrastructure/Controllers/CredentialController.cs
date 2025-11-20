@@ -220,12 +220,12 @@ namespace DbAPI.Infrastructure.Controllers {
         public IActionResult GetResetHTMLForm(string token) {
             _logger.LogInformation($"Запрос на сброс пароля создан для токена {token}");
 
-            #if SWAGGER
+#if SWAGGER
                 string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "DbAPI", "Presentation", "wwwroot", "reset-password.html");
-            #endif
-            #if DOCKER
+#endif
+#if DOCKER
                 string path = Path.Combine(Directory.GetCurrentDirectory(), "Presentation", "wwwroot", "reset-password.html");
-            #endif
+#endif
 
             return PhysicalFile(path, "text/html");
         }

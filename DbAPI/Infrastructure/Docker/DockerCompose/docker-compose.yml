@@ -45,6 +45,6 @@ services:
       - DB_NAME2=User_data
       - DB_SA_PASSWORD=JcGDN9ST5KEG!
       - LOG_PATH=logs/
-      - RESET
+      - SECRETS_PATH=Infrastructure/Secrets/;
     networks:
       - dbapiapp

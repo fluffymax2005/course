@@ -6,6 +6,10 @@ using TypeId = int;
 
 namespace DbAPI.Infrastructure.Services {
     public static class DependencyInjection {
+        private static readonly string EMAIL_SECRETS_PATH = "Infrastructure/Secrets/EmailSettings.json";
+        private static readonly string JWT_SECRETS_PATH = "Infrastructure/Secrets/JwtSettings.json";
+
+
         public static IServiceCollection AddReposes(this IServiceCollection services) {
 
             // Reposes registration for main database
@@ -44,10 +48,17 @@ namespace DbAPI.Infrastructure.Services {
         public static WebApplication AddStaticFiles(this WebApplication app) {
             app.UseStaticFiles(new StaticFileOptions {
                 FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(), @"Presentation\wwwroot"))
+                    Path.Combine(Directory.GetCurrentDirectory(), "Presentation/wwwroot"))
             });
 
             return app;
+        }
+
+        public static ConfigurationManager AddConfigurationSecrets(this ConfigurationManager configuration) {
+            configuration.AddJsonFile(EMAIL_SECRETS_PATH)
+                .AddJsonFile(JWT_SECRETS_PATH);
+
+            return configuration;
         }
     }
 }

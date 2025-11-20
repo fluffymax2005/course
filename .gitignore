@@ -16,3 +16,6 @@ DbAPI/Properties/
 DbAPI/DbAPI.csproj
 DbAPI/DbAPI.csproj.user
 DbAPI/appsettings.json
+
+# Ignore secrets directory
+DbAPI/Infrastructure/Secrets/

@@ -112,6 +112,7 @@ builder.Services.AddDbContext<CredentialDbContext>(options =>
 builder.Services.AddReposes();
 builder.Services.AddEmailServices();
 builder.Services.AddPasswordRecoveryServices();
+builder.Configuration.AddConfigurationSecrets();
 
 // JWT
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -155,7 +156,7 @@ if (app.Environment.IsDevelopment()) {
 
 app.UseRouting();
 
-app.AddStaticFiles(); // // Allow using HTML CSS JS
+app.AddStaticFiles(); // Allow using HTML CSS JS
 
 app.UseCors("AllowFrontend"); // CORS policy
 
