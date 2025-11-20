@@ -1,7 +1,7 @@
 ﻿using DbAPI.Core.Entities;
 using DbAPI.Infrastructure.Interfaces;
 using DbAPI.Infrastructure.Repositories;
-
+using Microsoft.Extensions.FileProviders;
 using TypeId = int;
 
 namespace DbAPI.Infrastructure.Services {
@@ -39,6 +39,15 @@ namespace DbAPI.Infrastructure.Services {
             services.AddScoped<IPasswordRecoveryService, PasswordRecoveryService>();
 
             return services;
+        }
+
+        public static WebApplication AddStaticFiles(this WebApplication app) {
+            app.UseStaticFiles(new StaticFileOptions {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), @"Presentation\wwwroot"))
+            });
+
+            return app;
         }
     }
 }

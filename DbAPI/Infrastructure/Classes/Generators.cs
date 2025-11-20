@@ -6,7 +6,7 @@ using TypeId = int;
 namespace DbAPI.Infrastructure.Classes {
     public static class Generators {
         private static readonly Random _random = new Random(1000);
-        private static readonly string PERSON_DATA_PATH = @"Person_Data";
+        private static readonly string PERSON_DATA_PATH = @"Core/Person_Data";
 
         private static readonly string[] phone_numbers = new string[] { };
 
