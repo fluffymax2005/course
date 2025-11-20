@@ -95,41 +95,6 @@ export class ChartParseData {
                 });
                 break;
         }
-        
-        /*switch (parseType) {
-            case this.QUARTER_PARSE_TYPE:
-            
-                for (let i = 1; i < 5; i++)    
-                    chartData.labels.push(`${i}-ый квартал`);
-
-                for (let i = 0; i < data.profit.length; i += 4) {
-                    const dataset = [];
-                    if (i < data.profit.length)
-                        dataset.push(data.profit[i].totalCapitalization);
-                    if (i + 1 < data.profit.length)
-                        dataset.push(data.profit[i + 1].totalCapitalization);
-                    if (i + 2 < data.profit.length)
-                        dataset.push(data.profit[i + 2].totalCapitalization);
-                    if (i + 3 < data.profit.length)
-                        dataset.push(data.profit[i + 3].totalCapitalization);
-                    
-                    
-                    chartData.data.push({
-                        label: `${data.profit[i].year}`,
-                        data: dataset,
-                        borderWidth: 2,
-                    })
-                }
-                break;
-            case this.YEAR_PARSE_TYPE:
-                for (let i = 0; i < data.profit.length; i++) {
-                    chartData.data.push({
-                        label: `${data.profit[i].year}`,
-                        data: [data.profit[i].totalCapitalization],
-                        borderWidth: 2,
-                    });
-                }
-        }*/
 
         console.log(chartData)
 

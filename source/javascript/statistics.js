@@ -109,6 +109,7 @@ function fillOrderChart() {
     // Если параметров больше (<MAX_CHARTS_PER_CONTAINER> - 1), то надо сделать срез данных и разделить срезы по разным графикам
     let slicedData = null; 
     if (parsedData.data.length > ChartParseData.MAX_CHARTS_PER_CONTAINER - 1) {
+        
         slicedData = { labels: [], data: [] };
 
         // В случае, если обрабатываем кварталы, то все label'ы - номера кварталов
@@ -119,11 +120,6 @@ function fillOrderChart() {
         // Разбиение всех данных над подконтейнеры
         for (let i = 0; i < parsedData.data.length; i += ChartParseData.MAX_CHARTS_PER_CONTAINER) {          
             const endIndex = Math.min(i + ChartParseData.MAX_CHARTS_PER_CONTAINER, parsedData.data.length);
-
-            /*// Обрабатываем случаи, когда выборка идет по кварталам, либо по годам
-            if (ChartVariables.chartParseData.type === ChartParseData.YEAR_PARSE_TYPE) {
-                slicedData.labels.push(parsedData.labels.slice(i, endIndex));
-            }*/
             slicedData.data.push(parsedData.data.slice(i, endIndex));            
         }
     }
@@ -146,24 +142,7 @@ function fillOrderChart() {
         const canvas = ChartCreation.createHistogram('order', parsedData.labels, parsedData.data);
         chartContainer.appendChild(canvas);
         rowContainer.appendChild(chartContainer);
-        displayContainer.appendChild(rowContainer);
-        
-        /*const canvas = ChartCreation.createHistogram('order', parsedData.labels, parsedData.data);
-
-        // Графики будут расположены попарно в подконтейнерах.
-        let pairContainer = null;
-        const pairNumber = Math.floor(ChartVariables.chartIDCounter / 2);
-        pairContainer = document.createElement('div');
-        pairContainer.id = `orderPairContainer_${pairNumber}`;
-        pairContainer.style.width = '100%';
-        pairContainer.style.height = '500px';
-        pairContainer.style.position = 'relative';
-
-        // Размещает компоненты
-        pairContainer.appendChild(canvas);
-        displayContainer.appendChild(pairContainer);*/
-
-        
+        displayContainer.appendChild(rowContainer);        
     } else {
         
         /////////// Решить проблемы с разметкой
@@ -174,21 +153,17 @@ function fillOrderChart() {
             
             // Создаем контейнер для двух графиков на данной строке
             let rowContainer = null;
-            if (i % 2 === 0) {
-                rowContainer = document.createElement('div');
-                rowContainer.id = `$orderPairContainer_${pairNumber}`;
-                rowContainer.style.width = '100%';
-                rowContainer.style.display = 'flex';
-                rowContainer.style.flexWrap = 'wrap';
-                rowContainer.style.justifyContent = 'space-between';
-                rowContainer.style.marginBottom = '20px';
-                rowContainer.style.gap = '20px';
-            } else {
-                rowContainer = document.getElementById(`$orderPairContainer_${pairNumber}`);
-            }
+            rowContainer = document.createElement('div');
+            rowContainer.id = `$orderPairContainer_${pairNumber}`;
+            rowContainer.style.width = '100%';
+            rowContainer.style.display = 'flex';
+            rowContainer.style.flexWrap = 'wrap';
+            rowContainer.style.justifyContent = 'space-between';
+            rowContainer.style.marginBottom = '20px';
+            rowContainer.style.gap = '20px';
 
             // Создаем графики для этой строки
-            slicedData.data[i].forEach((dataset, datasetIndex) => {
+            slicedData.data[i].forEach((dataset) => {
                 const chartContainer = document.createElement('div');
                 chartContainer.id = `$orderChartPairContainer_${pairNumber}`;
                 chartContainer.style.flex = '1';
@@ -201,31 +176,13 @@ function fillOrderChart() {
                 chartContainer.style.padding = '10px'; 
                 chartContainer.style.boxSizing = 'border-box';
 
-                const singleDataset = [dataset];
-                const canvas = ChartCreation.createHistogram('order', slicedData.labels[i], singleDataset);
+                const canvas = ChartCreation.createHistogram('order', slicedData.labels, [dataset]);
                 
                 chartContainer.appendChild(canvas);
                 rowContainer.appendChild(chartContainer);
             });
 
-            if (i % 2 == 0)
-                displayContainer.appendChild(rowContainer);
+            displayContainer.appendChild(rowContainer);
         }
-        
-        /*for (let i = 0; i < slicedData.data.length; i++) {
-            const canvas = ChartCreation.createHistogram('order', slicedData.labels[i], slicedData.data[i]);
-            
-            let pairContainer = null;
-            if (ChartVariables.chartIDCounter % 2) {
-                pairContainer = document.getElementById(`$orderPairContainer_${pairNumber}`);
-            } else {
-                pairContainer = document.createElement('div');
-                pairContainer.id = `$orderPairContainer_${pairNumber}`;
-                
-                displayContainer.appendChild(pairContainer);
-            }
-            pairContainer.appendChild(canvas);
-
-        }*/
     }
 }
