@@ -328,6 +328,8 @@ export class InputWithTips {
         input.setAttribute('correct-value', value);
         input.setAttribute('valid', 'false');
 
+        validateInput();
+
         // Добавляем базовые стили для лучшего UX
         input.style.width = '100%';
         input.style.padding = '12px 16px';
@@ -339,6 +341,8 @@ export class InputWithTips {
         input.style.transition = 'all 0.3s ease';
 
         let currentDropdown = null;
+
+        updateStyles();
 
         // Функция для получения подходящих элементов
         function getSimilarSets(inputValue) {
