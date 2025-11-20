@@ -154,7 +154,7 @@ async function addUser(event) {
     
     const formData = new FormData(event.target);
     if (formData.get('password') != formData.get('confirm-password')) {
-        messageBoxShow('Пароли не совпадают', 'red', '20px', '45%', 'translateY(50px)');
+        MessageBox.ShowFromLeft('Пароли не совпадают', 'red', false, '40', 'translateY(50px)');
         return;
     }
 
