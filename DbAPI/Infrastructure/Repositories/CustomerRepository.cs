@@ -67,7 +67,7 @@ namespace DbAPI.Infrastructure.Repositories {
 
         public async Task UpdateAsync(Customer entity) {
             await EntityValidate(entity.Forename, entity.Surname, entity.PhoneNumber, entity.Email,
-                entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged, entity.WhenChanged,
+                entity.WhoAdded, entity.WhenAdded, 0, entity.WhoChanged, entity.WhenChanged,
                 entity.Note, entity.IsDeleted);
 
             entity.WhenChanged = DateTime.Now;

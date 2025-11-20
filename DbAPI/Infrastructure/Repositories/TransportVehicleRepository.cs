@@ -75,7 +75,7 @@ namespace DbAPI.Infrastructure.Repositories {
         public async Task UpdateAsync(TransportVehicle entity) {
             await EntityValidate(entity.DriverId, entity.Number, entity.Series, entity.RegistrationCode,
                 entity.Model, entity.Color, entity.ReleaseYear, entity.WhoAdded, entity.WhenAdded,
-                entity.Id, entity.WhoChanged, entity.WhenChanged, entity.Note, entity.IsDeleted);
+                0, entity.WhoChanged, entity.WhenChanged, entity.Note, entity.IsDeleted);
 
             entity.WhenChanged = DateTime.Now;
 
