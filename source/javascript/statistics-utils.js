@@ -76,23 +76,29 @@ export class ChartParseData {
                 
             case this.YEAR_PARSE_TYPE:
                 // Для годовой статистики показываем общую капитализацию за каждый год
-                const yearGroups = {};
-                data.profit.forEach(item => {
-                    // Для годовой статистики используем общую капитализацию за год
-                    // Если в данных есть прямая годовая статистика, используем её
-                    // Иначе показываем сообщение, что нужны годовые данные
-                    yearGroups[item.year] = item.totalCapitalization;
-                });
+                // Группируем данные по годам
+                const yearGroups = [...new Set(data.profit.map(item => item.year))].sort();
                 
-                // Создаем labels и datasets
-                Object.keys(yearGroups).sort().forEach(year => {
-                    chartData.labels.push(`Год ${year}`);
+                yearGroups.forEach(year => {
+                    const dataset = data.profit.find(p => p.year === year).totalCapitalization;
+                    
+                    chartData.labels.push(`${year}`);
                     chartData.data.push({
-                        label: `Год ${year}`,
-                        data: [yearGroups[year]],
+                        label: `${year}`,
+                        data: [dataset],
                         borderWidth: 2,
                     });
                 });
+                
+                /*// Создаем labels и datasets
+                Object.keys(yearGroups).sort().forEach(year => {
+                    chartData.labels.push(`${year}`);
+                    chartData.data.push({
+                        label: `${year}`,
+                        data: [yearGroups[year]],
+                        borderWidth: 2,
+                    });
+                });*/
                 break;
         }
 

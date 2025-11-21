@@ -78,12 +78,12 @@ async function  fetchStatisticData() {
 
     // Локальный путь доступа к БД
     const path = ApiService.getStatisticsPath(
-        structSelect.options[structSelect.selectedIndex].value,
-        categorySelect.options[categorySelect.selectedIndex].value,
-        timeIntervalSelect.options[categorySelect.selectedIndex].value,
+        structSelect.value,
+        categorySelect.value,
+        timeIntervalSelect.value,
         yearStartInput.value,
         yearEndInput.value,
-        popularSelect ? popularSelect.options[popularSelect.selectedIndex].value : null,
+        popularSelect ? popularSelect.value : null,
         popularSelect ? popularSelect.text === 'Да' ? 'true' : 'false' : null
     );
     console.log(path);
@@ -150,10 +150,7 @@ function fillOrderChart() {
         chartContainer.appendChild(canvas);
         rowContainer.appendChild(chartContainer);
         displayContainer.appendChild(rowContainer);        
-    } else {
-        
-        /////////// Решить проблемы с разметкой
-        
+    } else {        
         // Со срезом - несколько строк по 2 графика
         for (let i = 0; i < slicedData.data.length; i++) {
             const pairNumber = Math.floor(ChartVariables.chartIDCounter / 2);
