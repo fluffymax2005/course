@@ -30,6 +30,9 @@ function displayStruct() {
         s => s.classList.remove('active'));
     document.querySelectorAll('.display').forEach(d => d.replaceChildren());
 
+    // Сбрасываем значения всех input в панели управления выборкой
+    document.querySelectorAll('.struct input').forEach(i => i.value = '');
+
     ChartVariables.clearCharts();
 
     if (text !== '') {
@@ -138,6 +141,10 @@ function fillOrderChart() {
         chartContainer.style.width = '100%';
         chartContainer.style.height = '500px';
         chartContainer.style.position = 'relative';
+        chartContainer.style.padding = '10px';
+        chartContainer.style.boxSizing = 'border-box'; 
+        chartContainer.style.borderRadius = '8px';
+        chartContainer.style.backgroundColor = 'white';
 
         const canvas = ChartCreation.createHistogram('order', parsedData.labels, parsedData.data);
         chartContainer.appendChild(canvas);
