@@ -136,6 +136,7 @@ export class AuthService {
 
                 let errorMessage = errorData.message;
                 this.setTextMessage(outputText, true, errorMessage);
+                MessageBox.RemoveAwait();   
                 return;
             }
 
@@ -159,6 +160,7 @@ export class AuthService {
         var outputText = document.getElementById('recoverMessage');
         console.log("Отправка запроса:", `${this.API_BASE_URL}/recover`);
 
+        MessageBox.ShowAwait();
         try {
             const response = await fetch(`${this.API_BASE_URL}/recover`, {
                 method: 'POST',
@@ -180,6 +182,7 @@ export class AuthService {
 
                 let errorMessage = errorData.message;
                 this.setTextMessage(outputText, true, errorMessage);
+                MessageBox.RemoveAwait();
                 return;
             }
 
@@ -188,9 +191,12 @@ export class AuthService {
         } catch (error) {
             console.error('Ошибка регистрации', error);
             this.setTextMessage(outputText, true, 'Внутренняя ошибка. Попробуйте позже');
+            MessageBox.RemoveAwait();
         }
 
         console.log('Восстановление прошло успешно');
+
+        MessageBox.RemoveAwait();
     }
 
     static setTextMessage(label, isError, message, displayStyle = 'block') {
