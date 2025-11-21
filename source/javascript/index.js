@@ -1,7 +1,7 @@
 import { deleteUserData, getToken } from "./cookie.js";
 import { ApiService} from "./api.js";
 import { dbCache } from "./table-utils.js";
-import { InputWithTips } from "./form-utils.js";
+import { InputWithTips, MessageBox } from "./form-utils.js";
 
 // Выход из системы
 window.quitSystem = function quitSystem() {       
@@ -22,7 +22,7 @@ window.quitSystem = function quitSystem() {
 
 // При загрузке формы проверяется актуальность сессии
 document.addEventListener('DOMContentLoaded', async function() {
-    // При загрузке главной формы проверяем актуальность сохраненного токена
+    // При загрузке главной формы проверяем актуальность сохраненного токена  
     const token = getToken();
     try {
         await ApiService.get(`Credential/validate-token?token=${token}`, true);

@@ -210,6 +210,77 @@ export class MessageBox {
         return toastId;
     }
 
+    static async ShowFromCenter(message, background_color, duration = 3000) {
+        if (activeToasts.size >= 10)
+            return;
+        
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        const toastId = Date.now() + Math.random(); // уникальный ID
+        
+        toast.style.cssText = `
+            position: fixed;
+            top: ${MESSAGE_BOX_HEIGHT_OFFSET}px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: ${background_color};
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.5s ease-in-out;
+            max-width: 600px;
+            text-align: center;
+        `;
+
+        document.body.appendChild(toast);
+
+        // Ждем пока элемент отрендерится
+        await new Promise(resolve => setTimeout(resolve, 0));
+        
+        const height = toast.offsetHeight;
+        
+        // Сохраняем информацию о тосте
+        activeToasts.set(toastId, {
+            element: toast,
+            height: height,
+            top: MESSAGE_BOX_HEIGHT_OFFSET
+        });
+
+        // Увеличиваем отступ для следующего тоста
+        MESSAGE_BOX_HEIGHT_OFFSET += height + TOAST_MARGIN;
+
+        // Анимация появления
+        requestAnimationFrame(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+        });
+
+        // Автоматическое скрытие с кастомной анимацией для центрированного тоста
+        setTimeout(() => {
+            // Анимация исчезновения - перемещение вверх на 50px с затуханием
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(-50px)';
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+                
+                // Удаляем из Map и пересчитываем позиции
+                activeToasts.delete(toastId);
+                this._recalculateToastPositions();
+            }, 300);
+        }, duration);
+
+        return toastId;
+    }
+
     static _removeToast(toastId) {
         const toastInfo = activeToasts.get(toastId);
         if (!toastInfo) return;
