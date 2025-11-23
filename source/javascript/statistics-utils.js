@@ -2,6 +2,7 @@ export class ChartVariables {
     static _chartIDArray = []; // массив, содержащий ID активных графиков
     static _chartIDCounter = 0; // счетчик порядкового номера графика
     static _chartParseData = []; // массив, содержащий информацию, подлежащую парсингу
+    static _timeIntervalType = null; // по какому временному диапазону идет выборка
 
     static get chartIDs() {return this._chartIDArray;}
     static set charIDs(array) {this._chartIDArray = array;}
@@ -14,6 +15,9 @@ export class ChartVariables {
     }
 
     static get chartIDCounter() {return this._chartIDCounter;}
+
+    static get timeIntervalType() {return this._timeIntervalType;}
+    static set timeIntervalType(type) {this._timeIntervalType = type;}
 
     static get chartParseData() {return this._chartParseData;}
     static set chartParseData(data) {this._chartParseData = data;}
@@ -34,6 +38,8 @@ export class ChartParseData {
     static YEAR_PARSE_TYPE = 'year';
 
     static MAX_CHARTS_PER_CONTAINER = 2;
+    static MAX_YEARS_PER_CHART = 5;
+
 
     /**
      * Метод парсинга Object[] в данные, пригодные для графиков
@@ -45,7 +51,7 @@ export class ChartParseData {
         if (!parseType || !data)
             return null;
 
-        const chartData = { labels: [], data: [] }
+        const chartData = { labels: [], datasets: [] }
 
         switch (parseType) {
             case this.QUARTER_PARSE_TYPE:
@@ -66,7 +72,7 @@ export class ChartParseData {
                         dataset.push(quarterData ? quarterData.totalCapitalization : null);
                     }
                     
-                    chartData.data.push({
+                    chartData.datasets.push({
                         label: `${year}`,
                         data: dataset,
                         borderWidth: 2,
@@ -83,22 +89,12 @@ export class ChartParseData {
                     const dataset = data.profit.find(p => p.year === year).totalCapitalization;
                     
                     chartData.labels.push(`${year}`);
-                    chartData.data.push({
+                    chartData.datasets.push({
                         label: `${year}`,
                         data: [dataset],
                         borderWidth: 2,
                     });
                 });
-                
-                /*// Создаем labels и datasets
-                Object.keys(yearGroups).sort().forEach(year => {
-                    chartData.labels.push(`${year}`);
-                    chartData.data.push({
-                        label: `${year}`,
-                        data: [yearGroups[year]],
-                        borderWidth: 2,
-                    });
-                });*/
                 break;
         }
 
@@ -128,6 +124,9 @@ export class ChartCreation {
         canvas.id = canvasID;
         canvas.style.width = '100%'
         canvas.style.height = '100%';
+
+        console.log(labels);
+        console.log(datasets);
 
         try {
             const ctx = canvas.getContext('2d');
@@ -159,6 +158,8 @@ export class ChartCreation {
         } catch (error) {
             console.error(error);
         }
+
+        console.log(canvas);
 
         return canvas;
     }

@@ -24,6 +24,7 @@ window.quitSystem = function quitSystem() {
 document.addEventListener('DOMContentLoaded', async function() {
     // При загрузке главной формы проверяем актуальность сохраненного токена  
     const token = getToken();
+    MessageBox.ShowAwait();
     try {
         await ApiService.get(`Credential/validate-token?token=${token}`, true);
     } catch (error) {
@@ -31,5 +32,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Проброс пользователя в окно авторизации
         deleteUserData();
         window.location.href = '../../authorize-form/authorize.html';
+    } finally {
+        MessageBox.RemoveAwait();
     }
 });

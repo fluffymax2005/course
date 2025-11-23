@@ -47,7 +47,14 @@ async function initAnalys(event) {
     document.querySelectorAll('.display').forEach(d => d.replaceChildren()); // убираем графики
     ChartVariables.clearCharts(); // сбрасываем значения текущих графиков
 
-    await fetchStatisticData();
+    try {
+        await fetchStatisticData();
+    } catch (error) {
+        await MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(-50px)');
+        return;
+    }
+    
+    ChartVariables.timeIntervalType = document.querySelector('.time-type-container select').value;
 
     switch (document.getElementById('structSelect').value) {
         case ChartParseData.ORDER: fillOrderChart(); break;
@@ -60,7 +67,7 @@ async function initAnalys(event) {
     MessageBox.RemoveAwait()
 }
 
-async function  fetchStatisticData() {
+async function fetchStatisticData() {
     const structSelect = document.getElementById('structSelect');
     const categorySelect = document.querySelector('.category-container select');
     const timeIntervalSelect = document.querySelector('.time-type-container select');
@@ -90,7 +97,7 @@ async function  fetchStatisticData() {
 
     const token = getToken();
 
-    MessageBox.ShowAwait()
+    //MessageBox.ShowAwait()
     try {
         const data = await ApiService.get(path, {
             'Authorization': `Bearer ${token}`
@@ -99,34 +106,40 @@ async function  fetchStatisticData() {
         ChartVariables.chartParseData = data; // запоминаем данные для парсинга
     } catch (error) {
         MessageBox.RemoveAwait();
-        await MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(-50px)');
-        return;
+        throw error;
     }
 }
 
 // БЛОК ФУНКЦИЙ, ЗАПОЛНЯЮЩИХ СТАТИСТИКУ
 function fillOrderChart() {
-    const parsedData = ChartParseData.parseOrderData(ChartVariables.chartParseData);
+    const parsedData = ChartParseData.parseOrderData(ChartVariables.chartParseData); // парсированные данные
     
     // Удобно отображать до <MAX_CHARTS_PER_CONTAINER> параметров в одном графике
     // Если параметров больше (<MAX_CHARTS_PER_CONTAINER> - 1), то надо сделать срез данных и разделить срезы по разным графикам
-    let slicedData = null; 
-    if (parsedData.data.length > ChartParseData.MAX_CHARTS_PER_CONTAINER - 1) {
-        
-        slicedData = { labels: [], data: [] };
+    let slicedData = null;
+    
+    // Если обрабатывается выборка по годам и число годов превышает ChartParseData.MAX_CHARTS_PER_CONTAINER
+    if (ChartVariables.timeIntervalType === ChartParseData.YEAR_PARSE_TYPE && parsedData.labels.length > ChartParseData.MAX_YEARS_PER_CHART) {
+        slicedData = { labels: [], datasets: [] };
 
-        // В случае, если обрабатываем кварталы, то все label'ы - номера кварталов
-        if (ChartVariables.chartParseData.type === ChartParseData.QUARTER_PARSE_TYPE) {
-            parsedData.labels.forEach(l => slicedData.labels.push(l));  
+        // Разбиение на пятерки годов
+        for (let i = 0; i < parsedData.labels.length; i += ChartParseData.MAX_YEARS_PER_CHART) {
+            const endIndex = Math.min(i + ChartParseData.MAX_YEARS_PER_CHART, parsedData.datasets.length);
+
+            slicedData.datasets.push(parsedData.datasets.slice(i, endIndex));
+            slicedData.labels.push(parsedData.labels.slice(i, endIndex));
         }
-        
+    } else if (ChartVariables.timeIntervalType === ChartParseData.QUARTER_PARSE_TYPE && parsedData.datasets.length > ChartParseData.MAX_CHARTS_PER_CONTAINER - 1) {
+        slicedData = { labels: [], datasets: [] };
+        parsedData.labels.forEach(l => slicedData.labels.push(l));  // В случае, если обрабатываем кварталы, то все label'ы - номера кварталов
+
         // Разбиение всех данных над подконтейнеры
-        for (let i = 0; i < parsedData.data.length; i += ChartParseData.MAX_CHARTS_PER_CONTAINER) {          
-            const endIndex = Math.min(i + ChartParseData.MAX_CHARTS_PER_CONTAINER, parsedData.data.length);
-            slicedData.data.push(parsedData.data.slice(i, endIndex));            
+        for (let i = 0; i < parsedData.datasets.length; i += ChartParseData.MAX_CHARTS_PER_CONTAINER) {          
+            const endIndex = Math.min(i + ChartParseData.MAX_CHARTS_PER_CONTAINER, parsedData.datasets.length);
+            slicedData.datasets.push(parsedData.datasets.slice(i, endIndex));            
         }
     }
-
+    
     const displayContainer = document.getElementById(ChartCreation._getDisplayClassID('order')); 
     displayContainer.innerHTML = ''; // Сбрасываем разметку контейнера со статистикой при создании
 
@@ -146,13 +159,41 @@ function fillOrderChart() {
         chartContainer.style.borderRadius = '8px';
         chartContainer.style.backgroundColor = 'white';
 
-        const canvas = ChartCreation.createHistogram('order', parsedData.labels, parsedData.data);
+        let canvas = null;
+        if (ChartVariables.timeIntervalType === ChartParseData.YEAR_PARSE_TYPE) {
+            const localData = { labels: [], datasets: [] };
+            for (let i = 0; i < parsedData.datasets.length; ++i) {
+                const currentChartDataSet = parsedData.datasets[i]; 
+                localData.labels.push(currentChartDataSet.label);
+
+                const data = [];
+                for (let j = 0; j < ChartParseData.MAX_YEARS_PER_CHART; j++) {
+                    if (i === j)
+                        data.push(currentChartDataSet.data[0]);
+                    else
+                        data.push(0);
+                }
+
+                const dataset = {
+                    label: currentChartDataSet.label,
+                    data: data,
+                    borderWidth: 2
+                };                    
+
+                localData.datasets.push(dataset);
+            }
+
+            canvas = ChartCreation.createHistogram('order', localData.labels, localData.datasets);
+        } else {
+            canvas = ChartCreation.createHistogram('order', parsedData.labels, parsedData.datasets);
+        }
+
         chartContainer.appendChild(canvas);
         rowContainer.appendChild(chartContainer);
         displayContainer.appendChild(rowContainer);        
     } else {        
         // Со срезом - несколько строк по 2 графика
-        for (let i = 0; i < slicedData.data.length; i++) {
+        for (let i = 0; i < slicedData.datasets.length; i++) {
             const pairNumber = Math.floor(ChartVariables.chartIDCounter / 2);
             
             // Создаем контейнер для двух графиков на данной строке
@@ -166,8 +207,31 @@ function fillOrderChart() {
             rowContainer.style.marginBottom = '20px';
             rowContainer.style.gap = '20px';
 
-            // Создаем графики для этой строки
-            slicedData.data[i].forEach((dataset) => {
+            if (ChartVariables.timeIntervalType === ChartParseData.YEAR_PARSE_TYPE) {
+                const localData = { labels: [], datasets: [] };
+                const currentChartDataSet = slicedData.datasets[i];
+
+
+                for (let i = 0; i < currentChartDataSet.length; ++i) {
+                    localData.labels.push(currentChartDataSet[i].label);
+
+                    const data = [];
+                    for (let j = 0; j < ChartParseData.MAX_YEARS_PER_CHART; j++) {
+                        if (i === j)
+                            data.push(currentChartDataSet[i].data);
+                        else
+                            data.push(0);
+                    }
+
+                    const dataset = {
+                        label: currentChartDataSet[i].label,
+                        data: data,
+                        borderWidth: 2
+                    };                    
+
+                    localData.datasets.push(dataset);
+                }
+
                 const chartContainer = document.createElement('div');
                 chartContainer.id = `$orderChartPairContainer_${pairNumber}`;
                 chartContainer.style.flex = '1';
@@ -180,11 +244,31 @@ function fillOrderChart() {
                 chartContainer.style.padding = '10px'; 
                 chartContainer.style.boxSizing = 'border-box';
 
-                const canvas = ChartCreation.createHistogram('order', slicedData.labels, [dataset]);
+                const canvas = ChartCreation.createHistogram('order', localData.labels, localData.datasets);
                 
                 chartContainer.appendChild(canvas);
                 rowContainer.appendChild(chartContainer);
-            });
+            } else {
+                // Создаем графики для этой строки
+                slicedData.datasets[i].forEach((dataset) => {
+                    const chartContainer = document.createElement('div');
+                    chartContainer.id = `$orderChartPairContainer_${pairNumber}`;
+                    chartContainer.style.flex = '1';
+                    chartContainer.style.minWidth = '45%';
+                    chartContainer.style.height = '500px';
+                    chartContainer.style.position = 'relative';
+                    chartContainer.style.backgroundColor = 'white';
+                    chartContainer.style.border = '1px solid #ddd';
+                    chartContainer.style.borderRadius = '8px';
+                    chartContainer.style.padding = '10px'; 
+                    chartContainer.style.boxSizing = 'border-box';
+
+                    const canvas = ChartCreation.createHistogram('order', slicedData.labels, [dataset]);
+                    
+                    chartContainer.appendChild(canvas);
+                    rowContainer.appendChild(chartContainer);
+                });
+            }
 
             displayContainer.appendChild(rowContainer);
         }
