@@ -50,7 +50,7 @@ async function initAnalys(event) {
     try {
         await fetchStatisticData();
     } catch (error) {
-        await MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(-50px)');
+        await MessageBox.ShowFromCenter(`Ошибка: ${error.data.message}`, 'red');
         return;
     }
     
@@ -76,10 +76,10 @@ async function fetchStatisticData() {
     const popularSelect = document.querySelector('.popular-container select');
 
     if (yearStartInput.value === '') {
-        MessageBox.ShowFromLeft('Укажите начальный год', 'red', false, '45', 'translateY(-50px)');
+        MessageBox.ShowFromCenter('Укажите начальный год', 'red');
         return;
     } else if (yearEndInput.value === '') {
-        MessageBox.ShowFromLeft('Укажите конечный год', 'red', false, '45', 'translateY(-50px)');
+        MessageBox.ShowFromCenter('Укажите конечный год', 'red');
         return;
     }
 

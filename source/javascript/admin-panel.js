@@ -123,7 +123,7 @@ async function showUserForm() {
             return;
         }
         
-        MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(40px)');
+        MessageBox.ShowFromCenter(`Ошибка: ${error.data.message}`, 'red');
         return;
     }
 }
@@ -154,7 +154,7 @@ async function addUser(event) {
     
     const formData = new FormData(event.target);
     if (formData.get('password') != formData.get('confirm-password')) {
-        MessageBox.ShowFromLeft('Пароли не совпадают', 'red', false, '40', 'translateY(50px)');
+        MessageBox.ShowFromCenter('Пароли не совпадают', 'red');
         return;
     }
 
@@ -183,7 +183,7 @@ async function addUser(event) {
         MessageBox.RemoveAwait()
 
         closeUserModal();
-        await MessageBox.ShowFromLeft('Пользователь успешно добавлен', 'green', false, '43', 'translateY(50px)');
+        await MessageBox.ShowFromCenter('Пользователь успешно добавлен', 'green');
         
         TableVariables.tableData.push(newUser);
 
@@ -197,7 +197,7 @@ async function addUser(event) {
             return;
         }
         
-        await MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(50px)');
+        await MessageBox.ShowFromCenter(`Ошибка: ${error.data.message}`);
         MessageBox.RemoveAwait();
         return;
     }
@@ -237,7 +237,7 @@ async function saveRole(event) {
         })
         
         closeRoleModal();
-        MessageBox.ShowFromLeft('Роль успешно добавлена', 'green', false, '45', 'translateY(50px)');
+        MessageBox.ShowFromCenter('Роль успешно добавлена', 'green');
         
         const newRole = await ApiService.get(`Role/${data.id}`, {
             'Authorization': `Bearer ${token}`
@@ -256,7 +256,7 @@ async function saveRole(event) {
             return;
         }
 
-        MessageBox.ShowFromLeft('Ошибка сохранения роли', 'red', false, '40', 'translateY(50px)');
+        MessageBox.ShowFromCenter('Ошибка сохранения роли', 'red');
     }
 }
 

@@ -2,7 +2,7 @@ import { switchTab } from "./admin-panel.js";
 import { getUserRights, UserRights } from "./cookie.js";
 import { getCurrentPageData } from "./database-general-service.js";
 import { clearSearch, displayTableData, hideTableInterface } from "./database-visuals.js";
-import { SectionName } from "./form-utils.js";
+import { MessageBox, SectionName } from "./form-utils.js";
 import { initStatisticsSection } from "./statistics.js";
 import { TableVariables } from "./table-utils.js";
 
@@ -41,11 +41,11 @@ async function showSection(sectionName = null, isLoadListener = false) {
 
         // Ограничение на переход в области для пользователя
         if ((userRights === UserRights.Basic || userRights === UserRights.Editor) && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
-            messageBoxShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
+            MessageBox.ShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
                 'red', true, rightPos, 'translateY(50px)');
             return;
         } else if (userRights === UserRights.Director && (sectionName === 'database' || sectionName === 'statstics' || sectionName === 'admin-panel')) {
-            messageBoxShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
+            MessageBox.ShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
                 'red', true, rightPos, 'translateY(50px)');
             return;
         }

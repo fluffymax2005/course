@@ -87,7 +87,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
                 return;
         } 
         
-        MessageBox.ShowFromLeft('Внутренняя ошибка', 'red', false, '43', 'translateY(50px)');
+        MessageBox.ShowFromCenter('Внутренняя ошибка', 'red');
         console.error(error);
         throw error;
     }
@@ -154,6 +154,7 @@ export function setupPagination(paginationID) {
 export function detectFieldType(fieldName, value) {
     if (fieldName.includes('Id')) return 'id'
     if (value === null || value === undefined) return 'text';
+    if (fieldName.includes('password')) return 'password';
     
     if (typeof value === 'boolean') return 'boolean';
     
@@ -241,7 +242,7 @@ export async function populateEditForm(record, tableName, action) {
 
             // В процессе создания компонентов произошла ошибка
             if (!input && !key.includes('can')) {
-                MessageBox.ShowFromLeft(`Внутренняя ошибка. Попробуйте позже`, 'red', false, '45', 'transformY(40px)');
+                MessageBox.ShowFromCenter(`Внутренняя ошибка. Попробуйте позже`, 'red');
                 console.error(key, record[key], tableName);
                 return;
             }
@@ -326,7 +327,7 @@ async function createNumberField(fieldName, value) {
                 return;
             } 
             
-            MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'trasformY(40px)');
+            MessageBox.ShowFromCenter(`Ошибка: ${error.data.message}`);
         }
     } else {
         component = document.createElement('input');

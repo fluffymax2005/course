@@ -31,6 +31,8 @@ export async function recordAction(event) {
     }
 
     let recordIndex = TableVariables.tableData.indexOf(localRecord); // индекс записи
+
+    let changePassword = false; // проверка, что меняем пароль
     
     // Копируем ВСЕ поля из исходной записи
     Object.keys(localRecord).forEach(key => {
@@ -54,7 +56,7 @@ export async function recordAction(event) {
         // Валидация для телефона только при подтверждении
         if (key === 'phoneNumber' && value) {
             if (!validatePhoneFormat(value)) {
-                messageBoxShow('Некорректный формат номера телефона. Используйте формат: +7XXXXXXXXXX', 'red', 0, 'translateY(50px)');
+                MessageBox.ShowFromCenter('Некорректный формат номера телефона. Используйте формат: +7XXXXXXXXXX', 'red');
                 return;
             }
             // Форматируем номер перед сохранением
@@ -63,10 +65,12 @@ export async function recordAction(event) {
         
         // Преобразуем типы данных и обновляем значение
         const fieldType = detectFieldType(key, localRecord[key]);
+        if (fieldType)
+            changePassword = true;
         try {
             body[key] = convertValueType(value, fieldType, key);
         } catch (error) {
-            MessageBox.ShowFromLeft(error.message, 'red', false, '40', 'translateY(50px)');
+            MessageBox.ShowFromCenter(error.message, 'red');
             return;
         }
         
@@ -122,9 +126,19 @@ export async function recordAction(event) {
 
                 break;
             case TableAction.Edit: {
-                data = await ApiService.put(`${apiTableName}/${TableVariables.record.id}`, body, {
-                    'Authorization': `Bearer ${token}`
-                });
+
+                let data = null;
+
+                // В случае, если меняем пароль 
+                if (changePassword) {
+                    data = await ApiService.put(`${apiTableName}/password/update`, body, {
+                        'Authorization': `Bearer ${token}`
+                    });
+                } else {
+                    data = await ApiService.put(`${apiTableName}/${TableVariables.record.id}`, body, {
+                        'Authorization': `Bearer ${token}`
+                    });
+                }
 
                 hash = data.hash;
 
@@ -198,26 +212,24 @@ export async function recordAction(event) {
 
         closeRecordModalForm();
 
-        MessageBox.ShowFromLeft('Операция успешна завершена', 'green', false, '40', 'translateY(50px)');
-    } catch (error) {
-        MessageBox.RemoveAwait();
-        
+        MessageBox.ShowFromCenter('Операция успешна завершена', 'green');
+    } catch (error) {       
         if ((action === TableAction.Edit || action === TableAction.Insert) && error.status === 400) {
-            MessageBox.ShowFromLeft(`${error.data.message}`, 'red', false, '40', 'translateY(50px)');
+            MessageBox.ShowFromCenter(`${error.data.message}`, 'red');
         } else if (error.status === 401) {
             deleteUserData();
             window.location.href = '../../authorize-form/authorize.html';
             return;
         }  else {
-            MessageBox.ShowFromLeft(`Ошибка: ${error.data.message}`, 'red', false, '40', 'translateY(50px)');
+            MessageBox.ShowFromCenter(`Ошибка: ${error.data.message}`, 'red');
         }
         
         
         console.error(error);
         return;
+    } finally {
+        MessageBox.RemoveAwait();
     }
-
-    MessageBox.RemoveAwait();
 }
 
 // Функция редактирования записи
@@ -263,10 +275,10 @@ function searchById() {
     const searchId = parseInt(searchInput.value);
     
     if (!TableVariables.tableData) {
-        MessageBox.ShowFromLeft('Выберите таблицу для поиска', 'red', false, '36', 'transformY(50px)');
+        MessageBox.ShowFromCenter('Выберите таблицу для поиска', 'red');
         return;
     } else if (searchId < 0) {
-        MessageBox.ShowFromLeft('Введите корректный ID', 'red', false, '36', 'transformY(50px)');
+        MessageBox.ShowFromCenter('Введите корректный ID');
         return;
     }
     
@@ -280,7 +292,7 @@ function searchById() {
         displaySearchResults([foundRecords]);
         showSearchInfo();
     } else {
-        MessageBox.ShowFromLeft(`Искомая(-ые) сущность(-и) не найдена(-ы)`, 'red', false, '40', 'transformY(50px)');
+        MessageBox.ShowFromCenter(`Искомая(-ые) сущность(-и) не найдена(-ы)`, 'red');
         return;
     }
     
