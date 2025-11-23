@@ -6,7 +6,6 @@ export class AuthService {
     static API_BASE_URL = 'http://localhost:5091/api/Credential';
 
     static async login() {
-        MessageBox.ShowAwait();
         
         const loginInput = document.getElementById('loginAuthorize');
         const passwordInput = document.getElementById('passwordAuthorize');
@@ -24,6 +23,7 @@ export class AuthService {
             return;
         }
 
+        MessageBox.ShowAwait();
         try {
             const response = await fetch(`${this.API_BASE_URL}/login`, {
                 method: 'POST',

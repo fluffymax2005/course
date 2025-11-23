@@ -76,11 +76,12 @@
                     </div>
                     <div class="password-group">
                         <label for="password" class="input-label">Пароль</label>
-                        <input type = "password"
+                        <input type="password"
                             id="passwordRegister"
                             class="input-box"
                             placeholder="Введите пароль"
-                            required>
+                            required
+                            onfocus="registerShowGeneratePassword()">
                     </div>
                     <div class="password-confirm-group">
                         <label for="password" class="input-label">Подтверждение пароля</label>
