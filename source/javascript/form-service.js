@@ -3,6 +3,7 @@ import {ApiService} from './api.js';
 import { isFieldRequired, getMinValue, getMaxValue, TableModifying } from './table-service.js';
 import { DATA_PER_PAGE, dbCache, fieldNameMapping, TableAction, TableGETSpecial, TableVariables } from './table-utils.js';
 import { InputWithTips, MessageBox, TableFormConfirmButton } from './form-utils.js';
+import { registerShowGeneratePassword } from './admin-panel.js';
 
 window.showAddRecordForm = showAddRecordForm;
 
@@ -270,6 +271,8 @@ async function createFormField(fieldName, value, tableName) {
             return createPhoneField(fieldName, value);
         case 'id':
             return createIdField(fieldName, value);
+        case 'password':
+            return createPasswordField(fieldName, value);
         default:
             return createTextField(fieldName, value, tableName);
     }
@@ -289,6 +292,40 @@ function createTextField(fieldName, value, tableName) {
         input.pattern = '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$';
         input.title = 'Введите корректный email адрес';
     }
+    
+    return input;
+}
+
+// Создание различных типов полей
+function createPasswordField(fieldName, value, tableName) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.id = `edit_${fieldName}`;
+    input.name = fieldName;
+    input.value = value || '';
+    input.required = isFieldRequired(fieldName, tableName);
+
+    
+    input.addEventListener('blur', function() {
+        setTimeout(() => {
+            const tipContainer = document.getElementById('generate-password-form');
+            if (tipContainer) {
+                tipContainer.classList.remove('active');
+            }
+        }, 200);
+    });
+    
+    input.addEventListener('focus', function() {
+        const tipContainer = document.getElementById('generate-password-form');
+        if (!tipContainer) {
+             registerShowGeneratePassword();
+        } else {
+            tipContainer.classList.add('active');
+        }
+       
+    });
+
+
     
     return input;
 }

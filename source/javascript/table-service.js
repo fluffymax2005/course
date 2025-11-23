@@ -65,7 +65,7 @@ export async function recordAction(event) {
         
         // Преобразуем типы данных и обновляем значение
         const fieldType = detectFieldType(key, localRecord[key]);
-        if (fieldType)
+        if (fieldType === 'password')
             changePassword = true;
         try {
             body[key] = convertValueType(value, fieldType, key);
