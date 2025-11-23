@@ -3,13 +3,16 @@ import { searchInputChange, updateSearchResults } from "./database-visuals.js";
 import { DATA_PER_PAGE, TableVariables } from "./table-utils.js";
 
 export function checkDatabaseAccess() {
-    const userRights = getUserRights(); // Функция должна быть реализована
+    const userRights = getUserRights();
     const actionButtons = document.getElementById('dbActionButtons');
     
     switch (userRights) {
         case UserRights.Basic:
         case UserRights.Director:
             actionButtons.style.display = 'none';
+            for (const e of document.getElementsByClassName('search-controls')) {
+                e.style.display = 'flex';
+            }
             break;
         default:
             actionButtons.style.display = 'flex';
