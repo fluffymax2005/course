@@ -271,6 +271,57 @@
                     <!-- Диаграммы будут динамически заполнены через Js -->
                 </div>
             </div>
+
+            <div class="vehicle struct" id="vehicleStruct">
+                <form class="vehicle dashboard" onsubmit="initAnalys(event)">
+                    <div class="specific-board">
+                        <div class="category-container">
+                            <label>Категория</label>
+                            <select id="order-select-category">
+                                <option value="top-popular">Популярность</option>
+                            </select>
+                        </div>
+
+                        <div class="popular-container">
+                            <label>Значение сортировки</label>
+                            <select id="vehicle-select-popularity">
+                                <option value="true">Наиболее популярные</option>
+                                <option value="false">Наименее популярные</option>
+                            </select>
+                        </div>
+                    </div>
+                
+                    <div class="time-interval-container">
+                        <div class="header-container">
+                            <label class="dashboard-header">Временной интервал</label>
+                        </div>
+
+                        <div class="time-type-container">
+                            <label class="time-type-label">Выборка по:</label>
+                            <select class="vehicle-select time-type">
+                                <option value="quarter">Кварталам</option>
+                                <option value="year">Годам</option>
+                            </select>
+                        </div>
+
+                        <div class="year-start-container">
+                            <label class="year-start">Начальный год</label>
+                            <input id="vehicle-input-year-start" min="0" type="number"></input>
+                        </div>
+                        
+                        <div class="year-end-container">
+                            <label class="year-end">Конечный год</label>
+                            <input id="vehicle-input-year-end" min="0" type="number"></input>
+                        </div>
+
+                        <button class="calc-button" type="submit">Анализ</button>
+                    </div>
+                </form>
+
+                <div class="vehicle display" id="vehicleDisplay">
+                    <!-- Диаграммы будут динамически заполнены через Js -->
+                </div>
+            </div>
         </div>
     </div>
         

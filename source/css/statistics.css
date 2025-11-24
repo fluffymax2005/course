@@ -78,6 +78,7 @@
     align-self: flex-start;
     height: auto;
     border-radius: 12px;
+    max-width: 20%;
 }
 
 .category-container {
@@ -203,5 +204,20 @@
 #statisticsSectionHeader {
     background: #E0F3FE;
     color: black;
+}
+
+.popular-container select {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+}
+
+.popular-container label {
+    margin-bottom: 5px;
 }
 

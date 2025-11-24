@@ -47,12 +47,17 @@ async function initAnalys(event) {
     document.querySelectorAll('.display').forEach(d => d.replaceChildren()); // убираем графики
     ChartVariables.clearCharts(); // сбрасываем значения текущих графиков
 
+    let isFetchSuccess = false;
+
     try {
-        await fetchStatisticData();
+        isFetchSuccess = await fetchStatisticData();
     } catch (error) {
         await MessageBox.ShowFromCenter(`Ошибка: ${error.data.message}`, 'red');
         return;
     }
+
+    if (!isFetchSuccess)
+        return;
     
     ChartVariables.timeIntervalType = document.querySelector('.time-type-container select').value;
 
@@ -77,10 +82,10 @@ async function fetchStatisticData() {
 
     if (yearStartInput.value === '') {
         MessageBox.ShowFromCenter('Укажите начальный год', 'red');
-        return;
+        return false;
     } else if (yearEndInput.value === '') {
         MessageBox.ShowFromCenter('Укажите конечный год', 'red');
-        return;
+        return false;
     }
 
     // Локальный путь доступа к БД
@@ -108,6 +113,8 @@ async function fetchStatisticData() {
         MessageBox.RemoveAwait();
         throw error;
     }
+
+    return true;
 }
 
 // БЛОК ФУНКЦИЙ, ЗАПОЛНЯЮЩИХ СТАТИСТИКУ
