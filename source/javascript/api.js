@@ -80,7 +80,7 @@ export class ApiService {
         let url = 
         `Statistics/${structValue}/${categoryValue}/${timeIntervalParam}?yearStart=${yearStartValue}&yearEnd=${yearEndValue}`;
         if (boolParam)
-            url += `&${boolParam}=${boolValue}`;
+            url += `&isPopular=${boolValue}`;
         return url;       
     }
 }
