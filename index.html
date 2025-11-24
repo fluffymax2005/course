@@ -298,19 +298,20 @@
 
                         <div class="time-type-container">
                             <label class="time-type-label">Выборка по:</label>
-                            <select class="vehicle-select time-type">
+                            <select class="vehicle-select time-type" id="vehicleSelect" onchange="vehicleChange()">
                                 <option value="quarter">Кварталам</option>
                                 <option value="year">Годам</option>
                             </select>
                         </div>
 
-                        <div class="year-start-container">
+                        
+                        <div class="year-start-container" id="vehicleYearStart">
                             <label class="year-start">Начальный год</label>
                             <input id="vehicle-input-year-start" min="0" type="number"></input>
                         </div>
                         
-                        <div class="year-end-container">
-                            <label class="year-end">Конечный год</label>
+                        <div class="year-end-container" id="vehicleYearEnd">
+                            <label class="year-end">Год</label>
                             <input id="vehicle-input-year-end" min="0" type="number"></input>
                         </div>
 

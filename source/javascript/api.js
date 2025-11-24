@@ -86,7 +86,7 @@ export class ApiService {
 }
 
 // Внутренний класс (не экспортируется)
-class ApiError extends Error {
+export class ApiError extends Error {
     constructor(message, status, data, originalError = null) {
         super(message);
         this.name = 'ApiError';

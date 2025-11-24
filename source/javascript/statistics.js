@@ -1,10 +1,11 @@
-import { ApiService } from "./api.js";
+import { ApiError, ApiService } from "./api.js";
 import { ChartCreation, ChartParseData, ChartVariables } from "./statistics-utils.js";
 import {MessageBox} from "./form-utils.js";
 import { getToken } from "./cookie.js";
 
 window.displayStruct = displayStruct;
 window.initAnalys = initAnalys;
+window.vehicleChange = vehicleChange;
 
 // Инициализация при переходе в данную секцию
 export function initStatisticsSection() {
@@ -39,6 +40,14 @@ function displayStruct() {
         // Активируем нужную
         document.getElementById(`${text}Struct`).classList.add('active');
     }
+
+    const yearStartContainer = document.getElementById('vehicleYearStart');
+    if (yearStartContainer) {
+        const yearStartLabel = yearStartContainer.querySelector('.year-start');
+        yearStartContainer.style.display = 'none';
+        yearStartLabel.textContent = 'Начальный год';
+    }
+    
 }
 
 async function initAnalys(event) {
@@ -52,7 +61,8 @@ async function initAnalys(event) {
     try {
         isFetchSuccess = await fetchStatisticData();
     } catch (error) {
-        await MessageBox.ShowFromCenter(`Ошибка: ${error.data.message}`, 'red');
+        if (error instanceof ApiError)
+            await MessageBox.ShowFromCenter(`Ошибка: ${error.data.message}`, 'red');
         return;
     }
 
@@ -74,18 +84,59 @@ async function initAnalys(event) {
 
 async function fetchStatisticData() {
     const structSelect = document.getElementById('structSelect');
-    const categorySelect = document.querySelector('.category-container select');
-    const timeIntervalSelect = document.querySelector('.time-type-container select');
-    const yearStartInput = document.querySelector('.year-start-container input');
-    const yearEndInput = document.querySelector('.year-end-container input');
-    const popularSelect = document.querySelector('.popular-container select');
 
-    if (yearStartInput.value === '') {
-        MessageBox.ShowFromCenter('Укажите начальный год', 'red');
-        return false;
-    } else if (yearEndInput.value === '') {
-        MessageBox.ShowFromCenter('Укажите конечный год', 'red');
-        return false;
+    const activeStruct = document.querySelector('.struct.active');
+
+    const categorySelect = activeStruct.querySelector('.category-container select');
+    const timeIntervalSelect = activeStruct.querySelector('.time-type-container select');
+    const yearStartInput = activeStruct.querySelector('.year-start-container input');
+    const yearEndInput = activeStruct.querySelector('.year-end-container input');
+    const popularSelect = activeStruct.querySelector('.popular-container select');
+
+    if (activeStruct.id.includes('order')) {
+        if (yearStartInput.value === '') {
+            await MessageBox.ShowFromCenter('Укажите начальный год', 'red');
+            return false;
+        } else if (yearEndInput.value === '') {
+            await MessageBox.ShowFromCenter('Укажите конечный год', 'red');
+            return false;
+        }
+    } else if (activeStruct.id.includes('vehicle')) {       
+        const timeIntervalType = timeIntervalSelect.value;
+        
+        if (timeIntervalType === ChartParseData.QUARTER_PARSE_TYPE) {
+            // Режим кварталов - проверяем только год
+            if (yearEndInput.value === '') {
+                await MessageBox.ShowFromCenter('Укажите год для анализа кварталов', 'red');
+                return false;
+            }
+        } else if (timeIntervalType === ChartParseData.YEAR_PARSE_TYPE) {
+            // Режим годов - проверяем оба поля
+            if (yearStartInput.value === '') {
+                await MessageBox.ShowFromCenter('Укажите начальный год', 'red');
+                return false;
+            } else if (yearEndInput.value === '') {
+                await MessageBox.ShowFromCenter('Укажите конечный год', 'red');
+                return false;
+            }
+            
+            // Дополнительная проверка: начальный год не должен быть больше конечного
+            const startYear = parseInt(yearStartInput.value);
+            const endYear = parseInt(yearEndInput.value);
+            if (startYear > endYear) {
+                await MessageBox.ShowFromCenter('Начальный год не может быть больше конечного года', 'red');
+                return false;
+            }
+        }
+    }
+
+    let yearStartValue = 0, yearEndValue = 0;
+    if (activeStruct.id.includes('order')) {
+        yearStartValue = yearStartInput.value;
+        yearEndValue = yearEndInput.value;
+    } else if (activeStruct.id.includes('vehicle')) {
+        yearStartValue = timeIntervalSelect.value === ChartParseData.QUARTER_PARSE_TYPE ? yearEndInput.value : yearStartInput.value;
+        yearEndValue = yearEndInput.value;
     }
 
     // Локальный путь доступа к БД
@@ -93,10 +144,10 @@ async function fetchStatisticData() {
         structSelect.value,
         categorySelect.value,
         timeIntervalSelect.value,
-        yearStartInput.value,
-        yearEndInput.value,
+        yearStartValue,
+        yearEndValue,
         popularSelect ? popularSelect.value : null,
-        popularSelect ? popularSelect.text === 'Да' ? 'true' : 'false' : null
+        popularSelect ? popularSelect.value : null
     );
     console.log(path);
 
@@ -115,6 +166,28 @@ async function fetchStatisticData() {
     }
 
     return true;
+}
+
+function vehicleChange() {
+    const select = document.getElementById('vehicleSelect');
+    const value = select.value;
+ 
+    const yearStartContainer = document.getElementById('vehicleYearStart');
+    const yearEndContainer = document.getElementById('vehicleYearEnd');
+    const yearStartLabel = yearStartContainer.querySelector('.year-start');
+    const yearEndLabel = yearEndContainer.querySelector('.year-end');
+    switch (value) {
+        case ChartParseData.QUARTER_PARSE_TYPE:
+            yearStartContainer.style.display = 'none';
+            yearStartLabel.textContent = 'Год';
+            ChartVariables.timeIntervalType = ChartParseData.QUARTER_PARSE_TYPE;
+            break;
+        case ChartParseData.YEAR_PARSE_TYPE:
+            yearStartContainer.style.display = 'flex';
+            yearStartLabel.textContent = 'Начальный год';
+            yearEndLabel.textContent = 'Конечный год';
+            ChartVariables.timeIntervalType = ChartParseData.YEAR_PARSE_TYPE;
+    }
 }
 
 // БЛОК ФУНКЦИЙ, ЗАПОЛНЯЮЩИХ СТАТИСТИКУ
@@ -206,7 +279,7 @@ function fillOrderChart() {
             // Создаем контейнер для двух графиков на данной строке
             let rowContainer = null;
             rowContainer = document.createElement('div');
-            rowContainer.id = `$orderPairContainer_${pairNumber}`;
+            rowContainer.id = `orderPairContainer_${pairNumber}`;
             rowContainer.style.width = '100%';
             rowContainer.style.display = 'flex';
             rowContainer.style.flexWrap = 'wrap';
@@ -240,7 +313,7 @@ function fillOrderChart() {
                 }
 
                 const chartContainer = document.createElement('div');
-                chartContainer.id = `$orderChartPairContainer_${pairNumber}`;
+                chartContainer.id = `orderChartPairContainer_${pairNumber}`;
                 chartContainer.style.flex = '1';
                 chartContainer.style.minWidth = '45%';
                 chartContainer.style.height = '500px';
@@ -259,7 +332,7 @@ function fillOrderChart() {
                 // Создаем графики для этой строки
                 slicedData.datasets[i].forEach((dataset) => {
                     const chartContainer = document.createElement('div');
-                    chartContainer.id = `$orderChartPairContainer_${pairNumber}`;
+                    chartContainer.id = `orderChartPairContainer_${pairNumber}`;
                     chartContainer.style.flex = '1';
                     chartContainer.style.minWidth = '45%';
                     chartContainer.style.height = '500px';
@@ -275,6 +348,148 @@ function fillOrderChart() {
                     chartContainer.appendChild(canvas);
                     rowContainer.appendChild(chartContainer);
                 });
+            }
+
+            displayContainer.appendChild(rowContainer);
+        }
+    }
+}
+
+function fillVehicleChart() {
+    const parsedData = ChartParseData.parseVehicleData(ChartVariables.chartParseData);
+    if (!parsedData) return;
+
+    const displayContainer = document.getElementById(ChartCreation._getDisplayClassID('vehicle')); 
+    displayContainer.innerHTML = '';
+    displayContainer.style.display = 'flex';
+    displayContainer.style.flexDirection = 'column';
+
+    if (parsedData.datasets.length === 0) return;
+
+    // Определяем логику разбивки в зависимости от типа временного интервала
+    let slicedData = null;
+    
+    if (ChartVariables.timeIntervalType === ChartParseData.YEAR_PARSE_TYPE && 
+        parsedData.labels.length > ChartParseData.MAX_YEARS_PER_CHART) {
+        
+        slicedData = { labels: [], datasets: [] };
+        
+        // Разбиваем годы на группы по MAX_YEARS_PER_CHART
+        for (let i = 0; i < parsedData.labels.length; i += ChartParseData.MAX_YEARS_PER_CHART) {
+            const endIndex = Math.min(i + ChartParseData.MAX_YEARS_PER_CHART, parsedData.labels.length);
+            
+            // Создаем срез labels
+            const slicedLabels = parsedData.labels.slice(i, endIndex);
+            
+            // Создаем срез datasets для этих годов
+            const slicedDatasets = parsedData.datasets.map(dataset => {
+                return {
+                    label: dataset.label,
+                    data: dataset.data.slice(i, endIndex),
+                    borderWidth: dataset.borderWidth
+                };
+            });
+            
+            slicedData.labels.push(slicedLabels);
+            slicedData.datasets.push(slicedDatasets);
+        }
+    }
+
+    // Если разбивка не требуется (все годы помещаются в один график)
+    if (!slicedData) {
+        const rowContainer = document.createElement('div');
+        rowContainer.style.width = '100%';
+        rowContainer.style.display = 'flex';
+        rowContainer.style.flexDirection = 'column';
+        rowContainer.style.marginBottom = '20px';
+
+        const chartContainer = document.createElement('div');
+        chartContainer.style.width = '100%';
+        chartContainer.style.height = '500px';
+        chartContainer.style.position = 'relative';
+        chartContainer.style.padding = '10px';
+        chartContainer.style.boxSizing = 'border-box'; 
+        chartContainer.style.borderRadius = '8px';
+        chartContainer.style.backgroundColor = 'white';
+
+        const canvas = ChartCreation.createHistogram('vehicle', parsedData.labels, parsedData.datasets);
+        
+        chartContainer.appendChild(canvas);
+        rowContainer.appendChild(chartContainer);
+
+        // Добавляем подпись с диапазоном лет для годовой статистики
+        if (ChartVariables.timeIntervalType === ChartParseData.YEAR_PARSE_TYPE) {
+            const yearLabel = document.createElement('div');
+            yearLabel.style.textAlign = 'center';
+            yearLabel.style.marginTop = '10px';
+            yearLabel.style.fontSize = '16px';
+            yearLabel.style.fontWeight = 'bold';
+            yearLabel.style.color = '#333';
+            
+            if (parsedData.labels.length > 0) {
+                const years = parsedData.labels;
+                if (years.length === 1) {
+                    yearLabel.textContent = `Год: ${years[0]}`;
+                } else {
+                    yearLabel.textContent = `Годы: ${years[0]} - ${years[years.length - 1]}`;
+                }
+                rowContainer.appendChild(yearLabel);
+            }
+        }
+
+        displayContainer.appendChild(rowContainer);
+    } else {
+        // Со срезом - создаем строки с максимум 2 графиками
+        for (let i = 0; i < slicedData.labels.length; i++) {
+            const rowContainer = document.createElement('div');
+            rowContainer.id = `vehicleRowContainer_${i}`;
+            rowContainer.style.width = '100%';
+            rowContainer.style.display = 'flex';
+            rowContainer.style.flexWrap = 'wrap';
+            rowContainer.style.justifyContent = 'space-between';
+            rowContainer.style.marginBottom = '20px';
+            rowContainer.style.gap = '20px';
+
+            // Создаем график для текущей группы годов
+            const currentLabels = slicedData.labels[i];
+            const currentDatasets = slicedData.datasets[i];
+            
+            const chartContainer = document.createElement('div');
+            chartContainer.id = `vehicleChart_${i}`;
+            chartContainer.style.flex = '1';
+            chartContainer.style.minWidth = '45%';
+            chartContainer.style.height = '500px';
+            chartContainer.style.position = 'relative';
+            chartContainer.style.backgroundColor = 'white';
+            chartContainer.style.border = '1px solid #ddd';
+            chartContainer.style.borderRadius = '8px';
+            chartContainer.style.padding = '10px'; 
+            chartContainer.style.boxSizing = 'border-box';
+
+            // Добавляем подзаголовок с диапазоном лет
+            const chartInfo = document.createElement('div');
+            chartInfo.style.textAlign = 'center';
+            chartInfo.style.marginBottom = '10px';
+            chartInfo.style.fontSize = '14px';
+            chartInfo.style.fontWeight = '600';
+            
+            if (currentLabels.length === 1) {
+                chartInfo.textContent = `Год: ${currentLabels[0]}`;
+            } else {
+                chartInfo.textContent = `Годы: ${currentLabels[0]} - ${currentLabels[currentLabels.length - 1]}`;
+            }
+            chartContainer.appendChild(chartInfo);
+
+            const canvas = ChartCreation.createHistogram('vehicle', currentLabels, currentDatasets);
+            
+            chartContainer.appendChild(canvas);
+            rowContainer.appendChild(chartContainer);
+
+            // Если в строке только один график, делаем его шире
+            if (slicedData.labels.length === 1 || (i === slicedData.labels.length - 1 && slicedData.labels.length % 2 === 1)) {
+                const singleChart = rowContainer.querySelector('div');
+                singleChart.style.minWidth = '70%';
+                singleChart.style.margin = '0 auto';
             }
 
             displayContainer.appendChild(rowContainer);
