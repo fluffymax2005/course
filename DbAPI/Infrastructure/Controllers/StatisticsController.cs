@@ -353,6 +353,7 @@ namespace DbAPI.Infrastructure.Controllers {
                 return Ok(new {
                     period = $"{yearStart}-{yearEnd}",
                     drivers = driverStats,
+                    type = "year"
                 });
 
             } catch (Exception ex) {
@@ -422,6 +423,7 @@ namespace DbAPI.Infrastructure.Controllers {
                 return Ok(new {
                     period = $"{yearStart}-{yearEnd}",
                     drivers = driverStats,
+                    type = "year"
                 });
 
             } catch (Exception ex) {
@@ -508,7 +510,8 @@ namespace DbAPI.Infrastructure.Controllers {
 
                 return Ok(new {
                     period = $"{yearStart}-{yearEnd}",
-                    distribution = rateDistributionByQuarter
+                    distribution = rateDistributionByQuarter,
+                    type = "quarter"
                 });
 
             } catch (Exception ex) {
@@ -587,7 +590,8 @@ namespace DbAPI.Infrastructure.Controllers {
 
                 return Ok(new {
                     period = $"{yearStart}-{yearEnd}",
-                    distribution = rateDistributionByYear
+                    distribution = rateDistributionByYear,
+                    type = "year"
                 });
 
             } catch (Exception ex) {
