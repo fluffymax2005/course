@@ -537,9 +537,9 @@ function fillDriverChart() {
     const yearEnd = activeStruct.querySelector('.year-end-container input').value;
 
     if (ChartVariables.categoryStatistics === ChartVariables.PROFIT) {
-        chartTitle.textContent = `Топ водителей по общему доходу за период ${yearStart}-${yearEnd} гг.`;
+        chartTitle.textContent = `Топ водителей по совокупному доходу за период ${yearStart}-${yearEnd} гг.`;
     } else if (ChartVariables.categoryStatistics === ChartVariables.ORDERS_COUNT) {
-        chartTitle.textContent = `Топ водителей по количеству заказов за период ${yearStart}-${yearEnd} гг.`;
+        chartTitle.textContent = `Топ водителей по совокупному количеству заказов за период ${yearStart}-${yearEnd} гг.`;
     }
     
     chartContainer.appendChild(chartTitle);
