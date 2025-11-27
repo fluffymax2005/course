@@ -29,7 +29,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
             setTableHash(tableName, encodeURIComponent(data.hash));
             isGoingToFetch = true;
         } catch (error) {
-            messageBoxShowFromRight(`Ошибка: ${error.message}`, 'red', false, 0, 'translateY(50px)');
+            MessageBox.ShowFromCenter(`Ошибка: ${error.message}`, 'red');
             throw error;
         }
     } else { // Данные есть, но не ясно, свежие ли?
@@ -50,7 +50,7 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
                 return;
             }   
             
-            messageBoxShowFromRight(`Ошибка: ${error.message}`, 'red', false, 0, 'translateY(50px)');
+            MessageBox.ShowFromCenter(`Ошибка: ${error.message}`, 'red');
             throw error;
         }
     }

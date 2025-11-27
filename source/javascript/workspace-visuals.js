@@ -41,12 +41,12 @@ async function showSection(sectionName = null, isLoadListener = false) {
 
         // Ограничение на переход в области для пользователя
         if ((userRights === UserRights.Basic || userRights === UserRights.Editor) && (sectionName === 'statistics' || sectionName === 'admin-panel')) {
-            MessageBox.ShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
-                'red', true, rightPos, 'translateY(50px)');
+            MessageBox.ShowFromCenter('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
+                'red');
             return;
         } else if (userRights === UserRights.Director && (sectionName === 'database' || sectionName === 'statstics' || sectionName === 'admin-panel')) {
             MessageBox.ShowFromLeft('У вашего аккаунта отсутствуют права на переход в выбранную секцию. Для разрешения проблемы обратитесь к системному администратору',
-                'red', true, rightPos, 'translateY(50px)');
+                'red');
             return;
         }
     }
