@@ -93,7 +93,7 @@ async function fetchStatisticData() {
     const yearEndInput = activeStruct.querySelector('.year-end-container input');
     const popularSelect = activeStruct.querySelector('.popular-container select');
 
-    if (activeStruct.id.includes('order') || activeStruct.id.includes('driver')) {
+    if (activeStruct.id.includes('order') || activeStruct.id.includes('driver') || activeStruct.id.includes('rate')) {
         if (yearStartInput.value === '') {
             await MessageBox.ShowFromCenter('Укажите начальный год', 'red');
             return false;
@@ -131,7 +131,7 @@ async function fetchStatisticData() {
     }
 
     let yearStartValue = 0, yearEndValue = 0;
-    if (activeStruct.id.includes('order') || activeStruct.id.includes('driver')) {
+    if (activeStruct.id.includes('order') || activeStruct.id.includes('driver') || activeStruct.id.includes('rate')) {
         yearStartValue = yearStartInput.value;
         yearEndValue = yearEndInput.value;
     } else if (activeStruct.id.includes('vehicle')) {
@@ -550,4 +550,162 @@ function fillDriverChart() {
     chartContainer.appendChild(canvas);
     rowContainer.appendChild(chartContainer);
     displayContainer.appendChild(rowContainer);
+}
+
+function fillRateChart() {
+    const parsedData = ChartParseData.parseRateData(ChartVariables.chartParseData);
+    if (!parsedData) return;
+
+    const displayContainer = document.getElementById(ChartCreation._getDisplayClassID('rate')); 
+    displayContainer.innerHTML = '';
+    displayContainer.style.display = 'flex';
+    displayContainer.style.flexDirection = 'column';
+
+    // Проверяем тип данных, а не временной интервал
+    if (parsedData.type === 'year') {
+        fillRateYearCharts(parsedData);
+    } else if (parsedData.type === 'quarter') {
+        fillRateQuarterCharts(parsedData);
+    }
+}
+
+function fillRateYearCharts(parsedData) {
+    const displayContainer = document.getElementById(ChartCreation._getDisplayClassID('rate'));
+    
+    if (!parsedData.periods || parsedData.periods.length === 0) {
+        console.log('No periods data for rate year charts');
+        return;
+    }
+
+    console.log('Creating rate year charts with periods:', parsedData.periods);
+
+    // Разбиваем на группы по 2 графика в строке
+    for (let i = 0; i < parsedData.periods.length; i += ChartParseData.MAX_CHARTS_PER_CONTAINER) {
+        const rowContainer = document.createElement('div');
+        rowContainer.style.width = '100%';
+        rowContainer.style.display = 'flex';
+        rowContainer.style.flexWrap = 'wrap';
+        rowContainer.style.justifyContent = 'space-between';
+        rowContainer.style.marginBottom = '20px';
+        rowContainer.style.gap = '20px';
+
+        const endIndex = Math.min(i + ChartParseData.MAX_CHARTS_PER_CONTAINER, parsedData.periods.length);
+        
+        for (let j = i; j < endIndex; j++) {
+            const periodData = parsedData.periods[j];
+            
+            console.log(`Creating chart for year ${periodData.year} with data:`, periodData);
+
+            const chartContainer = document.createElement('div');
+            chartContainer.style.flex = '1';
+            chartContainer.style.minWidth = '45%';
+            chartContainer.style.height = '500px';
+            chartContainer.style.position = 'relative';
+            chartContainer.style.backgroundColor = 'white';
+            chartContainer.style.border = '1px solid #ddd';
+            chartContainer.style.borderRadius = '8px';
+            chartContainer.style.padding = '10px';
+            chartContainer.style.boxSizing = 'border-box';
+            chartContainer.style.display = 'flex';
+            chartContainer.style.flexDirection = 'column';
+
+            // Добавляем заголовок с годом
+            const yearTitle = document.createElement('div');
+            yearTitle.style.textAlign = 'center';
+            yearTitle.style.marginBottom = '10px';
+            yearTitle.style.fontSize = '18px';
+            yearTitle.style.fontWeight = 'bold';
+            yearTitle.style.color = '#333';
+            yearTitle.textContent = `Распределение тарифов за ${periodData.year} год`;
+            chartContainer.appendChild(yearTitle);
+
+            // Создаем контейнер для диаграммы
+            const chartInnerContainer = document.createElement('div');
+            chartInnerContainer.style.flex = '1';
+            chartInnerContainer.style.position = 'relative';
+            
+            // Используем готовый метод createDonut для круговой диаграммы
+            const canvas = ChartCreation.createDonut('rate', periodData.labels, periodData.datasets);
+            chartInnerContainer.appendChild(canvas);
+            chartContainer.appendChild(chartInnerContainer);
+
+            rowContainer.appendChild(chartContainer);
+        }
+
+        // Если в последней строке один график, центрируем его
+        if (rowContainer.children.length === 1) {
+            const singleChart = rowContainer.querySelector('div');
+            singleChart.style.minWidth = '70%';
+            singleChart.style.margin = '0 auto';
+        }
+
+        displayContainer.appendChild(rowContainer);
+    }
+}
+
+function fillRateQuarterCharts(parsedData) {
+    const displayContainer = document.getElementById(ChartCreation._getDisplayClassID('rate'));
+
+    if (!parsedData.periods || parsedData.periods.length === 0) return;
+
+    // Разбиваем на группы по 2 графика в строке
+    for (let i = 0; i < parsedData.periods.length; i += ChartParseData.MAX_CHARTS_PER_CONTAINER) {
+        const rowContainer = document.createElement('div');
+        rowContainer.style.width = '100%';
+        rowContainer.style.display = 'flex';
+        rowContainer.style.flexWrap = 'wrap';
+        rowContainer.style.justifyContent = 'space-between';
+        rowContainer.style.marginBottom = '20px';
+        rowContainer.style.gap = '20px';
+
+        const endIndex = Math.min(i + ChartParseData.MAX_CHARTS_PER_CONTAINER, parsedData.periods.length);
+        
+        for (let j = i; j < endIndex; j++) {
+            const periodData = parsedData.periods[j];
+            
+            const chartContainer = document.createElement('div');
+            chartContainer.style.flex = '1';
+            chartContainer.style.minWidth = '45%';
+            chartContainer.style.height = '500px';
+            chartContainer.style.position = 'relative';
+            chartContainer.style.backgroundColor = 'white';
+            chartContainer.style.border = '1px solid #ddd';
+            chartContainer.style.borderRadius = '8px';
+            chartContainer.style.padding = '10px';
+            chartContainer.style.boxSizing = 'border-box';
+            chartContainer.style.display = 'flex';
+            chartContainer.style.flexDirection = 'column';
+
+            // Добавляем заголовок с годом
+            const yearTitle = document.createElement('div');
+            yearTitle.style.textAlign = 'center';
+            yearTitle.style.marginBottom = '10px';
+            yearTitle.style.fontSize = '18px';
+            yearTitle.style.fontWeight = 'bold';
+            yearTitle.style.color = '#333';
+            yearTitle.textContent = `Распределение тарифов за ${periodData.year} год по кварталам`;
+            chartContainer.appendChild(yearTitle);
+
+            // Создаем контейнер для диаграммы
+            const chartInnerContainer = document.createElement('div');
+            chartInnerContainer.style.flex = '1';
+            chartInnerContainer.style.position = 'relative';
+            
+            // Используем готовый метод createHistogram для столбчатой диаграммы
+            const canvas = ChartCreation.createHistogram('rate', periodData.labels, periodData.datasets);
+            chartInnerContainer.appendChild(canvas);
+            chartContainer.appendChild(chartInnerContainer);
+
+            rowContainer.appendChild(chartContainer);
+        }
+
+        // Если в последней строке один график, центрируем его
+        if (rowContainer.children.length === 1) {
+            const singleChart = rowContainer.querySelector('div');
+            singleChart.style.minWidth = '70%';
+            singleChart.style.margin = '0 auto';
+        }
+
+        displayContainer.appendChild(rowContainer);
+    }
 }

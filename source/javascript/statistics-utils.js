@@ -273,6 +273,154 @@ export class ChartParseData {
         return colors;
     }
 
+    static parseRateData(data) {
+        const parseType = data.type;
+        if (!parseType || !data)
+            return null;
+
+        const chartData = { labels: [], datasets: [] };
+
+        switch (parseType) {
+            case this.QUARTER_PARSE_TYPE:
+                // Для кварталов создаем гистограмму
+                return this._parseRateQuarterData(data);
+            case this.YEAR_PARSE_TYPE:
+                // Для годов создаем круговые диаграммы
+                return this._parseRateYearData(data);
+            default:
+                return null;
+        }
+    }
+
+    static _parseRateYearData(data) {
+        const chartData = { 
+            type: 'year',
+            periods: [] 
+        };
+
+        if (data.distribution && data.distribution.length > 0) {
+            data.distribution.forEach(yearData => {
+                const periodData = {
+                    year: yearData.year,
+                    labels: [],
+                    datasets: []
+                };
+
+                // Собираем данные для круговой диаграммы
+                if (yearData.rateDistribution && yearData.rateDistribution.length > 0) {
+                    const dataset = {
+                        data: [],
+                        backgroundColor: [],
+                        borderColor: [],
+                        borderWidth: 2
+                    };
+
+                    yearData.rateDistribution.forEach(rate => {
+                        periodData.labels.push(rate.rateName);
+                        dataset.data.push(rate.orderPercentage);
+                        
+                        // Генерируем цвета для каждого тарифа
+                        const color = this._generateRateColor(rate.rateId);
+                        dataset.backgroundColor.push(color);
+                        dataset.borderColor.push(color.replace('0.7', '1'));
+                    });
+
+                    periodData.datasets.push(dataset);
+                }
+
+                chartData.periods.push(periodData);
+            });
+        }
+
+        console.log('Parsed rate year data:', chartData);
+        return chartData;
+    }
+
+    static _parseRateQuarterData(data) {
+        if (!data.distribution || data.distribution.length === 0) 
+            return null;
+
+        // Группируем данные по годам
+        const years = [...new Set(data.distribution.map(item => item.year))].sort();
+        const chartData = {
+            type: 'quarter',
+            periods: []
+        };
+
+        years.forEach(year => {
+            const yearData = data.distribution.filter(item => item.year === year);
+            
+            // Создаем данные для каждого года
+            const periodData = {
+                year: year,
+                labels: ['1 квартал', '2 квартал', '3 квартал', '4 квартал'],
+                datasets: []
+            };
+
+            // Собираем все уникальные тарифы для этого года
+            const allRates = new Map();
+            
+            yearData.forEach(quarterData => {
+                if (quarterData.rateDistribution) {
+                    quarterData.rateDistribution.forEach(rate => {
+                        if (!allRates.has(rate.rateId)) {
+                            allRates.set(rate.rateId, {
+                                rateName: rate.rateName,
+                                data: new Array(4).fill(0), // 4 квартала
+                                color: this._generateRateColor(rate.rateId)
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Заполняем данные по кварталам для этого года
+            yearData.forEach(quarterData => {
+                const quarterIndex = quarterData.quarter - 1; // кварталы от 0 до 3
+                
+                if (quarterData.rateDistribution && quarterIndex < 4) {
+                    quarterData.rateDistribution.forEach(rate => {
+                        const rateData = allRates.get(rate.rateId);
+                        if (rateData) {
+                            rateData.data[quarterIndex] = rate.orderPercentage;
+                        }
+                    });
+                }
+            });
+
+            // Создаем datasets для этого года
+            allRates.forEach((rateData, rateId) => {
+                periodData.datasets.push({
+                    label: rateData.rateName,
+                    data: rateData.data,
+                    borderWidth: 2,
+                    backgroundColor: rateData.color,
+                    borderColor: rateData.color.replace('0.7', '1')
+                });
+            });
+
+            chartData.periods.push(periodData);
+        });
+
+        console.log('Parsed rate quarter data:', chartData);
+        return chartData;
+    }
+
+    // Вспомогательный метод для генерации цветов тарифов
+    static _generateRateColor(rateId) {
+        const colors = [
+            'rgba(255, 99, 132, 0.7)',   // красный
+            'rgba(54, 162, 235, 0.7)',   // синий
+            'rgba(75, 192, 192, 0.7)',   // зеленый
+            'rgba(255, 159, 64, 0.7)',   // оранжевый
+            'rgba(153, 102, 255, 0.7)',  // фиолетовый
+            'rgba(255, 205, 86, 0.7)',   // желтый
+            'rgba(201, 203, 207, 0.7)',  // серый
+        ];
+        
+        return colors[rateId % colors.length];
+    }
+
     // Вспомогательный метод для генерации случайных цветов
     static _generateColor() {
         const letters = '0123456789ABCDEF';
@@ -341,14 +489,13 @@ export class ChartCreation {
 
     static createDonut(selectValue, labels, datasets) {
         const canvas = document.createElement('canvas');
-        const canvasID = `${selectValue}Canvas_${ChartVariables.chartIDCounter}`
+        const canvasID = `${selectValue}Canvas_${ChartVariables.chartIDCounter}`;
         ChartVariables.appendChartID(canvasID);
         canvas.id = canvasID;
-        canvas.style.width = '100%'
+        canvas.style.width = '100%';
         canvas.style.height = '100%';
 
-        console.log(labels);
-        console.log(datasets);
+        console.log('Creating donut chart with:', { labels, datasets });
 
         try {
             const ctx = canvas.getContext('2d');
@@ -361,22 +508,31 @@ export class ChartCreation {
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
-                    legend: {
-                        position: 'top',
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    return `${label}: ${value.toFixed(2)}%`;
+                                }
+                            }
+                        }
                     },
-                    title: {
-                        display: true,
-                        text: 'Chart.js Doughnut Chart'
-                    }
-                    }
+                    cutout: '50%'
                 },
             });
         } catch (error) {
-            console.error(error);
+            console.error('Error creating donut chart:', error);
         }
-
-        console.log(canvas);
 
         return canvas;
     }
