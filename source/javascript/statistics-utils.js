@@ -1,8 +1,12 @@
 export class ChartVariables {
+    static PROFIT = 'profit';
+    static ORDERS_COUNT = 'orders-count';
+
     static _chartIDArray = []; // массив, содержащий ID активных графиков
     static _chartIDCounter = 0; // счетчик порядкового номера графика
     static _chartParseData = []; // массив, содержащий информацию, подлежащую парсингу
     static _timeIntervalType = null; // по какому временному диапазону идет выборка
+    static _categoryStatistics = null; // категория, по которой производится парсинг для графиков
 
     static get chartIDs() {return this._chartIDArray;}
     static set charIDs(array) {this._chartIDArray = array;}
@@ -21,6 +25,9 @@ export class ChartVariables {
 
     static get chartParseData() {return this._chartParseData;}
     static set chartParseData(data) {this._chartParseData = data;}
+
+    static get categoryStatistics() {return this._categoryStatistics;}
+    static set categoryStatistics(category) {this._categoryStatistics = category;}
 
     static clearCharts() {
         this._chartIDArray = [];
@@ -189,6 +196,81 @@ export class ChartParseData {
 
         console.log('Parsed vehicle data:', chartData);
         return chartData;
+    }
+
+    static parseDriverData(data) {
+        const parseType = data.type;
+        if (!parseType || !data)
+            return null;
+
+        const chartData = { labels: [], datasets: [] };
+
+        // Определяем поле данных в зависимости от категории статистики
+        let dataField = '';
+        let datasetLabel = '';
+        
+        switch (ChartVariables.categoryStatistics) {
+            case ChartVariables.PROFIT:
+                dataField = 'totalProfit';
+                datasetLabel = 'Общий доход (руб.)';
+                break;
+            case ChartVariables.ORDERS_COUNT:
+                dataField = 'orderCount';
+                datasetLabel = 'Количество заказов';
+                break;
+            default:
+                return null;
+        }
+
+        // Для водителей всегда используем гистограмму с данными по каждому водителю
+        if (data.drivers && data.drivers.length > 0) {
+            // Сортируем водителей по выбранному полю (по убыванию)
+            const sortedDrivers = [...data.drivers].sort((a, b) => b[dataField] - a[dataField]);
+            
+            // Берем топ водителей для отображения (максимум 10 для лучшей читаемости)
+            const topDrivers = sortedDrivers.slice(0, Math.min(10, sortedDrivers.length));
+            
+            // Создаем labels - имена водителей
+            chartData.labels = topDrivers.map(driver => driver.driverName);
+            
+            // Создаем dataset с данными
+            const dataset = {
+                label: datasetLabel,
+                data: topDrivers.map(driver => driver[dataField]),
+                borderWidth: 2,
+                backgroundColor: this._generateDriverColors(topDrivers.length),
+                borderColor: this._generateDriverColors(topDrivers.length, 0.8)
+            };
+            
+            chartData.datasets.push(dataset);
+        }
+
+        console.log('Parsed driver data:', chartData);
+        return chartData;
+    }
+
+    // Вспомогательный метод для генерации цветов для водителей
+    static _generateDriverColors(count, alpha = 1) {
+        const colors = [];
+        const baseColors = [
+            'rgba(54, 162, 235, ALPHA)',   // синий
+            'rgba(255, 99, 132, ALPHA)',   // красный
+            'rgba(75, 192, 192, ALPHA)',   // зеленый
+            'rgba(255, 159, 64, ALPHA)',   // оранжевый
+            'rgba(153, 102, 255, ALPHA)',  // фиолетовый
+            'rgba(255, 205, 86, ALPHA)',   // желтый
+            'rgba(201, 203, 207, ALPHA)',  // серый
+            'rgba(255, 99, 71, ALPHA)',    // томатный
+            'rgba(46, 139, 87, ALPHA)',    // морской волны
+            'rgba(147, 112, 219, ALPHA)'   // средний фиолетовый
+        ];
+        
+        for (let i = 0; i < count; i++) {
+            const color = baseColors[i % baseColors.length].replace('ALPHA', alpha);
+            colors.push(color);
+        }
+        
+        return colors;
     }
 
     // Вспомогательный метод для генерации случайных цветов

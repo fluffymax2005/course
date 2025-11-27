@@ -93,7 +93,7 @@ async function fetchStatisticData() {
     const yearEndInput = activeStruct.querySelector('.year-end-container input');
     const popularSelect = activeStruct.querySelector('.popular-container select');
 
-    if (activeStruct.id.includes('order')) {
+    if (activeStruct.id.includes('order') || activeStruct.id.includes('driver')) {
         if (yearStartInput.value === '') {
             await MessageBox.ShowFromCenter('Укажите начальный год', 'red');
             return false;
@@ -131,7 +131,7 @@ async function fetchStatisticData() {
     }
 
     let yearStartValue = 0, yearEndValue = 0;
-    if (activeStruct.id.includes('order')) {
+    if (activeStruct.id.includes('order') || activeStruct.id.includes('driver')) {
         yearStartValue = yearStartInput.value;
         yearEndValue = yearEndInput.value;
     } else if (activeStruct.id.includes('vehicle')) {
@@ -150,6 +150,8 @@ async function fetchStatisticData() {
         popularSelect ? popularSelect.value : null
     );
     console.log(path);
+
+    ChartVariables.categoryStatistics = categorySelect.value;
 
     const token = getToken();
 
@@ -495,4 +497,57 @@ function fillVehicleChart() {
             displayContainer.appendChild(rowContainer);
         }
     }
+}
+
+function fillDriverChart() {
+    const parsedData = ChartParseData.parseDriverData(ChartVariables.chartParseData);
+    if (!parsedData || parsedData.datasets.length === 0) return;
+
+    const displayContainer = document.getElementById(ChartCreation._getDisplayClassID('driver')); 
+    displayContainer.innerHTML = ''; // Сбрасываем разметку контейнера
+    displayContainer.style.display = 'flex';
+    displayContainer.style.flexDirection = 'column';
+
+    // Создаем контейнер для графика
+    const rowContainer = document.createElement('div');
+    rowContainer.style.width = '100%';
+    rowContainer.style.display = 'flex';
+    rowContainer.style.flexDirection = 'column';
+    rowContainer.style.marginBottom = '20px';
+
+    const chartContainer = document.createElement('div');
+    chartContainer.style.width = '100%';
+    chartContainer.style.height = '500px';
+    chartContainer.style.position = 'relative';
+    chartContainer.style.padding = '10px';
+    chartContainer.style.boxSizing = 'border-box'; 
+    chartContainer.style.borderRadius = '8px';
+    chartContainer.style.backgroundColor = 'white';
+
+    // Добавляем заголовок с информацией о типе статистики
+    const chartTitle = document.createElement('div');
+    chartTitle.style.textAlign = 'center';
+    chartTitle.style.marginBottom = '15px';
+    chartTitle.style.fontSize = '18px';
+    chartTitle.style.fontWeight = 'bold';
+    chartTitle.style.color = '#333';
+    
+    const activeStruct = document.querySelector('.struct.active');
+    const yearStart = activeStruct.querySelector('.year-start-container input').value;
+    const yearEnd = activeStruct.querySelector('.year-end-container input').value;
+
+    if (ChartVariables.categoryStatistics === ChartVariables.PROFIT) {
+        chartTitle.textContent = `Топ водителей по общему доходу за период ${yearStart}-${yearEnd} гг.`;
+    } else if (ChartVariables.categoryStatistics === ChartVariables.ORDERS_COUNT) {
+        chartTitle.textContent = `Топ водителей по количеству заказов за период ${yearStart}-${yearEnd} гг.`;
+    }
+    
+    chartContainer.appendChild(chartTitle);
+
+    // Используем готовый метод createHistogram
+    const canvas = ChartCreation.createHistogram('driver', parsedData.labels, parsedData.datasets);
+    
+    chartContainer.appendChild(canvas);
+    rowContainer.appendChild(chartContainer);
+    displayContainer.appendChild(rowContainer);
 }

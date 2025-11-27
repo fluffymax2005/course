@@ -328,7 +328,7 @@
                 <form class="driver dashboard" onsubmit="initAnalys(event)">
                     <div class="category-container">
                         <label>Категория</label>
-                        <select id="drvier-select-category">
+                        <select id="driver-select-category">
                             <option value="profit">Принесенный доход</option>
                             <option value="orders-count">Число заказов</option>
                         </select>
@@ -340,19 +340,19 @@
 
                         <div class="time-type-container">
                             <label class="time-type-label">Выборка по:</label>
-                            <select class="order-select time-type">
+                            <select class="driver-select time-type">
                                 <option value="year">Годам</option>
                             </select>
                         </div>
 
                         <div class="year-start-container">
                             <label class="year-start">Начальный год</label>
-                            <input id="order-input-year-start" min="0" type="number"></input>
+                            <input id="driver-input-year-start" min="0" type="number"></input>
                         </div>
                         
                         <div class="year-end-container">
                             <label class="year-end">Конечный год</label>
-                            <input id="order-input-year-end" min="0" type="number"></input>
+                            <input id="driver-input-year-end" min="0" type="number"></input>
                         </div>
 
                         <button class="calc-button" type="submit">Анализ</button>
