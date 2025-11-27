@@ -206,7 +206,8 @@ namespace DbAPI.Infrastructure.Controllers {
 
                 return Ok(new {
                     period = $"{yearStart}-{yearEnd}",
-                    stats = topVehiclesByQuarter
+                    stats = topVehiclesByQuarter,
+                    type = "quarter"
                 });
 
             } catch (Exception ex) {
@@ -215,7 +216,7 @@ namespace DbAPI.Infrastructure.Controllers {
             }
         }
 
-        // GET: api/statistics/vehicle/top-popular?isPopular=true&yearStart=2023&yearEnd=2024
+        // GET: api/statistics/vehicle/top-popular?isPopular=true&yearStart={yearStart}&yearEnd={yearEnd}
         [HttpGet("vehicle/top-popular/year")]
         [Authorize(Roles = "Admin, Director")]
         public async Task<IActionResult> TopMostPopularTransportVehiclesByYears([FromQuery] bool isPopular, [FromQuery] int yearStart, [FromQuery] int yearEnd) {
@@ -287,7 +288,8 @@ namespace DbAPI.Infrastructure.Controllers {
 
                 return Ok(new {
                     period = $"{yearStart}-{yearEnd}",
-                    stats = topVehiclesByYear
+                    stats = topVehiclesByYear,
+                    type = "year"
                 });
 
             } catch (Exception ex) {
