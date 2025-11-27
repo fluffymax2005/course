@@ -395,12 +395,12 @@
     padding-top: 20px;
 }
 
-.generate-password-form {
+#generate-password-form {
     position: absolute;
     z-index: 10000;
 }
 
-.generate-password-form.active {
+#generate-password-form.active {
     opacity: 1;
 }
 

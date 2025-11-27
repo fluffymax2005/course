@@ -221,7 +221,7 @@ export async function recordAction(event) {
             window.location.href = '../../authorize-form/authorize.html';
             return;
         }  else {
-            MessageBox.ShowFromCenter(`Ошибка: ${error.data.message}`, 'red');
+            MessageBox.ShowFromCenter(`Ошибка: ${error.data}`, 'red');
         }
         
         

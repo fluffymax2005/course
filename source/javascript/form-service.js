@@ -324,9 +324,7 @@ function createPasswordField(fieldName, value, tableName) {
         }
        
     });
-
-
-    
+   
     return input;
 }
 

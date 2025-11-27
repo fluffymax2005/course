@@ -170,7 +170,7 @@ export function registerShowGeneratePassword() {
         
         // Устанавливаем позицию подсказки
         tipContainer.style.position = 'absolute';
-        tipContainer.style.top = `${inputRect.bottom + 200}px`;
+        tipContainer.style.top = `${inputRect.bottom + 5}px`;
         tipContainer.style.left = `${inputRect.left}px`;
         tipContainer.style.width = `${inputRect.width}px`;
         tipContainer.style.backgroundColor = '#f8f9fa';
