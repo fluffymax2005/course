@@ -111,7 +111,8 @@ namespace DbAPI.Infrastructure.Controllers {
             string logRights = request.RegisterRights switch {
                 UserRights.Basic => "простого пользователя",
                 UserRights.Editor => "редактора",
-                UserRights.Admin => "администратора"
+                UserRights.Admin => "администратора",
+                UserRights.Director => "директора"
             };
 
             _logger.LogInformation($"Начало попытки регистрации пользователя \"{request.UserName}\" " +
@@ -425,6 +426,45 @@ namespace DbAPI.Infrastructure.Controllers {
 
             _logger.LogInformation($"Администратор {User.Identity.Name} обновил учетную запись с ID = {entity.Id}");
             await _repository.UpdateAsync(entity);
+            return Ok(new { hash = UpdateTableHash() });
+        }
+
+        // PUT: api/{entity}/password/update
+        [HttpPut("password/update")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdatePassword([FromBody] Credential request) {
+            _logger.LogWarning($"Администратор {User.Identity.Name} пытается обновить пароль учетной записи с ID = {request.Id}");
+            var entity = await _repository.GetByIdAsync(request.Id);
+            if (entity == null) {
+                _logger.LogError($"Администратору {User.Identity.Name} не удалось обновить пароль учетной записи с ID = {entity.Id}. " +
+                    $"Причина: сущность не найдена");
+                return BadRequest(new { message = $"Сущность с ID = {request.Id} не найдена" });
+            }
+
+            if (!Hasher.IsPasswordStrong(request.Password)) {
+                _logger.LogError($"Администратору {User.Identity.Name} не удалось обновить пароль учетной записи с ID = {entity.Id}. " +
+                    $"Причина: пароль ненадежен");
+                return BadRequest(new {
+                    message = $"Введенный пароль недопустим.{Environment.NewLine}" +
+                    $"Пароль должен содержать как минимум:{Environment.NewLine}" +
+                    $"1. Одну латинскую букву нижнего и верхнего регистра.{Environment.NewLine}" +
+                    $"2. Одну цифру.{Environment.NewLine}" +
+                    $"3. Один спецсимвол.{Environment.NewLine}" +
+                    $"Длина пароля должен быть не менее 8 символов."
+                });
+            }
+
+            entity.Password = Hasher.HashPassword(request.Password);
+            entity.WhoChanged = User.Identity.Name;
+
+            try {
+                await _repository.UpdateAsync(entity);
+            } catch (Exception ex) {
+                _logger.LogError($"Credential:UpdateAsync({entity.Id}): {ex.Message}");
+                return BadRequest(new { message = $"Ошибка сохранения: {ex.Message}" });
+            }
+
+            _logger.LogInformation($"Администратор {User.Identity.Name} обновил пароль учетной записи с ID = {entity.Id}");
             return Ok(new { hash = UpdateTableHash() });
         }
 
