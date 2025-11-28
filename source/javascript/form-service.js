@@ -1,5 +1,5 @@
 import {getTableHash, getToken, setTableHash} from './cookie.js'
-import {ApiService} from './api.js';
+import {ApiError, ApiService} from './api.js';
 import { isFieldRequired, getMinValue, getMaxValue, TableModifying } from './table-service.js';
 import { DATA_PER_PAGE, dbCache, fieldNameMapping, TableAction, TableGETSpecial, TableVariables } from './table-utils.js';
 import { InputWithTips, MessageBox, TableFormConfirmButton } from './form-utils.js';
@@ -72,6 +72,11 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
         });
 
         if (Array.isArray(data)) {
+            // Полученных данных нет
+            if (data.length === 0) { 
+                throw new ApiError('Таблица не содержит данных', 200, null);
+            }
+            
             // Сохраняем в кэш
             dbCache.set(tableName, data);
             
@@ -87,8 +92,15 @@ export async function fetchTableData(tableName, entityName, paginationID, useCac
                 window.location.href = '../../authorize-form/authorize.html';
                 return;
         } 
+
+        // API вернуло пустой массив
+        if (error.status === 200 && !error.data) {
+            MessageBox.ShowFromCenter(error.message, 'red');
+
+        } else {
+            MessageBox.ShowFromCenter('Внутренняя ошибка', 'red');
+        }
         
-        MessageBox.ShowFromCenter('Внутренняя ошибка', 'red');
         console.error(error);
         throw error;
     }
