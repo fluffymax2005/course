@@ -1,5 +1,5 @@
 import { getUserRights, UserRights } from "./cookie.js";
-import { searchInputChange, updateSearchResults } from "./database-visuals.js";
+import { updateSearchResults } from "./database-visuals.js";
 import { DATA_PER_PAGE, TableVariables } from "./table-utils.js";
 
 export function checkDatabaseAccess() {

@@ -25,12 +25,8 @@ export function deleteCookie(name) {
 }
 
 export function deleteUserData() {
-    // Замена старых куки на новые
-    const cookies = ['token', 'tokenExpireTime', 'userRights', 'userName'];
-
-    cookies.forEach(cookie => {
-        deleteCookie(cookie);
-    });
+    // Очистка всех данных, относящихся к куки и кэшу
+    localStorage.clear();
 }
 
 

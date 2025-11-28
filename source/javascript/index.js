@@ -1,7 +1,6 @@
 import { deleteUserData, getToken } from "./cookie.js";
 import { ApiService} from "./api.js";
-import { dbCache } from "./table-utils.js";
-import { InputWithTips, MessageBox } from "./form-utils.js";
+import { MessageBox } from "./form-utils.js";
 
 // Выход из системы
 window.quitSystem = function quitSystem() {       
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         await ApiService.get(`Credential/validate-token?token=${token}`, true);
     } catch (error) {
         // Токен отсутствует или просрочен
-        // Проброс пользователя в окно авторизации
+        // Проброс пользователя в окно авторизации и удаление кэшированных данных
         deleteUserData();
         window.location.href = '../../authorize-form/authorize.html';
     } finally {
