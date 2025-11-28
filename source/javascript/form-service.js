@@ -311,6 +311,7 @@ function createPasswordField(fieldName, value, tableName) {
             const tipContainer = document.getElementById('generate-password-form');
             if (tipContainer) {
                 tipContainer.classList.remove('active');
+                document.body.removeChild(tipContainer);
             }
         }, 200);
     });

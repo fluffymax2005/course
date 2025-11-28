@@ -120,14 +120,21 @@ async function showUserForm() {
 
         const passwordInputs = document.querySelectorAll('#password');
 
-        passwordInputs.forEach(i => i.addEventListener('blur', function() {
+        passwordInputs.forEach(i => {
+            i.addEventListener('blur', function() {
+            
             setTimeout(() => {
                 const tipContainer = document.getElementById('generate-password-form');
                 if (tipContainer) {
                     tipContainer.classList.remove('active');
                 }
             }, 200);
-        }));
+            });
+
+            if (!i.id.includes('edit_password')) {
+                i.classList.add('active');
+            }
+        });
         
         passwordInputs.forEach(i => i.addEventListener('focus', function() {
             const tipContainer = document.getElementById('generate-password-form');
@@ -160,18 +167,19 @@ export function registerShowGeneratePassword() {
         tipContainer.classList.add('generate-password-form', 'active');
         
 
-        let passwordInput = null;
-        if (document.getElementById('userModal').style.display === 'block')
-            passwordInput = document.getElementById('password');
-        else
-            passwordInput = document.getElementById('edit_password');
-
+        let passwordInput = document.getElementById('password');
+        if (!passwordInput.classList.contains('active'))
+            passwordInput = document.getElementById('edit_password')
         const inputRect = passwordInput.getBoundingClientRect();
+
+        // Учитываем прокрутку страницы
+        const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop;
         
         // Устанавливаем позицию подсказки
         tipContainer.style.position = 'absolute';
-        tipContainer.style.top = `${inputRect.bottom + 5}px`;
-        tipContainer.style.left = `${inputRect.left}px`;
+        tipContainer.style.top = `${inputRect.bottom + scrollY + 5}px`;
+        tipContainer.style.left = `${inputRect.left + scrollX}px`;
         tipContainer.style.width = `${inputRect.width}px`;
         tipContainer.style.backgroundColor = '#f8f9fa';
         tipContainer.style.border = '1px solid #007bff';
@@ -325,6 +333,7 @@ function editUser(userId) {
 
 function closeUserModal() {
     document.getElementById('userModal').style.display = 'none';
+    document.getElementById('password').classList.remove('active');
 }
 
 async function addUser(event) {
