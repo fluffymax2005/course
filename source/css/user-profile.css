@@ -1,0 +1,46 @@
+.user-profile {
+    min-height: 900px;
+}
+
+.user-profile:not(:active) {
+    display: none;
+}
+
+.user-profile:active {
+    opacity: 1;
+    pointer-events: all;
+    display: flex;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+#userProfileSectionHeader {
+    background: #E0F3FE;
+    color: black;
+}
+
+.visible-display-container {
+    box-sizing: border-box;
+    max-width: 98%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.information-display {
+    background: #D8DDFE;
+    align-items: center;
+    display: flex;
+}
+
+.visible-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 0;
+    background: #C6E8FD;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    height: 100%;
+}
+

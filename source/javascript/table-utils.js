@@ -91,6 +91,7 @@ export class TableName {
     static TRANPSORT_VEHICLE = ['Транспортные средства', 'data']
     static CREDENTIAL = ['Учетные записи', 'users'];
     static ROLE = ['Роли', 'roles'];
+    static TAXI = ['БД такси', 'taxi'];
 
     static getViewName(divTableID) {
         const fields = Object.values(TableName); // константые поля класса

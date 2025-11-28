@@ -44,13 +44,14 @@ export async function switchTab(tabName) {
     // Показать выбранную вкладку
     document.getElementById(`${tableCodeName}-tab`).classList.add('active');
     
-    // Активировать кнопку (если event передан)
+    // Активировать кнопку
     if (event) {
         event.target.classList.add('active');
     } else {
         // Ищем кнопку по tabName и активируем её
         document.querySelectorAll('.tab-btn').forEach(btn => {
-            if (btn.textContent.toLowerCase().includes(tabName) || 
+            if (btn.textContent === tabName || 
+                btn.textContent.toLowerCase().includes(tabName.toLowerCase()) || 
                 btn.getAttribute('data-tab') === tabName) {
                 btn.classList.add('active');
             }

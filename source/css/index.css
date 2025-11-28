@@ -14,7 +14,6 @@ header {
     align-items: center;
     background-color: rgb(178, 200, 223);
     padding: 0 16px;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 /* Левая часть header */

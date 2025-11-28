@@ -69,10 +69,6 @@ async function showSection(sectionName = null, isLoadListener = false) {
         activeSection.style.display = 'block';
         activeSection.classList.add('active-section');
 
-        // Сменяем название заголовка и его иконку рядом с панелью навигации
-        const headerText = document.getElementById('header-text');
-        headerText.textContent = SectionName.getCodeName(sectionName);
-
         const headerIcon = document.getElementById('page-icon');
 
         if (sectionName === SectionName.MAIN[1]) {

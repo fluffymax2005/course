@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="source/css/database.css">
     <link rel="stylesheet" href="source/css/admin-panel.css">
     <link rel="stylesheet" href="source/css/statistics.css">
+    <link rel="stylesheet" href="source/css/user-profile.css">
 
     <script type="module" src="source/javascript/index.js"></script>
     <script type="module" src="source/javascript/workspace-visuals.js"></script>
@@ -50,15 +51,16 @@
                         <img src="assets/icons/admin-panel.svg">
                         <p class="menu-nav-text">Панель администратора</p>
                     </a>
+                    <a onclick="showSection('user-profile')" class="menu-nav-item">
+                        <img src="assets/icons/user-profile.svg">
+                        <p class="menu-nav-text">Профиль</p>
+                    </a>
+
                 </div>
             </div>
             
             <a href="#">
                 <img class="header-icon" id="page-icon" src="assets/icons/main-page.svg">
-            </a>
-            
-            <a class="header-nav" onclick="showSection()" href="#">
-                <span id="header-text">Главная</span>
             </a>
         </div>
             
@@ -115,6 +117,10 @@
                 <button class="action-btn tertiary" onclick="showSection('admin-panel')">
                     <span class="btn-icon">👨‍💼</span>
                     <span>Админ-панель</span>
+                </button>
+                <button class="action-btn fortiary" onclick="showSection('user-profile')">
+                    <span class="btn-icon">💼</span>
+                    <span>Профиль</span>
                 </button>
             </div>
         </div>
@@ -417,6 +423,7 @@
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchTab('Учетные записи')" id="usersSwitchTab">Учетные записи</button>
                 <button class="tab-btn" onclick="switchTab('Роли')" id="rolesSwitchTab">Роли</button>
+                <button class="tab-btn" onclick="switchTab('БД такси')" id="taxiSwitchTab">БД такси</button>
             </div>
 
             <!-- Содержимое вкладки пользователей -->
@@ -481,6 +488,42 @@
 
                 <div class="pagination" id="rolesPagination">
                     <!-- Пагинация будет добавлена через JavaScript -->
+                </div>
+            </div>
+
+            <div id="taxi-tab" class="tab-content">
+                <div class="admin-header">
+                    <h2>Сведения о пользователе</h2>
+                </div>
+
+                <div class="user-info" id="userInfo">
+                    <div class="info-elem">
+                        <label>Имя пользователя: </label>
+                        <label id="userName"><!-- будет заполнено через JS --></label>
+                    </div>
+                    <div class="info-elem">
+                        <label>Права пользователя: </label>
+                        <label id="userRights"><!-- будет заполнено через JS --></label>
+                    </div>
+                    <div class="info-elem">
+                        <label>Сессия актуальна до: </label>
+                        <label id="sessionLifeTime"><!-- будет заполнено через JS --></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="user-profile">
+        <div class="section-header" id="userProfileSectionHeader">
+            <h1>Профиль пользователя</h1>
+            <p>Информация о пользователе</p>
+        </div>
+
+        <div class="information-display">
+            <div class="visible-display-container">
+                <div class="visible-display">
+                    вывы
                 </div>
             </div>
         </div>
