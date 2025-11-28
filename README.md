@@ -39,6 +39,9 @@ Configure "appsettings.json" file. Obligating prerequestes are showed below:
     "DefaultDataConnection": "Server=&lt;Your_server_IP_or_name&gt;;Database=&lt;Your_DB_name&gt;;User ID=&lt;Your_DB_login&gt;;Password=&lt;Your_DB_password&gt;;Trusted_Connection=True;TrustServerCertificate=True;", // Main Db
     "DefaultCredentialConnection": "Server=&lt;Your_server_IP_or_name&gt;;Database=&lt;Your_DB_name&gt;;User ID=&lt;Your_DB_login&gt;;Password=&lt;Your_DB_password&gt;;Trusted_Connection=True;TrustServerCertificate=True;", // User data Db
   },
+
+  "IncludeSeedData": &lt;true_or_false&gt;, // whether use seed data when OrderDbContext migration is initialized
+
   "AllowedHosts": "*"
 }
 </small></pre>

@@ -23,6 +23,8 @@ namespace DbAPI.Infrastructure.Contexts {
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
 
+            bool includeSeedData = Environment.GetEnvironmentVariable("IncludeSeedData") == "true";
+
             modelBuilder.Entity<Customer>(entity => {
                 entity.Property(e => e.Id).IsRequired().ValueGeneratedOnAdd().HasColumnOrder(1);
                 entity.Property(e => e.Forename).IsRequired().HasColumnOrder(2);
@@ -35,10 +37,7 @@ namespace DbAPI.Infrastructure.Contexts {
                 entity.Property(e => e.WhenChanged).HasColumnOrder(10);
                 entity.Property(e => e.Note).HasColumnOrder(11);
                 entity.Property(e => e.IsDeleted).HasColumnOrder(12);
-            });
-
-            var customers = Generators.GenerateCustomers(5000);
-            modelBuilder.Entity<Customer>().HasData(customers);
+            });           
 
             ///////////////////////////
 
@@ -57,9 +56,6 @@ namespace DbAPI.Infrastructure.Contexts {
                 entity.Property(e => e.IsDeleted).HasColumnOrder(13);
             });
 
-            var drivers = Generators.GenerateDrivers(500);
-            modelBuilder.Entity<Driver>().HasData(drivers);
-
             ///////////////////////////
 
             modelBuilder.Entity<Core.Entities.Route>(entity => {
@@ -73,9 +69,6 @@ namespace DbAPI.Infrastructure.Contexts {
                 entity.Property(e => e.Note).HasColumnOrder(8);
                 entity.Property(e => e.IsDeleted).HasColumnOrder(9);
             });
-
-            var routes = Generators.GenerateRoutes(500);
-            modelBuilder.Entity<Core.Entities.Route>().HasData(routes);
 
             ///////////////////////////
 
@@ -96,9 +89,6 @@ namespace DbAPI.Infrastructure.Contexts {
                 entity.Property(e => e.IsDeleted).HasColumnOrder(14);
             });
 
-            var vehicles = Generators.GenerateTransportVehicles(drivers, 250);
-            modelBuilder.Entity<TransportVehicle>().HasData(vehicles);
-
             ///////////////////////////
 
             modelBuilder.Entity<Rate>(entity => {
@@ -113,9 +103,6 @@ namespace DbAPI.Infrastructure.Contexts {
                 entity.Property(e => e.Note).HasColumnOrder(9);
                 entity.Property(e => e.IsDeleted).HasColumnOrder(10);
             });
-
-            var rates = Generators.GenerateRates(drivers, vehicles);
-            modelBuilder.Entity<Rate>().HasData(rates);
 
             ///////////////////////////
 
@@ -134,8 +121,25 @@ namespace DbAPI.Infrastructure.Contexts {
                 entity.Property(e => e.IsDeleted).HasColumnOrder(12);
             });
 
-            var orders = Generators.GenerateOrders(customers, routes, rates, vehicles, 10000);
-            modelBuilder.Entity<Order>().HasData(orders);
+            if (includeSeedData) {
+                var customers = Generators.GenerateCustomers(5000);
+                modelBuilder.Entity<Customer>().HasData(customers);
+
+                var drivers = Generators.GenerateDrivers(500);
+                modelBuilder.Entity<Driver>().HasData(drivers);
+
+                var routes = Generators.GenerateRoutes(500);
+                modelBuilder.Entity<Core.Entities.Route>().HasData(routes);
+
+                var vehicles = Generators.GenerateTransportVehicles(drivers, 250);
+                modelBuilder.Entity<TransportVehicle>().HasData(vehicles);
+
+                var rates = Generators.GenerateRates(drivers, vehicles);
+                modelBuilder.Entity<Rate>().HasData(rates);
+
+                var orders = Generators.GenerateOrders(customers, routes, rates, vehicles, 10000);
+                modelBuilder.Entity<Order>().HasData(orders);
+            }
         }
     }
 }
