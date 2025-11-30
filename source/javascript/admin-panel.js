@@ -14,6 +14,7 @@ window.searchUsers = searchUsers;
 window.showRoleForm = showRoleForm;
 window.saveRole = saveRole;
 window.registerShowGeneratePassword = registerShowGeneratePassword;
+window.generate = generate;
 
 // Словарь: наименование сущности -> Имя компонента пагинации
 const paginationNameMap = new Map();
@@ -445,6 +446,32 @@ async function saveRole(event) {
         }
 
         MessageBox.ShowFromCenter('Ошибка сохранения роли', 'red');
+    }
+}
+
+async function generate(entity) {
+    const entityCountInput = document.getElementById('entityCount');
+    const entityCount = parseInt(entityCountInput.value);
+
+    if (entityCount <= 0) {
+        MessageBox.ShowFromCenter('Число записей должно быть положительным числом', 'red');
+        return;
+    }
+
+    MessageBox.ShowAwait();
+
+    try {
+        const data = await ApiService.get(`Generator/${entity}?count=${entityCount}`, {
+            'Authorization': `Bearer ${getToken()}`
+        });
+
+        await MessageBox.ShowFromCenter('Генерация прошла успешно', 'green');
+
+        entityCountInput.value = '';
+    } catch (error) {
+        await MessageBox.ShowFromCenter(`Ошибка: ${error.data.message}`, 'red');
+    } finally {
+        await MessageBox.RemoveAwait();
     }
 }
 

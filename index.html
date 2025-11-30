@@ -423,7 +423,7 @@
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchTab('Учетные записи')" id="usersSwitchTab">Учетные записи</button>
                 <button class="tab-btn" onclick="switchTab('Роли')" id="rolesSwitchTab">Роли</button>
-                <button class="tab-btn" onclick="switchTab('БД такси')" id="taxiSwitchTab">БД такси</button>
+                <button class="tab-btn" onclick="switchTab('БД такси')" id="taxiSwitchTab">Основная база данных</button>
             </div>
 
             <!-- Содержимое вкладки пользователей -->
@@ -493,23 +493,20 @@
 
             <div id="taxi-tab" class="tab-content">
                 <div class="admin-header">
-                    <h2>Сведения о пользователе</h2>
+                    <h2>Специальные возможности</h2>
                 </div>
-
-                <div class="user-info" id="userInfo">
-                    <div class="info-elem">
-                        <label>Имя пользователя: </label>
-                        <label id="userName"><!-- будет заполнено через JS --></label>
+                <div class="generator-container">
+                    <label>Количество записей</label>
+                    <input id="entityCount" type="number" min="1" placeholder="Введите натуральное число">
+                    <div class="generator-buttons-container">
+                        <button class="btn-primary" id="generateOrder" onclick="generate('order')">Сгенерировать заказы</button>
+                        <button class="btn-primary" id="generateCustomer" onclick="generate('customer')">Сгенерировать заказчиков</button>
+                        <button class="btn-primary" id="generateRate" onclick="generate('rate')">Сгенерировать тарифы</button>
+                        <button class="btn-primary" id="generateRoute" onclick="generate('route')">Сгенерировать маршруты</button>
+                        <button class="btn-primary" id="generateDriver" onclick="generate('driver')">Сгенерировать водителей</button>
+                        <button class="btn-primary" id="generateVehicle" onclick="generate('transportvehicle')">Сгенерировать транспортные средства</button>
                     </div>
-                    <div class="info-elem">
-                        <label>Права пользователя: </label>
-                        <label id="userRights"><!-- будет заполнено через JS --></label>
-                    </div>
-                    <div class="info-elem">
-                        <label>Сессия актуальна до: </label>
-                        <label id="sessionLifeTime"><!-- будет заполнено через JS --></label>
-                    </div>
-                </div>
+                </div> 
             </div>
         </div>
     </div>

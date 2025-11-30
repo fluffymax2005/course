@@ -30,6 +30,11 @@
     background: rgba(250, 193, 129, 0.7) ;
 }
 
+#dbSectionHeader p,
+#dbSectionHeader h1 {
+    color: black;
+}
+
 .table-selector {
     display: flex;
     flex-direction: column;

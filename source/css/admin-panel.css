@@ -108,7 +108,8 @@
 }
 
 #addCredentialBtn {
-    background: rgb(50, 183, 108);;
+    background: rgb(50, 183, 108);
+    color: bl;
 }
 
 #addRoleBtn {
@@ -450,4 +451,32 @@
 .action-btn.fortiary {
   background: #86d0fd;
   color: white;
+}
+
+#taxi-tab {
+    justify-content: center;
+}
+
+.generator-buttons-container button {
+    background: rgb(50, 183, 108);
+}
+
+#entityCount {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.generator-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.generator-container label {
+    font-size: 16px;
+    margin-bottom: 5px;
+    font-weight: 500;
 }
