@@ -38,12 +38,12 @@ namespace DbAPI.Core.Entities {
         //public ICollection<Rate> Rates { get; set; } = new List<Rate>();
 
         public static bool PhoneNumberValidate(string phoneNumber) {
-            if (phoneNumber.IsNullOrEmpty() || phoneNumber.Length <= 7) {
+            if (phoneNumber.IsNullOrEmpty() || phoneNumber.Length <= 10) {
                 return false;
-            } else if (phoneNumber.StartsWith("+7") && phoneNumber.Length != 9 &&
+            } else if (phoneNumber.StartsWith("+7") && phoneNumber.Length != 12 &&
                 phoneNumber.Any(c => !char.IsDigit(c))) {
                 return false;
-            } else if (!phoneNumber.StartsWith("+7") && phoneNumber.Length != 8 &&
+            } else if (!phoneNumber.StartsWith("+7") && phoneNumber.Length != 11 &&
                 phoneNumber.Any(c => !char.IsDigit(c))) {
                 return false;
             }

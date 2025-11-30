@@ -36,7 +36,7 @@ namespace DbAPI.Core.Entities {
         //public ICollection<Order> orders { get; set; } = new List<Order>();
 
         public static bool PhoneNumberValidate(string phoneNumber) {
-            if (phoneNumber.IsNullOrEmpty() || phoneNumber.Length <= 7) {
+            if (phoneNumber.IsNullOrEmpty() || phoneNumber.Length <= 10) {
                 return false;
             } else if (phoneNumber.StartsWith("+7") && phoneNumber.Length != 12 &&
                 phoneNumber.Any(c => !char.IsDigit(c))) {
