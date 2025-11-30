@@ -46,6 +46,10 @@ export function getUserName() {
     return getCookie('userName');
 }
 
+export function getEmail() {
+    return getCookie('email');
+}
+
 export function getTableHash(name) {
     return getCookie(`table_hash_${name}`);
 }
