@@ -523,7 +523,22 @@
         <div class="information-display">
             <div class="visible-display-container">
                 <div class="visible-display">
-                    вывы
+                    <div class="header-user-container">
+                        <label>Общая информация по пользователю</label>
+                    </div>
+                    <div class="table-container" id="userInfoTableContainer">
+                        <table id="userInfoTable" class="user-info-table">
+                            <thead>
+                                <tr>
+                                    <th>Параметр</th>
+                                    <th>Значение</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userInfoTableBody">
+                                <!-- Будет динамически заполнено через JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

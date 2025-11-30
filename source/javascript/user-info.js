@@ -3,7 +3,7 @@ import { formatValue } from "./database-general-service.js";
 
 
 export function showUserInfoSection() {
-    const table = document.querySelector('.main-user-information-container table'); // таблица, данные для которой заполняем
+    const table = document.querySelector('#userInfoTable'); // таблица, данные для которой заполняем
     const tBody = table.querySelector('#userInfoTableBody'); // тело таблицы
 
     tBody.innerHTML = '';
@@ -77,4 +77,27 @@ export function showUserInfoSection() {
     sessionRow.appendChild(sessionValueTd);
 
     tBody.appendChild(sessionRow);
+
+    // Доступные секции
+    const sectionRow = document.createElement('tr');
+    const sectionKeyTd = document.createElement('td');
+    sectionKeyTd.textContent = 'Доступные секции';
+    sectionKeyTd.style.textAlign = 'center';
+
+    const sectionValueTd = document.createElement('td');
+    let sectionString = '';
+    switch (getUserRights()) {
+        case UserRights.Admin: sectionString = '\"Главная\", \"База данных\", \"Статистика\", \"Панель администратора\", \"Профиль\"'; break;
+        case UserRights.Basic: sectionString = '\"Главная\", \"База данных\", \"Профиль\"'; break;
+        case UserRights.Director: sectionString = '\"Главная\", \"Статистика\", \"Профиль\"'; break;
+        case UserRights.Editor: sectionString = '\"Главная\", \"База данных\", \"Профиль\"'; break;
+    }
+
+    sectionValueTd.textContent = sectionString;
+    sectionValueTd.style.textAlign = 'center';
+
+    sectionRow.appendChild(sectionKeyTd);
+    sectionRow.appendChild(sectionValueTd);
+
+    tBody.appendChild(sectionRow);
 }
