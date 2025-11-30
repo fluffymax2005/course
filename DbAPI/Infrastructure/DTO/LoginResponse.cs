@@ -6,6 +6,7 @@ namespace DbAPI.Infrastructure.DTO {
         public TypeId UserId { get; set; }
         public string Username { get; set; } = string.Empty;
         public UserRights UserRights { get; set; }
+        public string Email { get; set; }
 
         public string Token { get; set; }
         public DateTime TokenExpireTime { get; set; }

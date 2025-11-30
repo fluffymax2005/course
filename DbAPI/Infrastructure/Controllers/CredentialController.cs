@@ -89,6 +89,7 @@ namespace DbAPI.Infrastructure.Controllers {
                     UserId = credential.Id,
                     Username = credential.Username,
                     UserRights = role.Rights,
+                    Email = credential.Email,
                     Token = token,
                     TokenExpireTime = DateTime.UtcNow.AddMinutes(_jwtService.GetTokenLifeTime()),
                     CanGet = role.CanGet,
