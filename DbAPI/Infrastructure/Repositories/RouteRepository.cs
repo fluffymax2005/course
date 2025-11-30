@@ -2,25 +2,26 @@
 using DbAPI.Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Route = DbAPI.Core.Entities.Route;
 using TypeId = int;
 
 namespace DbAPI.Infrastructure.Repositories {
-    public class RouteRepository : IRepository<Core.Entities.Route, TypeId> {
+    public class RouteRepository : IRepository<Route, TypeId> {
         private readonly OrderDbContext _context;
 
         public RouteRepository(OrderDbContext context) {
             _context = context;
         }
 
-        public async Task<Core.Entities.Route?> GetByIdAsync(TypeId id) {
+        public async Task<Route?> GetByIdAsync(TypeId id) {
             return await _context.Routes.FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<IEnumerable<Core.Entities.Route>?> GetAllAsync() {
+        public async Task<IEnumerable<Route>?> GetAllAsync() {
             return await _context.Routes.ToListAsync();
         }
 
-        public async Task<TypeId?> AddAsync(Core.Entities.Route entity) {
+        public async Task<TypeId?> AddAsync(Route entity) {
 
             entity.WhenAdded = DateTime.Now;
             entity.WhoChanged = null;
@@ -35,6 +36,21 @@ namespace DbAPI.Infrastructure.Repositories {
             await _context.SaveChangesAsync();
 
             return entity.Id;
+        }
+
+        public async Task AddCollectionAsync(IList<Route> entities) {
+            foreach (var entity in entities) {
+                entity.WhoChanged = null;
+                entity.WhenChanged = null;
+                entity.IsDeleted = null;
+
+                await EntityValidate(entity.BoardingAddress, entity.DropAddress, entity.WhoAdded,
+                    entity.WhenAdded, entity.Id, entity.WhoChanged, entity.WhenChanged, entity.Note,
+                    entity.IsDeleted);
+
+                await _context.Routes.AddAsync(entity);
+                await _context.SaveChangesAsync();
+            }
         }
 
         private async Task EntityValidate(string boardingAddress, string dropAddress, string whoAdded,
@@ -55,7 +71,7 @@ namespace DbAPI.Infrastructure.Repositories {
                 throw new DbUpdateException("БД переполнена. Отсутствует доступный ID для новой сущности");
         }
 
-        public async Task UpdateAsync(Core.Entities.Route entity) {
+        public async Task UpdateAsync(Route entity) {
             await EntityValidate(entity.BoardingAddress, entity.DropAddress, entity.WhoAdded,
                 entity.WhenAdded, 0, entity.WhoChanged, entity.WhenChanged, entity.Note,
                 entity.IsDeleted);

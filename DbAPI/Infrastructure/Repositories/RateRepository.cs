@@ -38,6 +38,21 @@ namespace DbAPI.Infrastructure.Repositories {
             return entity.Id;
         }
 
+        public async Task AddCollectionAsync(IList<Rate> entities) {
+            foreach (var entity in entities) {
+                entity.WhoChanged = null;
+                entity.WhenChanged = null;
+                entity.IsDeleted = null;
+
+                await EntityValidate(entity.Forename, entity.MovePrice,
+                entity.IdlePrice, entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged,
+                entity.WhenChanged, entity.Note, entity.IsDeleted);
+
+                await _context.Rates.AddAsync(entity);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         private async Task EntityValidate(string forename, int movePrice, int idlePrice,
             string whoAdded, DateTime whenAdded, TypeId? id, string? whoChanged = null,
             DateTime? whenChanged = null, string? note = null, DateTime? isDeleted = null) {

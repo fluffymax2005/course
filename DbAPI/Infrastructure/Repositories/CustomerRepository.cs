@@ -37,6 +37,21 @@ namespace DbAPI.Infrastructure.Repositories {
             return entity.Id;
         }
 
+        public async Task AddCollectionAsync(IList<Customer> entities) {
+            foreach (var entity in entities) {
+                entity.WhoChanged = null;
+                entity.WhenChanged = null;
+                entity.IsDeleted = null;
+
+                await EntityValidate(entity.Forename, entity.Surname, entity.PhoneNumber, entity.Email,
+                    entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged, entity.WhenChanged,
+                    entity.Note, entity.IsDeleted);
+
+                await _context.Customers.AddAsync(entity);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         private async Task EntityValidate(string forename, string surname, string phoneNumber, string email,
             string whoAdded, DateTime whenAdded, TypeId? id = null, string? whoChanged = null,
             DateTime? whenChanged = null, string? note = null, DateTime? isDeleted = null) {

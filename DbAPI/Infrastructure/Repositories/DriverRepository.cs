@@ -38,6 +38,21 @@ namespace DbAPI.Infrastructure.Repositories {
             return entity.Id;
         }
 
+        public async Task AddCollectionAsync(IList<Driver> entities) {
+            foreach (var entity in entities) {
+                entity.WhoChanged = null;
+                entity.WhenChanged = null;
+                entity.IsDeleted = null;
+
+                await EntityValidate(entity.Forename, entity.Surname, entity.PhoneNumber, entity.DriverLicenceSeries,
+                    entity.DriverLicenceNumber, entity.WhoAdded, entity.WhenAdded, entity.Id, entity.WhoChanged,
+                    entity.WhenChanged, entity.Note, entity.IsDeleted);
+
+                await _context.Drivers.AddAsync(entity);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         private async Task EntityValidate(string forename, string surname, string phoneNumber,
             string driverLicenceSeries, string driverLicenceNumber, string? whoAdded = null,
             DateTime? whenAdded = null, TypeId? id = null, string? whoChanged = null, DateTime? whenChanged = null,
