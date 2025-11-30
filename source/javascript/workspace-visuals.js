@@ -5,6 +5,7 @@ import { clearSearch, displayTableData, hideTableInterface } from "./database-vi
 import { MessageBox, SectionName } from "./form-utils.js";
 import { initStatisticsSection } from "./statistics.js";
 import { TableVariables } from "./table-utils.js";
+import { showUserInfoSection } from "./user-info.js";
 
 window.showNavigationMenu = showNavigationMenu;
 window.hideNavigationMenu = hideNavigationMenu;
@@ -52,7 +53,7 @@ async function showSection(sectionName = null, isLoadListener = false) {
     }
 
     // Скрываем все разделы
-    const sections = document.querySelectorAll('.main, .database, .statistics, .admin-panel');
+    const sections = document.querySelectorAll('.main, .database, .statistics, .admin-panel, .user-profile');
     sections.forEach(section => {
         section.style.display = 'none';
         section.classList.remove('active-section');
@@ -104,6 +105,9 @@ async function showSection(sectionName = null, isLoadListener = false) {
             headerIcon.src = 'assets/icons/admin-panel.svg';
             await switchTab('Учетные записи');
             hideTableInterface();
+        } else if (sectionName === SectionName.USER_INFO[1]) {
+            headerIcon.src = 'assets/icons/user-profile.svg';
+            showUserInfoSection();
         }
     }
     

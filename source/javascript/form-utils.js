@@ -8,6 +8,7 @@ export class SectionName {
     static DATABASE = ['База данных', 'database'];
     static STATISTICS = ['Статистика', 'statistics'];
     static ADMIN_PANEL = ['Панель администратора', 'admin-panel'];
+    static USER_INFO = ['Профиль пользователя', 'user-profile'];
 
     static getViewName(divSectionName) {
         const sections = Object.values(SectionName); // все поля данного класса
