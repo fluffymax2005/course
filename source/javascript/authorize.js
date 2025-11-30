@@ -61,8 +61,8 @@ export class AuthService {
             
 
             // Замена старых куки на новые
-            const cookies = ['token', 'tokenExpireTime', 'userRights', 'userName'];
-            const cookiesValues = [data.token, data.tokenExpireTime, data.userRights, data.username];
+            const cookies = ['token', 'tokenExpireTime', 'userRights', 'userName', 'email'];
+            const cookiesValues = [data.token, data.tokenExpireTime, data.userRights, data.username, data.email];
 
             cookies.forEach((cookie, index) => {
                 localStorage.removeItem(cookie);
