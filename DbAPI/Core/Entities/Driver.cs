@@ -54,7 +54,7 @@ namespace DbAPI.Core.Entities {
         public static bool DriverLicenceSeriesValidate(string driverLicenceSeries) {
             if (driverLicenceSeries.IsNullOrEmpty() || driverLicenceSeries.Length != 2) {
                 return false;
-            } else if (driverLicenceSeries.Any(c => char.IsUpper(c) || c < 'A' || c > 'Z')) {
+            } else if (driverLicenceSeries.Any(c => !char.IsUpper(c) || c < 'A' || c > 'Z')) {
                 return false;
             }
             return true;
