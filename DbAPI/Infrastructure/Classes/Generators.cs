@@ -50,7 +50,7 @@ namespace DbAPI.Infrastructure.Classes {
             }).ToList();
         }
 
-        public static List<Core.Entities.Route> GenerateRoutes(TypeId count) {
+        public static List<Route> GenerateRoutes(TypeId count) {
             var districts = new[] { "Центральный", "Северный", "Южный", "Западный", "Восточный" };
             var streetTypes = new[] { "ул.", "пр.", "пер.", "б-р", "наб." };
             var streetNames = new[] { "Ленина", "Гагарина", "Пушкина", "Советская", "Мира" };
