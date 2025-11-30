@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+    <meta charset = "utf-8">
+    <meta name = "viewport" content = "width = device-width">
+
+    <title>Авторизация</title>
+    <link rel="stylesheet" href="source/css/authorize.css">
+
+    <script type="module" src="source/javascript/authorize.js"></script>
+    <script type="module" src="source/javascript/authorize-visuals.js"></script>
+    <body>
+        
+        <div class="forms-container">
+            <div class="form authorize-form active">
+                <div class="icon">
+                    <img src="assets/icons/dark/authorize-icon.svg" id="authorize-icon">
+                </div>
+            
+                <h1 id="authorizeHeader">Авторизация</h1>
+                
+                <form id="authorizeForm">
+                    <div class="login-group">
+                        <label for="login" class="input-label">Логин</label>
+                        <input type = "text"
+                            id="loginAuthorize"
+                            class="input-box"
+                            placeholder="Введите логин или адрес электронной почты"
+                            required>
+                    </div>
+                    <div class="password-group">
+                        <label for="password" class="input-label">Пароль</label>
+                        <input type = "password"
+                            id="passwordAuthorize"
+                            class="input-box"
+                            placeholder="Введите пароль"
+                            required>
+                    </div>
+                    <button type="button"
+                        class="action-button" 
+                        id="enterButton" 
+                        onclick="AuthService.login()"`>Авторизация
+                    </button>
+                    <ul class="nav-labels">
+                        <li><a id="registerLabel" 
+                            onclick="showRegisterForm()">Регистрация</a></li>
+                        <li><a id="forgotPasswordLabel"
+                            onclick="showForgotPasswordForm()">Забыли пароль?</a></li>
+                    </ul>
+                    <p class="output-message" id="authorizeMessage"></p>
+                </form>
+            </div>
+
+            <div class="form register-form">
+                <div class="icon">
+                    <img src="assets/icons/dark/register-icon.svg" id="register-icon">
+                </div>
+                <h1 id="registerHeader">Регистрация</h1>
+                
+                <form id="registerForm">
+                    <div class="login-group">
+                        <label for="login" class="input-label">Логин</label>
+                        <input type = "text"
+                            id="loginRegister"
+                            class="input-box"
+                            placeholder="Введите логин"
+                            required>
+                    </div>
+                    <div class="email-group">
+                        <label for="email" class="input-label">Электронная почта</label>
+                        <input type = "text"
+                            id="emailRegister"
+                            class="input-box"
+                            placeholder="Введите адрес электронной почты"
+                            required>
+                    </div>
+                    <div class="password-group">
+                        <label for="password" class="input-label">Пароль</label>
+                        <input type="password"
+                            id="passwordRegister"
+                            class="input-box"
+                            placeholder="Введите пароль"
+                            required
+                            onfocus="registerShowGeneratePassword()">
+                    </div>
+                    <div class="password-confirm-group">
+                        <label for="password" class="input-label">Подтверждение пароля</label>
+                        <input type = "password"
+                            id="confirmPasswordRegister"
+                            class="input-box"
+                            placeholder="Подтвердите пароль"
+                            required>
+                    </div>
+
+                    <button type="button"
+                        class="action-button"
+                        id="registerButton"
+                        onclick="AuthService.register()">Регистрация
+                    </button>
+                    
+                    <p class="back-text"
+                        id="registerBackLabel"
+                        onclick="showAuthorizeForm()">Вернуться назад
+                    </p>  
+                                      
+                    <p class="output-message" id="registerMessage"></p>
+                </form>
+            </div>
+
+            <div class="form recovery-form">
+                <h1 id="forgotPasswordHeader">Восстановление пароля</h1>
+                <p class="recovery-description">
+                    Введите адрес электронной почты, привязанный к вашему аккаунту.
+                    Мы отправим вам инструкции для восстановления пароля.
+                </p>
+
+                <form id="recoveryForm">
+                    <div class="recovery-group">
+                        <label for="email" class="input-label">Электронная почта</label>
+                        <input type="email"
+                            id="recoverEmail"
+                            class="input-box"
+                            placeholder="Введите адрес электронной почты"
+                            required>
+                    </div>
+
+                    <button type="button" 
+                        class="action-button" 
+                        id="recoveryButton"
+                        onclick="AuthService.recover()">Восстановить
+                    </button>
+                </form>
+
+                <p class="back-text"
+                    id="recoverBackLabel"
+                        onclick="showAuthorizeForm()">Вернуться назад
+                </p>
+                <p class="output-message" id="recoverMessage">✅ Инструкции по восстановлению пароля отправлены на указанную почту почту!</p>
+            </div>
+        </div>
+    </body>
+</html>
