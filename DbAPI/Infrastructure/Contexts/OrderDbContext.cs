@@ -37,7 +37,7 @@ namespace DbAPI.Infrastructure.Contexts {
                 entity.Property(e => e.WhenChanged).HasColumnOrder(10);
                 entity.Property(e => e.Note).HasColumnOrder(11);
                 entity.Property(e => e.IsDeleted).HasColumnOrder(12);
-            });           
+            });
 
             ///////////////////////////
 

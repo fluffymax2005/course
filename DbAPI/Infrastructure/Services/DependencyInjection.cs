@@ -25,6 +25,14 @@ namespace DbAPI.Infrastructure.Services {
             services.AddScoped<RoleRepository>();
             services.AddScoped<IRepository<Credential, TypeId>, CredentialRepository>();
 
+            // Partical reposes
+            services.AddScoped<OrderRepository>();
+            services.AddScoped<CustomerRepository>();
+            services.AddScoped<DriverRepository>();
+            services.AddScoped<RateRepository>();
+            services.AddScoped<RouteRepository>();
+            services.AddScoped<TransportVehicleRepository>();
+
             return services;
         }
 

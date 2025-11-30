@@ -10,7 +10,7 @@ namespace DbAPI.Infrastructure.Classes {
 
         private static readonly string[] phone_numbers = new string[] { };
 
-        public static List<Customer> GenerateCustomers(TypeId count) {
+        public static List<Customer> GenerateCustomers(TypeId count, bool useAutoKeyGeneration = false) {
             string[] male_names = File.ReadAllLines($"{PERSON_DATA_PATH}/male_names.txt");
             string[] male_surnames = File.ReadAllLines($"{PERSON_DATA_PATH}/male_surnames.txt");
 
@@ -38,7 +38,7 @@ namespace DbAPI.Infrastructure.Classes {
                 phone_numbers.Concat(new string[] { phoneNumber }.ToArray());
 
                 return new Customer {
-                    Id = i,
+                    Id = useAutoKeyGeneration ? 0 : i,
                     Forename = forename,
                     Surname = surname,
                     PhoneNumber = phoneNumber,
@@ -50,7 +50,7 @@ namespace DbAPI.Infrastructure.Classes {
             }).ToList();
         }
 
-        public static List<Route> GenerateRoutes(TypeId count) {
+        public static List<Route> GenerateRoutes(TypeId count, bool useAutoKeyGeneration = false) {
             var districts = new[] { "Центральный", "Северный", "Южный", "Западный", "Восточный" };
             var streetTypes = new[] { "ул.", "пр.", "пер.", "б-р", "наб." };
             var streetNames = new[] { "Ленина", "Гагарина", "Пушкина", "Советская", "Мира" };
@@ -73,7 +73,7 @@ namespace DbAPI.Infrastructure.Classes {
                 } while (dropOff == boarding);
 
                 return new Route {
-                    Id = i,
+                    Id = useAutoKeyGeneration ? 0 : i,
                     BoardingAddress = boarding,
                     DropAddress = dropOff,
                     WhoAdded = "system",
@@ -83,7 +83,7 @@ namespace DbAPI.Infrastructure.Classes {
             }).ToList();
         }
 
-        public static List<Driver> GenerateDrivers(TypeId count) {
+        public static List<Driver> GenerateDrivers(TypeId count, bool useAutoKeyGeneration = false) {
             string[] male_names = File.ReadAllLines($"{PERSON_DATA_PATH}/male_names.txt");
             string[] male_surnames = File.ReadAllLines($"{PERSON_DATA_PATH}/male_surnames.txt");
 
@@ -115,7 +115,7 @@ namespace DbAPI.Infrastructure.Classes {
                 phone_numbers.Concat(new string[] { phoneNumber }.ToArray());
 
                 return new Driver {
-                    Id = i,
+                    Id = useAutoKeyGeneration ? 0 : i,
                     Forename = forename,
                     Surname = surname,
                     PhoneNumber = phoneNumber,
@@ -130,7 +130,7 @@ namespace DbAPI.Infrastructure.Classes {
             }).ToList();
         }
 
-        public static List<TransportVehicle>? GenerateTransportVehicles(List<Driver> drivers, TypeId count) {
+        public static List<TransportVehicle>? GenerateTransportVehicles(List<Driver> drivers, TypeId count, bool useAutoKeyGeneration = false) {
             // Проверка, что список водителей не пуст
             if (drivers == null || drivers.Count == 0)
                 return null;
@@ -167,7 +167,7 @@ namespace DbAPI.Infrastructure.Classes {
                 usedDriverIds.Add(driver.Id);
 
                 return new TransportVehicle {
-                    Id = i,
+                    Id = useAutoKeyGeneration ? 0 : i,
                     DriverId = driver.Id, // Связываем с конкретным водителем
                     Number = $"{letters[_random.Next(letters.Length)]}" +
                             $"{_random.Next(0, 10)}{_random.Next(0, 10)}{_random.Next(0, 10)}" +
@@ -186,7 +186,7 @@ namespace DbAPI.Infrastructure.Classes {
             }).ToList();
         }
 
-        public static List<Rate>? GenerateRates(List<Driver> drivers, List<TransportVehicle> vehicles, TypeId count = 5) {
+        public static List<Rate>? GenerateRates(List<Driver> drivers, List<TransportVehicle> vehicles, TypeId count = 5, bool useAutoKeyGeneration = false) {
             // Проверка наличия связанных данных
             if (drivers == null || drivers.Count == 0)
                 return null;
@@ -218,7 +218,7 @@ namespace DbAPI.Infrastructure.Classes {
                 rateTypeIndexes.Add(rateTypeIndex);
 
                 return new Rate {
-                    Id = i,
+                    Id = useAutoKeyGeneration ? 0 : i,
                     Forename = rateTypes[rateTypeIndex],
                     MovePrice = move_prices[rateTypeIndex],
                     IdlePrice = idle_prices[rateTypeIndex],
@@ -231,7 +231,8 @@ namespace DbAPI.Infrastructure.Classes {
             }).ToList();
         }
 
-        public static List<Order>? GenerateOrders(List<Customer> customers, List<Core.Entities.Route> routes, List<Rate> rates, List<TransportVehicle> vehicles, TypeId count) {
+        public static List<Order>? GenerateOrders(List<Customer> customers, List<Route> routes, List<Rate> rates, List<TransportVehicle> vehicles,
+            TypeId count, bool useAutoKeyGeneration = false) {
             // Проверка наличия связанных данных
             if (customers == null || customers.Count == 0)
                 return null;
@@ -253,7 +254,7 @@ namespace DbAPI.Infrastructure.Classes {
                 var distance = _random.Next(1, 50); // Дистанция 1-50 км
 
                 return new Order {
-                    Id = i,
+                    Id = useAutoKeyGeneration ? 0 : i,
                     CustomerId = customer.Id,
                     RouteId = route.Id,
                     RateId = rate.Id,
@@ -268,7 +269,7 @@ namespace DbAPI.Infrastructure.Classes {
             }).ToList();
         }
 
-        public static List<Role>? GenerateRoles() {
+        public static List<Role>? GenerateRoles(bool useAutoKeyGeneration = false) {
 
             string[] forenames = ["basic", "editor", "admin", "director"];
             UserRights[] rights = [UserRights.Basic, UserRights.Editor, UserRights.Admin, UserRights.Director];
@@ -278,7 +279,7 @@ namespace DbAPI.Infrastructure.Classes {
 
             return Enumerable.Range(1, 4).Select(i => {
                 return new Role {
-                    Id = i,
+                    Id = useAutoKeyGeneration ? 0 : i,
                     Forename = forenames[i - 1],
                     Rights = rights[i - 1],
                     CanGet = true,
@@ -291,13 +292,13 @@ namespace DbAPI.Infrastructure.Classes {
             }).ToList();
         }
 
-        public static List<Credential>? GenerateCredentials() {
+        public static List<Credential>? GenerateCredentials(bool useAutoKeyGeneration = false) {
             TypeId[] roleIDs = { 1, 2, 3 };
             string[] usernames = { "basic", "editor", "admin" };
 
             return Enumerable.Range(1, 3).Select(i => {
                 return new Credential {
-                    Id = i,
+                    Id = useAutoKeyGeneration ? 0 : i,
                     Username = usernames[i - 1],
                     Password = Hasher.HashPassword("JcGDN9ST5KEG!"),
                     Email = $"santech_montage@mail.ru",

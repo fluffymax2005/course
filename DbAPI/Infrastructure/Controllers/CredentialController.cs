@@ -223,7 +223,7 @@ namespace DbAPI.Infrastructure.Controllers {
             _logger.LogInformation($"Запрос на сброс пароля создан для токена {token}");
 
 #if SWAGGER
-                string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "DbAPI", "Presentation", "wwwroot", "reset-password.html");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "DbAPI", "Presentation", "wwwroot", "reset-password.html");
 #endif
 #if DOCKER
                 string path = Path.Combine(Directory.GetCurrentDirectory(), "Presentation", "wwwroot", "reset-password.html");

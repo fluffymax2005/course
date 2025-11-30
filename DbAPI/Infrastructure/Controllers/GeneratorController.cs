@@ -1,6 +1,6 @@
 ﻿using DbAPI.Core.Entities;
 using DbAPI.Infrastructure.Classes;
-using DbAPI.Infrastructure.Interfaces;
+using DbAPI.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Route = DbAPI.Core.Entities.Route;
@@ -12,21 +12,21 @@ namespace DbAPI.Infrastructure.Controllers {
     [ApiController]
     public class GeneratorController : ControllerBase {
         private readonly ILogger<GeneratorController> _logger;
-        private readonly IRepository<Order, TypeId> _orderRepository;
-        private readonly IRepository<Customer, TypeId> _customerRepository;
-        private readonly IRepository<Driver, TypeId> _driverRepository;
-        private readonly IRepository<Rate, TypeId> _rateRepository;
-        private readonly IRepository<Route, TypeId> _routeRepository;
-        private readonly IRepository<TransportVehicle, TypeId> _vehicleRepository;
+        private readonly OrderRepository _orderRepository;
+        private readonly CustomerRepository _customerRepository;
+        private readonly DriverRepository _driverRepository;
+        private readonly RateRepository _rateRepository;
+        private readonly RouteRepository _routeRepository;
+        private readonly TransportVehicleRepository _vehicleRepository;
 
         public GeneratorController(
-            ILogger<GeneratorController> logger, 
-            IRepository<Order, TypeId> orderRepository,
-            IRepository<Customer, TypeId> customerRepository,
-            IRepository<Driver, TypeId> driverRepository,
-            IRepository<Rate, TypeId> rateRepository,
-            IRepository<Route, TypeId> routeRepository,
-            IRepository<TransportVehicle, TypeId> vehicleRepository) {
+            ILogger<GeneratorController> logger,
+            OrderRepository orderRepository,
+            CustomerRepository customerRepository,
+            DriverRepository driverRepository,
+            RateRepository rateRepository,
+            RouteRepository routeRepository,
+            TransportVehicleRepository vehicleRepository) {
 
             _logger = logger;
             _orderRepository = orderRepository;
@@ -60,7 +60,7 @@ namespace DbAPI.Infrastructure.Controllers {
             var rates = (List<Rate>)await _rateRepository.GetAllAsync();
             var vehicles = (List<TransportVehicle>)await _vehicleRepository.GetAllAsync();
 
-            var generatedOrders = Generators.GenerateOrders(customers, routes, rates, vehicles, count);
+            var generatedOrders = Generators.GenerateOrders(customers, routes, rates, vehicles, count, true);
             if (generatedOrders == null || generatedOrders.Count == 0) {
                 _logger.LogError($"GeneratorController.GenerateOrders({count}) завершилась неуспешно. Причина: " +
                     $"генерация невозможна. Отсутствует(-ют) одна или несколько зависимых таблиц.");
@@ -68,13 +68,13 @@ namespace DbAPI.Infrastructure.Controllers {
             }
 
             foreach (var entity in generatedOrders) {
-                entity.Id = 0;
-                await _orderRepository.AddAsync(entity);
+                entity.WhoAdded = User.Identity.Name;
             }
-                
+
+            await _orderRepository.AddCollectionAsync(generatedOrders);
 
             _logger.LogInformation($"GeneratorController.GenerateOrders({count}) завершилась успешно.");
-            return Ok(new { message = "Генерация прошла успешно."});
+            return Ok(new { message = "Генерация прошла успешно." });
         }
 
         [HttpGet("customer")]
@@ -95,7 +95,7 @@ namespace DbAPI.Infrastructure.Controllers {
                 return BadRequest(new { message = "Генерация невозможна. Запрошенное количество записей превышает максимальную вместимость таблицы БД." });
             }
 
-            var generatedCustomers = Generators.GenerateCustomers(count);
+            var generatedCustomers = Generators.GenerateCustomers(count, true);
             if (generatedCustomers == null || generatedCustomers.Count == 0) {
                 _logger.LogError($"GeneratorController.GenerateCustomers({count}) завершилась неуспешно. Причина: " +
                     $"генерация невозможна. Внутренняя ошибка Generators.GenerateCustomers({count}).");
@@ -103,10 +103,11 @@ namespace DbAPI.Infrastructure.Controllers {
             }
 
             foreach (var entity in generatedCustomers) {
-                entity.Id = 0;
-                await _customerRepository.AddAsync(entity);
+                entity.WhoAdded = User.Identity.Name;
             }
-                
+
+            await _customerRepository.AddCollectionAsync(generatedCustomers);
+
             _logger.LogInformation($"GeneratorController.GenerateCustomers({count}) завершилась успешно.");
             return Ok(new { message = "Генерация прошла успешно." });
         }
@@ -129,7 +130,7 @@ namespace DbAPI.Infrastructure.Controllers {
                 return BadRequest(new { message = "Генерация невозможна. Запрошенное количество записей превышает максимальную вместимость таблицы БД." });
             }
 
-            var generatedDrivers = Generators.GenerateDrivers(count);
+            var generatedDrivers = Generators.GenerateDrivers(count, true);
             if (generatedDrivers == null || generatedDrivers.Count == 0) {
                 _logger.LogError($"GeneratorController.GenerateDrivers({count}) завершилась неуспешно. Причина: " +
                     $"генерация невозможна. Внутренняя ошибка Generators.GenerateDrivers({count}).");
@@ -137,9 +138,10 @@ namespace DbAPI.Infrastructure.Controllers {
             }
 
             foreach (var entity in generatedDrivers) {
-                entity.Id = 0;
-                await _driverRepository.AddAsync(entity);
+                entity.WhoAdded = User.Identity.Name;
             }
+
+            await _driverRepository.AddCollectionAsync(generatedDrivers);
 
             _logger.LogInformation($"GeneratorController.GenerateDrivers({count}) завершилась успешно.");
             return Ok(new { message = "Генерация прошла успешно." });
@@ -166,19 +168,21 @@ namespace DbAPI.Infrastructure.Controllers {
             var drivers = (List<Driver>)await _driverRepository.GetAllAsync();
             var vehicles = (List<TransportVehicle>)await _vehicleRepository.GetAllAsync();
 
-            var generatedRates = Generators.GenerateRates(drivers, vehicles, count);
+            var generatedRates = Generators.GenerateRates(drivers, vehicles, count, true);
             if (generatedRates == null || generatedRates.Count == 0) {
                 _logger.LogError($"GeneratorController.GenerateRates({count}) завершилась неуспешно. Причина: " +
                     $"генерация невозможна. Отсутствует(-ют) одна или несколько зависимых таблиц, либо число тарифов меньше 5, либо тарифы уже сгенерированы.");
-                return BadRequest(new { message = "Генерация невозможна. Отсутствует(-ют) одна или несколько зависимых таблиц, " +
+                return BadRequest(new {
+                    message = "Генерация невозможна. Отсутствует(-ют) одна или несколько зависимых таблиц, " +
                     "либо число тарифов меньше 5, либо тарифы уже сгенерированы."
                 });
             }
 
             foreach (var entity in generatedRates) {
-                entity.Id = 0;
-                await _rateRepository.AddAsync(entity);
+                entity.WhoAdded = User.Identity.Name;
             }
+
+            await _rateRepository.AddCollectionAsync(generatedRates);
 
             _logger.LogInformation($"GeneratorController.GenerateRates({count}) завершилась успешно.");
             return Ok(new { message = "Генерация прошла успешно." });
@@ -202,7 +206,7 @@ namespace DbAPI.Infrastructure.Controllers {
                 return BadRequest(new { message = "Генерация невозможна. Запрошенное количество записей превышает максимальную вместимость таблицы БД." });
             }
 
-            var generatedRoutes = Generators.GenerateRoutes(count);
+            var generatedRoutes = Generators.GenerateRoutes(count, true);
             if (generatedRoutes == null || generatedRoutes.Count == 0) {
                 _logger.LogError($"GeneratorController.GenerateRoutes({count}) завершилась неуспешно. Причина: " +
                     $"генерация невозможна. Внутренняя ошибка Generators.GenerateRoutes({count}).");
@@ -210,9 +214,10 @@ namespace DbAPI.Infrastructure.Controllers {
             }
 
             foreach (var entity in generatedRoutes) {
-                entity.Id = 0;
-                await _routeRepository.AddAsync(entity);
+                entity.WhoAdded = User.Identity.Name;
             }
+
+            await _routeRepository.AddCollectionAsync(generatedRoutes);
 
             _logger.LogInformation($"GeneratorController.GenerateRoutes({count}) завершилась успешно.");
             return Ok(new { message = "Генерация прошла успешно." });
@@ -238,7 +243,7 @@ namespace DbAPI.Infrastructure.Controllers {
 
             var drivers = (List<Driver>)await _driverRepository.GetAllAsync();
 
-            var generatedVehicles = Generators.GenerateTransportVehicles(drivers, count);
+            var generatedVehicles = Generators.GenerateTransportVehicles(drivers, count, true);
             if (generatedVehicles == null || generatedVehicles.Count == 0) {
                 _logger.LogError($"GeneratorController.GenerateVehicles({count}) завершилась неуспешно. Причина: " +
                     $"генерация невозможна. Отсутствует(-ют) одна или несколько зависимых таблиц.");
@@ -246,9 +251,10 @@ namespace DbAPI.Infrastructure.Controllers {
             }
 
             foreach (var entity in generatedVehicles) {
-                entity.Id = 0;
-                await _vehicleRepository.AddAsync(entity);
+                entity.WhoAdded = User.Identity.Name;
             }
+
+            await _vehicleRepository.AddCollectionAsync(generatedVehicles);
 
             _logger.LogInformation($"GeneratorController.GenerateVehicles({count}) завершилась успешно.");
             return Ok(new { message = "Генерация прошла успешно." });
