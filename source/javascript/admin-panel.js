@@ -451,6 +451,11 @@ async function saveRole(event) {
 
 async function generate(entity) {
     const entityCountInput = document.getElementById('entityCount');
+    if (entityCountInput.value === '') {
+        MessageBox.ShowFromCenter('Введите количество записей', 'red');
+        return;
+    }
+
     const entityCount = parseInt(entityCountInput.value);
 
     if (entityCount <= 0) {
