@@ -1,0 +1,223 @@
+.statistics {
+    background: #D8DDFE;
+    min-height: 800px;
+}
+
+.statistics-container {
+    box-sizing: border-box;
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.struct {
+    align-items: start;
+    display: flex;
+    background: #b9c2fb;
+    border-radius: 12px;
+    min-height: 500px;
+}
+
+.struct:not(.active) {
+    opacity: 0;
+    display: none;
+    pointer-events: none;
+}
+
+.struct.active {
+    opacity: 1;
+    pointer-events: all;
+    display: flex;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.statistics-select-structure {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 0;
+    background: #C6E8FD;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.statistics-select-structure label {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 20px;
+    padding-bottom: 2px;
+}
+
+.statistics-select-structure select {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.statistics-select-structure select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.statistics-select-structure select:hover {
+    border-color: #cbd5e0;
+}
+
+.dashboard {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-self: flex-start;
+    height: auto;
+    border-radius: 12px;
+    max-width: 20%;
+}
+
+.category-container {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+}
+
+.category-container select,
+.time-interval-container select {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+}
+
+.category-container label {
+    margin-bottom: 5px;
+}
+
+.time-interval-container {
+    margin-top: 5px;
+    padding-top: 5px;
+}
+
+.time-interval-container input {
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.time-interval-container label {
+    margin-bottom: 5px;
+}
+
+.header-container {
+    margin-bottom: 5px;
+}
+
+.header-container label {
+    justify-content: center;
+    display: flex;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.year-start-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.year-end-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.time-interval-container button {
+    width: 100%;
+    color: black;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    background: #C3FDE4;
+    justify-content: center;
+    margin-top: 5px;
+}
+
+.time-interval-container button:hover {
+    transform: translateY(-2px);
+    box-shadow:  0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.time-type-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.time-type-container select {
+    margin-bottom: 8px;
+}
+
+.display {
+    position: relative;
+    width: 100%;
+    min-height: 100px;
+    height: auto;
+    padding: 20px;
+    font-size: 16px;
+    border-left: none;
+    align-self: stretch;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 2px solid rgba(0, 0, 0, 0.3);
+}
+
+.display canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#statisticsSectionHeader {
+    background: #E0F3FE;
+    color: black;
+}
+
+.popular-container select {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+}
+
+.popular-container label {
+    margin-bottom: 5px;
+}
+
