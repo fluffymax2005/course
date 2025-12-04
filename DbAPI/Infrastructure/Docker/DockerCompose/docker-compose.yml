@@ -1,5 +1,5 @@
 networks:
-  dbapiapp:
+  fullstack:
 
 services:
  sqlserver-data:
@@ -12,7 +12,7 @@ services:
     ports:
       - 8002:1433
     networks:
-      - dbapiapp
+      - fullstack
 
  sqlserver-credentials:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -24,7 +24,7 @@ services:
     ports:
       - 8003:1433
     networks:
-      - dbapiapp  
+      - fullstack  
  dbapi:
     container_name: DbAPI
     image: ${DOCKER_REGISTRY-}dbapi
@@ -47,4 +47,15 @@ services:
       - LOG_PATH=logs/
       - SECRETS_PATH=Infrastructure/Secrets/;
     networks:
-      - dbapiapp
+      - fullstack
+ frontend:
+    container_name: UI
+    build:
+      context: ../../../
+      dockerfile: Presentation/Docker/Dockerfile
+    ports:
+      - 5000:81
+    depends_on:
+      - dbapi
+    networks:
+      - fullstack
