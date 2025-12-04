@@ -80,7 +80,7 @@ export class AuthService {
 
         // Успешный переход в рабочую область
         setTimeout(() => {
-            window.location.href = '../../workspace-form/index.html';
+            window.location.href = '../workspace-form/';
         }, 2000);        
     }
 
