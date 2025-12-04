@@ -1,6 +1,26 @@
-# Ignore build files
+# Ignore root folder files
 .vs/
 gui/bin
 gui/obj
 db/bin
 db/obj
+.github/
+
+DbAPi.sln
+
+# Ignore project folder files
+
+*.vs*
+*bin*
+*obj*
+*Migrations*
+DbAPI/Properties/
+*logs*
+
+DbAPI/DbAPI.csproj
+DbAPI/DbAPI.csproj.user
+DbAPI/appsettings.json
+
+# Ignore secrets directory
+DbAPI/Infrastructure/Secrets/EmailSettings.json
+DbAPI/Infrastructure/Secrets/JwtSettings.json

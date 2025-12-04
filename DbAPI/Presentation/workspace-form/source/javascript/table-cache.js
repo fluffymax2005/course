@@ -1,0 +1,37 @@
+// Кэширование данных при запросе из БД.
+export class TableCache {
+    constructor() {
+        this.cacheKey = 'db_cache_';
+    }
+
+    // Сохраняем данные в кэш
+    set(tableName, data) {
+        const cacheData = {
+            data: data,
+            timestamp: Date.now(),
+            expiresAt: Date.now() + this.cacheDuration
+        };
+        localStorage.setItem(this.cacheKey + tableName, JSON.stringify(cacheData));
+    }
+
+    // Получаем данные из кэша
+    get(tableName) {
+        const cached = localStorage.getItem(this.cacheKey + tableName);
+        if (!cached) return null;
+
+        const cacheData = JSON.parse(cached);
+        return cacheData.data;
+    }
+
+    // Очищаем кэш для конкретной таблицы
+    clear(tableName) {
+        localStorage.removeItem(this.cacheKey + tableName);
+    }
+
+    // Очищаем весь кэш
+    clearAll() {
+        Object.keys(localStorage)
+            .filter(key => key.startsWith(this.cacheKey))
+            .forEach(key => localStorage.removeItem(key));
+    }
+}
