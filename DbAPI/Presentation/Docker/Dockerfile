@@ -6,8 +6,8 @@ WORKDIR /app
 EXPOSE 81
 
 # COPY frontend data
-COPY ["Presentation/authorize-form", "./authorize-form"]
-COPY ["Presentation/workspace-form", "./workspace-form"]
+COPY ["authorize-form", "./authorize-form"]
+COPY ["workspace-form", "./workspace-form"]
 
 # Initiate static server + ASP.NET
 CMD ["serve", ".", "-l", "81"]

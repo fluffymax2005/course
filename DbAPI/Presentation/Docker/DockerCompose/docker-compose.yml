@@ -1,0 +1,13 @@
+networks:
+  frontend:
+
+services:
+ frontend:
+    container_name: UI
+    build:
+      context: ../../
+      dockerfile: Docker/Dockerfile
+    ports:
+      - 5000:81
+    networks:
+      - frontend
