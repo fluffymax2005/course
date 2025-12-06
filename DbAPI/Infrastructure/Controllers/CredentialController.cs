@@ -39,12 +39,6 @@ namespace DbAPI.Infrastructure.Controllers {
             return entity.Id;
         }
 
-        [HttpGet("test")]
-        public async Task<IActionResult> Test() {
-            _logger.LogInformation("CredentialController:Test()");
-            return Ok($"Подключение к БД успешно установлено: {DateTime.Now}");
-        }
-
         [HttpPost("login")]
         [EnableRateLimiting("LoginPolicy")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginPrompt request) {
