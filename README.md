@@ -17,7 +17,7 @@ Create folder for your project. Go to your project folder.
 
 <h2>3. Creating project</h2>
 
-Create ASP.NET WEB API project
+Create ASP.NET WEB API project<br>
 <code>
 dotnet new webapi -o DbAPI -f net8.0<br>
 cd DbAPI
@@ -68,6 +68,8 @@ If you are going to use ONLY Swagger add following code:
   <DefineConstants>$(DefineConstants);SWAGGER</DefineConstants>
 </PropertyGroup>
 ```
+
+Note: using both constants may cause compile/logic errors
 
 <h2>6. Secrets files</h2>
 
