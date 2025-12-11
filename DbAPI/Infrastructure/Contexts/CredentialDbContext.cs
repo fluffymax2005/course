@@ -5,11 +5,15 @@ using Microsoft.EntityFrameworkCore;
 namespace DbAPI.Infrastructure.Contexts {
 
     public class CredentialDbContext : DbContext {
+        private readonly IConfiguration _configuration;
+
         public DbSet<Credential> Credentials { get; set; }
         public DbSet<Role> Roles { get; set; }
 
-        public CredentialDbContext(DbContextOptions<CredentialDbContext> options) : base(options) {
+        public CredentialDbContext(DbContextOptions<CredentialDbContext> options, IConfiguration configuration) : base(options) {
+            _configuration = configuration;
             Database.EnsureCreated();
+
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
@@ -19,7 +23,7 @@ namespace DbAPI.Infrastructure.Contexts {
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
 
-            var roles = Generators.GenerateRoles();
+            bool includeSeedData = _configuration.GetValue<bool>("IncludeSeedData");
 
             modelBuilder.Entity<Role>(entity => {
                 entity.Property(e => e.Id).ValueGeneratedOnAdd().IsRequired().HasColumnOrder(1);
@@ -37,11 +41,7 @@ namespace DbAPI.Infrastructure.Contexts {
                 entity.Property(e => e.IsDeleted).HasColumnOrder(13);
             });
 
-            modelBuilder.Entity<Role>().HasData(roles);
-
             ///////////////////////////
-
-            var credentials = Generators.GenerateCredentials();
 
             modelBuilder.Entity<Credential>(entity => {
                 entity.Property(e => e.Id).ValueGeneratedOnAdd().IsRequired().HasColumnOrder(1);
@@ -57,7 +57,13 @@ namespace DbAPI.Infrastructure.Contexts {
                 entity.Property(e => e.IsDeleted).HasColumnOrder(11);
             });
 
-            modelBuilder.Entity<Credential>().HasData(credentials);
+            if (includeSeedData) {
+                var roles = Generators.GenerateRoles();
+                modelBuilder.Entity<Role>().HasData(roles);
+
+                var credentials = Generators.GenerateCredentials();
+                modelBuilder.Entity<Credential>().HasData(credentials);
+            }
         }
     }
 }

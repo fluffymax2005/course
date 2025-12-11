@@ -3,8 +3,9 @@ using DbAPI.Infrastructure.Classes;
 using Microsoft.EntityFrameworkCore;
 
 namespace DbAPI.Infrastructure.Contexts {
-
     public class OrderDbContext : DbContext {
+        private readonly IConfiguration _configuration;
+
         public DbSet<Order> Orders { get; set; }
         public DbSet<Rate> Rates { get; set; }
         public DbSet<Core.Entities.Route> Routes { get; set; }
@@ -12,7 +13,8 @@ namespace DbAPI.Infrastructure.Contexts {
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Customer> Customers { get; set; }
 
-        public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options) {
+        public OrderDbContext(DbContextOptions<OrderDbContext> options, IConfiguration configuration) : base(options) {
+            _configuration = configuration;
             Database.EnsureCreated();
         }
 
@@ -23,7 +25,7 @@ namespace DbAPI.Infrastructure.Contexts {
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
 
-            bool includeSeedData = Environment.GetEnvironmentVariable("IncludeSeedData") == "true";
+            bool includeSeedData = _configuration.GetValue<bool>("IncludeSeedData");
 
             modelBuilder.Entity<Customer>(entity => {
                 entity.Property(e => e.Id).IsRequired().ValueGeneratedOnAdd().HasColumnOrder(1);
